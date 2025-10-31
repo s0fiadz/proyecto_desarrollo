@@ -1,0 +1,166 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Departamentos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container mt-4">
+    <h2 class="mb-3">Gestión de Departamentos</h2>
+    <hr>
+    
+    <div class="d-flex justify-content-between mb-4">
+        <div>
+            <a href="{% url 'crear_departamento' %}" class="btn btn-success me-2">Nuevo Departamento</a>
+            <a href="{% url 'main_departamento_bloqueado' %}" class="btn btn-warning me-2">Ver departamentos bloqueados</a> 
+            <a href="{% url 'main_admin' %}" class="btn btn-secondary">Volver al menú principal</a>
+        </div>
+        
+        <form method="GET" class="d-flex" action="{% url 'main_departamento' %}">
+            <input type="search" name="search" class="form-control me-2" placeholder="Buscar por Nombre o Dirección" aria-label="Search" value="{{ search_query|default:'' }}">
+            <button class="btn btn-outline-primary" type="submit">Buscar</button>
+            {% if search_query %}
+                <a href="{% url 'main_departamento' %}?direccion_id={{ direccion_id_seleccionada|default:'' }}&ordenar={{ orden_seleccionado|default:'' }}" 
+                   class="btn btn-outline-danger ms-2">Limpiar</a>
+            {% endif %}
+        </form>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="dropdown mb-3">
+        <button class="btn btn-primary dropdown-toggle" type="button" id="filtroDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            Filtrar y Ordenar
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="filtroDropdown">
+            <li><h6 class="dropdown-header">Filtrar por Dirección</h6></li>
+            {% for direccion in todas_las_direcciones %}
+                <li>
+                    <a class="dropdown-item {% if direccion.pk|stringformat:'s' == direccion_id_seleccionada %}active{% endif %}" 
+                       href="{% url 'main_departamento' %}?direccion_id={{ direccion.pk }}&{{ query_params|urlencode }}">
+                        {{ direccion.nombre_direccion }}
+                    </a>
+                </li>
+            {% endfor %}
+            <li><hr class="dropdown-divider"></li>
+            <li>
+                <a class="dropdown-item {% if not direccion_id_seleccionada %}active{% endif %}" 
+                   href="{% url 'main_departamento' %}?ordenar={{ orden_seleccionado|default:'alfabeticamente' }}&search={{ search_query|default:'' }}&page=1">
+                    Mostrar Todos (Limpiar Filtro)
+                </a>
+            </li>
+
+            <li><h6 class="dropdown-header mt-3">Ordenar Por</h6></li>
+            
+            <li>
+                <a class="dropdown-item {% if orden_seleccionado == 'alfabeticamente' or not orden_seleccionado %}active{% endif %}" 
+                   href="{% url 'main_departamento' %}?ordenar=alfabeticamente&direccion_id={{ direccion_id_seleccionada|default:'' }}&search={{ search_query|default:'' }}&page=1">
+                    Alfabéticamente (Nombre)
+                </a>
+            </li>
+            
+            <li>
+                <a class="dropdown-item {% if orden_seleccionado == 'direccion' %}active{% endif %}" 
+                   href="{% url 'main_departamento' %}?ordenar=direccion&direccion_id={{ direccion_id_seleccionada|default:'' }}&search={{ search_query|default:'' }}&page=1">
+                    Dirección
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Encargado</th>
+                    <th>Dirección</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for d in departamentos %}
+                <tr>
+                    <td>{{ d.nombre_dpto }}</td>
+                    <td>
+                        {% with encargado=d.encargadodepartamento_set.first %}
+                            {% if encargado %}
+                                {{ encargado.usuario.username }}
+                            {% else %}
+                                <span class="text-muted">Sin asignar</span>
+                            {% endif %}
+                        {% endwith %}
+                    </td>
+                    <td>{{ d.direccion.nombre_direccion|default:"N/A" }}</td>
+                    <td>
+                        <span class="badge bg-{% if d.state == 'Activo' %}success{% else %}danger{% endif %}">
+                            {{ d.state }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'ver_departamento' d.id %}" class="btn btn-sm btn-info me-1">Ver</a>
+                        <a href="{% url 'editar_departamento' d.id %}" class="btn btn-sm btn-primary me-1">Editar</a>
+                        <a href="{% url 'bloquear_desbloquear_departamento' d.id %}" class="btn btn-sm btn-{% if d.state == 'Activo' %}danger{% else %}success{% endif %}">
+                            {% if d.state == 'Activo' %}Bloquear{% else %}Desbloquear{% endif %}
+                        </a>
+                        <a href="{% url 'asignar_encargado' id_departamento=d.id %}" class="btn btn-sm btn-warning mt-1">
+                            Asignar Encargado
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No hay departamentos registrados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if departamentos.paginator.num_pages > 1 %}
+    <nav aria-label="Paginación de Departamentos">
+        <ul class="pagination justify-content-center">
+            {% if departamentos.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?{{ query_params }}&page={{ departamentos.previous_page_number }}">Anterior</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+            {% endif %}
+            {% for i in departamentos.paginator.page_range %}
+                {% if departamentos.number == i %}
+                    <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                {% else %}
+                    <li class="page-item"><a class="page-link" href="?{{ query_params }}&page={{ i }}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if departamentos.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?{{ query_params }}&page={{ departamentos.next_page_number }}">Siguiente</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+            {% endif %}
+        </ul>
+    </nav>
+    <div class="text-center mb-4">
+        <p class="text-muted">Página {{ departamentos.number }} de {{ departamentos.paginator.num_pages }}</p>
+    </div>
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

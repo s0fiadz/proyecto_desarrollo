@@ -1,0 +1,79 @@
+<h4>Editar Encuesta</h4>
+
+{% if error %}
+<p style="color: red;"><strong>Error:</strong> {{ error }}</p>
+{% endif %}
+
+<form method="post" action="{% url 'encuesta_edit' encuesta.id_encuesta %}">
+    {% csrf_token %}
+    <input type="hidden" name="id_encuesta" value="{{ encuesta.id_encuesta }}" />
+    
+    <p><strong>Datos de la Encuesta:</strong></p>
+    <p><input type="text" name="titulo" placeholder="Ingrese el título" value="{{ encuesta.titulo }}" required /></p>
+    
+    <p>
+        <select name="tipo_incidencia" required>
+            {% for tipo in tipos_incidencia %}
+            <option value="{{ tipo.id_tipo }}" {% if tipo.id_tipo == encuesta.id_tipo_incidencia.id_tipo %}selected{% endif %}>
+                {{ tipo.nombre }}
+            </option>
+            {% endfor %}
+        </select>
+    </p>
+    
+    <p><textarea name="descripcion" placeholder="Ingrese la descripción">{{ encuesta.descripcion }}</textarea></p>
+    
+    <p>
+        <label>Activo:
+            <input type="checkbox" name="activo" {% if encuesta.activo %}checked{% endif %} />
+        </label>
+    </p>
+    
+    <hr>
+    <p><strong>Preguntas de la Encuesta:</strong></p>
+    <div id="preguntas-container">
+        {% for pregunta in preguntas %}
+        <div class="pregunta-item">
+            <input type="hidden" name="ids_preguntas[]" value="{{ pregunta.id_preguntas }}" />
+            <input type="text" name="preguntas_existentes[]" value="{{ pregunta.pregunta }}" placeholder="Ingrese una pregunta" style="width: 70%;" required />
+            <a href="{% url 'eliminar_pregunta' pregunta.id_preguntas %}" onclick="return confirm('¿Está seguro de que desea eliminar esta pregunta?')" style="color: red; margin-left: 10px; text-decoration: none;">✕ Eliminar</a>
+        </div>
+        {% endfor %}
+        
+        <!-- Espacio para nuevas preguntas -->
+        <div class="pregunta-item">
+            <input type="text" name="nuevas_preguntas[]" placeholder="Agregar nueva pregunta (opcional)" style="width: 70%;" />
+            <button type="button" onclick="eliminarPregunta(this)" style="color: red; margin-left: 10px;">✕</button>
+        </div>
+    </div>
+    
+    <p>
+        <button type="button" onclick="agregarPregunta()">+ Agregar otra pregunta</button>
+    </p>
+    
+    <p><input type="submit" value="Guardar Cambios"/></p>
+</form>
+
+<script>
+function agregarPregunta() {
+    const container = document.getElementById('preguntas-container');
+    const newPregunta = document.createElement('div');
+    newPregunta.className = 'pregunta-item';
+    newPregunta.innerHTML = `
+        <input type="text" name="nuevas_preguntas[]" placeholder="Agregar nueva pregunta" style="width: 70%;" />
+        <button type="button" onclick="eliminarPregunta(this)" style="color: red; margin-left: 10px;">✕</button>
+    `;
+    container.appendChild(newPregunta);
+}
+
+function eliminarPregunta(button) {
+    const preguntas = document.querySelectorAll('.pregunta-item');
+    if (preguntas.length > 1) {
+        button.parentElement.remove();
+    } else {
+        alert('Debe haber al menos una pregunta');
+    }
+}
+</script>
+
+<a href="{% url 'encuesta_list' %}">Volver a Encuestas</a>

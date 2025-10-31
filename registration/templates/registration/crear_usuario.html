@@ -1,0 +1,25 @@
+<h2>Crear nuevo usuario</h2>
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" style="margin-top:10px;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<form method="POST">
+    {% csrf_token %}
+
+    <fieldset>
+        <legend>Datos de usuario</legend>
+        {{ user_form.as_p }}
+    </fieldset>
+
+    <fieldset>
+        <legend>Datos de perfil</legend>
+        {{ profile_form.as_p }}
+    </fieldset>
+
+    <button type="submit">Crear usuario</button>
+    <a href="{% url 'main_usuario' %}">Cancelar</a>
+</form>

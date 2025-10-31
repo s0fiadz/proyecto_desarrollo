@@ -1,0 +1,26 @@
+<h2>Asignar encargado a {{ direccion.nombre_direccion }}</h2>
+
+{% if messages %}
+    <ul>
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<form method="POST">
+    {% csrf_token %}
+    <label for="usuario">Seleccionar encargado:</label>
+    <select name="usuario" id="usuario" required>
+        <option value="">-- Seleccione Encargado --</option>
+        {% for usuario in usuarios %}
+            <option value="{{ usuario.id }}">
+                {{ usuario.first_name }} {{ usuario.last_name }}
+            </option>
+        {% endfor %}
+    </select>
+    <br><br>
+    <button type="submit">Asignar</button>
+</form>
+
+<a href="{% url 'main_direccion' %}">Volver</a>

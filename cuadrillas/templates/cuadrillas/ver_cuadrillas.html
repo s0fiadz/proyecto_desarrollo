@@ -1,0 +1,93 @@
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4>Detalles de la Cuadrilla</h4>
+        <a href="{% url 'main_cuadrilla' %}" class="btn btn-secondary">
+            ← Volver a la lista
+        </a>
+    </div>
+
+    <!-- Información de la Cuadrilla -->
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0">
+                {{ cuadrilla_data.nombre_cuadrilla }}
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>ID Cuadrilla:</strong> {{ cuadrilla_data.id_cuadrilla }}</p>
+                    <p><strong>Nombre:</strong> {{ cuadrilla_data.nombre_cuadrilla }}</p>
+                    <p><strong>Departamento:</strong> 
+                        {% if cuadrilla_data.departamento %}
+                            {{ cuadrilla_data.departamento.nombre }}
+                        {% else %}
+                            <span class="text-muted">Sin departamento</span>
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Jefe de Cuadrilla:</strong>
+                        {% if cuadrilla_data.jefe_cuadrilla %}
+                            {{ cuadrilla_data.jefe_cuadrilla.usuario.first_name }} 
+                            {{ cuadrilla_data.jefe_cuadrilla.usuario.last_name }}
+                        {% else %}
+                            <span class="text-muted">Sin jefe asignado</span>
+                        {% endif %}
+                    </p>
+                    <p><strong>Estado:</strong> 
+                        {% if cuadrilla_data.state %}
+                            <span class="badge bg-success">Activa</span>
+                        {% else %}
+                            <span class="badge bg-danger">Inactiva</span>
+                        {% endif %}
+                    </p>
+                    <p><strong>Fecha creación:</strong> {{ cuadrilla_data.created|date:"d/m/Y" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Miembros de la Cuadrilla -->
+    <div class="card shadow mt-4">
+        <div class="card-header bg-info text-white">
+            <h5 class="card-title mb-0">Miembros de la Cuadrilla</h5>
+        </div>
+        <div class="card-body">
+            {% if cuadrilla_data.miembro_cuadrilla_set.all %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered text-center">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Apellido</th>
+                                <th>Cargo</th>
+                                <th>Fecha Ingreso</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for miembro in cuadrilla_data.miembro_cuadrilla_set.all %}
+                            <tr>
+                                <td>{{ miembro.usuario.first_name }}</td>
+                                <td>{{ miembro.usuario.last_name }}</td>
+                                <td>
+                                    {% if miembro.cargo == 'Jefe de Cuadrilla' %}
+                                        <span class="badge bg-primary">{{ miembro.cargo }}</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ miembro.cargo }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ miembro.fecha_ingreso|date:"d/m/Y" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted text-center">No hay miembros en esta cuadrilla.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

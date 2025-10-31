@@ -1,0 +1,35 @@
+<h4>Lista de Incidencias</h4>
+
+<a href="{% url 'incidencia_create' %}">Crear Nueva Incidencia</a>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Dirección</th>
+            <th>Prioridad</th>
+            <th>Estado</th>
+            <th>Fecha</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for incidencia in incidencias %}
+        <tr>
+            <td>{{ incidencia.id_incidencia }}</td>
+            <td>{{ incidencia.direccion }}</td>
+            <td>{{ incidencia.get_prioridad_display }}</td>
+            <td>{{ incidencia.get_estado_display }}</td>
+            <td>{{ incidencia.fecha_creacion|date:"d/m/Y" }}</td>
+            <td>
+                <a href="{% url 'incidencia_view' incidencia.id_incidencia %}">Ver</a>
+                <a href="{% url 'cambiar_estado' incidencia.id_incidencia %}">Cambiar Estado</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6">No hay incidencias registradas</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

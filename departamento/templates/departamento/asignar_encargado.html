@@ -1,0 +1,14 @@
+<h2>Asignar Encargado al Departamento: {{ departamento.nombre_dpto }}</h2>
+
+<form method="post" action="{% url 'asignar_encargado' id_departamento=departamento.id %}">
+    {% csrf_token %}
+    <label for="usuario">Seleccione un usuario:</label>
+    <select name="usuario" id="usuario" required>
+        <option value="">-- Seleccione --</option>
+        {% for u in usuarios %}
+            <option value="{{ u.id }}">{{ u.username }}</option>
+        {% endfor %}
+    </select>
+
+    <button type="submit">Asignar</button>
+</form>

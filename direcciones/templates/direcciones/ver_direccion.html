@@ -1,0 +1,13 @@
+<h4>Ver Dirección</h4>
+<a href="{% url 'main_direccion' %}">Volver al Listado</a>
+<hr>
+<p><strong>Nombre de Dirección:</strong> {{ direccion_data.nombre_direccion }}</p>
+<p><strong>Estado:</strong> 
+    {% if direccion_data.state %}
+        Activo
+    {% else %}
+        Inactivo
+    {% endif %}
+</p>
+<p><strong>Fecha de creación:</strong> {{ direccion_data.created|date:"d/m/Y H:i" }}</p>
+<p><strong>Última actualización:</strong> {{ direccion_data.updated|date:"d/m/Y H:i" }}</p>

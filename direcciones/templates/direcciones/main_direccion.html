@@ -1,0 +1,43 @@
+<h2>Gestión de Direcciones</h2>
+</hr>
+<a href="{% url 'crear_direccion' %}">Nueva Dirección</a>
+<br>
+<a href="{% url 'main_direcciones_bloqueadas' %}" class="btn btn-warning">Ver direcciones bloqueadas</a>
+<br>
+<a href = "{% url 'main_admin' %}">Volver al menú principal</a>
+<br/><br/>
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" style="margin-top:10px;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+<hr/>
+<table border="1">
+    <thead>
+            <th>Nombre de Dirección</th>
+            <th>Encargado de Dirección</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+    </thead>
+    {% for direccion in direccion_listado %}
+        <tr>
+            <td>{{ direccion.nombre_direccion }}</td>
+            <td>
+                {% if direccion.encargado %}
+                    {{ direccion.encargado.usuario.first_name }} {{ direccion.encargado.usuario.last_name }}
+                {% else %}
+                -
+                {% endif %}
+            </td>
+            <td>{{ direccion.state }}</td>
+            <td>
+                <a href="{% url 'ver_direccion' direccion.id_direccion %}">Ver</a>
+                <a href="{% url 'asignar_encargado' direccion.id_direccion %}">Asignar Encargado</a>
+                <a href="{% url 'editar_direccion' direccion.id_direccion %}">Editar</a>
+                <a href="{% url 'bloquear_desbloquear_direccion' direccion.id_direccion %}">Bloquear</a>
+            </td>
+        </tr>
+    {% endfor %}
+</table>

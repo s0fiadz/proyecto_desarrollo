@@ -1,0 +1,36 @@
+<h2>Departamentos bloqueados</h2>
+</hr>
+<a href = "{% url 'main_departamento' %}">Volver a la lista de departamentos</a>
+<br/><br/>
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" style="margin-top:10px;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+<hr/>
+<table border="1">
+    <thead>
+            <th>Nombre Departamento</th>
+            <th>Dirección</th>
+            <th>Encargado</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+    </thead>
+    {% for departamento in departamento_bloqueado_listado %}
+        <tr>
+            <td>{{ departamento.nombre_dpto }}</td>
+            <td>{{ departamento.direccion }}</td>
+            <td>{{ departamento.encargado }}</td>
+            <td>{{ departamento.state }}</td>
+            <td>
+                <a href="{% url 'bloquear_desbloquear_departamento' departamento.id%}">Desbloquear</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5">No hay usuarios bloqueados</td>
+        </tr>
+    {% endfor %}
+</table>

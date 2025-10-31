@@ -1,0 +1,33 @@
+<<h2>Asignar Jefe a la Cuadrilla "{{ cuadrilla.nombre_cuadrilla }}"</h2>
+
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}" style="margin-top:10px;">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endif %}
+
+<form method="post">
+  {% csrf_token %}
+
+  <label for="jefe_id">Seleccione un Jefe:</label>
+  <select name="jefe_id" id="jefe_id" required>
+    <option value="" disabled selected>-- Seleccione --</option>
+
+    {% for jefe in jefes_disponibles %}
+      <option value="{{ jefe.id }}"
+        {% if cuadrilla.jefe_cuadrilla and cuadrilla.jefe_cuadrilla.id == jefe.id %}selected{% endif %}
+      >
+        {{ jefe.usuario.first_name }} {{ jefe.usuario.last_name }} ({{ jefe.cargo }})
+      </option>
+    {% empty %}
+      <option disabled>No hay miembros con cargo "Jefe de Cuadrilla" en esta cuadrilla</option>
+    {% endfor %}
+  </select>
+
+  <br><br>
+  <button type="submit">Asignar Jefe</button>
+</form>
+
+<a href="{% url 'main_cuadrilla' %}">Volver a la lista de cuadrillas</a>

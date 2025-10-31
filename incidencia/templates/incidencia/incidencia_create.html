@@ -1,0 +1,106 @@
+<h4>Crear Incidencia</h4>
+
+{% if error %}
+<p style="color: red;"><strong>Error:</strong> {{ error }}</p>
+{% endif %}
+
+<form method="post" action="{% url 'incidencia_create' %}" enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    <p><strong>Datos de la Incidencia:</strong></p>
+    
+    <p>
+        <select name="id_encuesta" id="id_encuesta" required onchange="cargarPreguntas()">
+            <option value="">Seleccione una encuesta</option>
+            {% for encuesta in encuestas %}
+            <option value="{{ encuesta.id_encuesta }}">{{ encuesta.titulo }}</option>
+            {% endfor %}
+        </select>
+    </p>
+    
+    <p><textarea name="descripcion" placeholder="Descripción de la incidencia" required></textarea></p>
+    
+    <p><input type="text" name="direccion" placeholder="Dirección" required /></p>
+    
+    <p><input type="text" name="lateral" placeholder="Lateral (opcional)" /></p>
+    
+    <p><input type="text" name="longitud" placeholder="Longitud (opcional)" /></p>
+    
+    <p>
+        <select name="prioridad" required>
+            <option value="">Seleccione prioridad</option>
+            <option value="baja">Baja</option>
+            <option value="media" selected>Media</option>
+            <option value="alta">Alta</option>
+            <option value="urgente">Urgente</option>
+        </select>
+    </p>
+    
+    <hr>
+    <p><strong>Datos del Vecino:</strong></p>
+    
+    <p><input type="text" name="nombre_vecino" placeholder="Nombre del vecino" required /></p>
+    
+    <p><input type="text" name="apellido_vecino" placeholder="Apellido del vecino" required /></p>
+    
+    <p><input type="email" name="correo_vecino" placeholder="Correo (opcional)" /></p>
+    
+    <p><input type="text" name="direccion_vecino" placeholder="Dirección del vecino" required /></p>
+    
+    <p><input type="text" name="rat" placeholder="RAT (opcional)" /></p>
+    
+    <hr>
+    <p><strong>Preguntas de la Encuesta:</strong></p>
+    <div id="preguntas-container">
+        <p>Seleccione una encuesta para cargar las preguntas</p>
+    </div>
+    
+    <hr>
+    <p><strong>Archivos Multimedia:</strong></p>
+    
+    <p>
+        <input type="file" name="archivos_multimedia" multiple />
+        <br>
+        <small>Puede seleccionar múltiples archivos</small>
+    </p>
+    
+    <p><textarea name="descripcion_archivo" placeholder="Descripción de los archivos (opcional)"></textarea></p>
+    
+    <p><input type="submit" value="Crear Incidencia"/></p>
+</form>
+
+<script>
+function cargarPreguntas() {
+    const encuestaId = document.getElementById('id_encuesta').value;
+    const container = document.getElementById('preguntas-container');
+    
+    if (!encuestaId) {
+        container.innerHTML = '<p>Seleccione una encuesta para cargar las preguntas</p>';
+        return;
+    }
+    
+    fetch(`{% url 'get_preguntas' %}?id_encuesta=${encuestaId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.length > 0) {
+                let html = '';
+                data.forEach(pregunta => {
+                    html += `
+                        <p>
+                            <strong>${pregunta.pregunta}</strong><br>
+                            <textarea name="respuesta_${pregunta.id_preguntas}" placeholder="Ingrese su respuesta" required></textarea>
+                        </p>
+                    `;
+                });
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = '<p>Esta encuesta no tiene preguntas definidas</p>';
+            }
+        })
+        .catch(error => {
+            container.innerHTML = '<p>Error al cargar las preguntas</p>';
+        });
+}
+</script>
+
+<a href="{% url 'incidencia_list' %}">Volver a Incidencias</a>

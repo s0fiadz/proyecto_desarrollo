@@ -1,0 +1,14 @@
+<h4>Detalles del Operario</h4>
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">{{ operario_data.first_name }} {{ operario_data.last_name }}</h5>
+        <p><strong>Username:</strong> {{ operario_data.username }}</p>
+        <p><strong>Email:</strong> {{ operario_data.email }}</p>
+        <p><strong>Estado:</strong> {% if operario_data.is_active %}Activo{% else %}Bloqueado{% endif %}</p>
+        
+    </div>
+</div>
+
+<a href="{% url 'main_cuadrilla' %}">Volver a la lista de cuadrillas</a>
+

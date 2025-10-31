@@ -1,0 +1,17 @@
+<h4>Editar Dirección</h4>
+<form method="post" action="{% url 'editar_direccion' direccion_data.id_direccion %}">
+    {% csrf_token %}
+    <p>
+        <label>Nombre de Dirección:</label>
+        <input type="text" name="nombre_direccion" value="{{ direccion_data.nombre_direccion }}" required>
+    </p>
+    <p>
+        <label>Estado:</label>
+        <select name="state">
+            <option value="True" {% if direccion_data.state %}selected{% endif %}>Activo</option>
+            <option value="False" {% if not direccion_data.state %}selected{% endif %}>Inactivo</option>
+        </select>
+    </p>
+    <p><input type="submit" value="Guardar Cambios"/></p>
+</form>
+<a href="{% url 'main_direccion' %}">Volver al Listado</a>

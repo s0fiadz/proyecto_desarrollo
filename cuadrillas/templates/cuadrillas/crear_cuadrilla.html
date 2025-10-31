@@ -1,0 +1,32 @@
+<h2>Crear nueva cuadrilla</h2>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" style="margin-top:10px;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<form method="post" action="{% url 'guardar_cuadrilla' %}">
+    {% csrf_token %}
+    
+    <p><input type="text" name="nombre_cuadrilla" placeholder="Nombre de la cuadrilla" required></p>
+    
+    <p>
+        <label>Operarios:</label>
+        <div style="border: 1px solid #ccc; padding: 10px;">
+            {% for operario in operarios_listado %}
+                <input type="checkbox" name="cuadrillas" value="{{ operario.id }}" id="operario_{{ operario.id }}">
+                <label for="operario_{{ operario.id }}">{{ operario.first_name }} {{ operario.last_name }}</label>
+                <br>
+            {% endfor %}
+        </div>
+    </p>
+
+    <p><input type="checkbox" name="state" id="state" checked> Activa</p>
+    
+    <p><button type="submit">Crear cuadrilla</button></p>
+    
+    <a href="{% url 'main_cuadrilla' %}">Volver al listado de cuadrillas</a>
+</form>

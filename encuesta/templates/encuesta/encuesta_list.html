@@ -1,0 +1,41 @@
+<h4>Lista de Encuestas</h4>
+
+<a href="{% url 'encuesta_create' %}">Crear Nueva Encuesta</a>
+<br>
+<a href="{% url 'main_admin' %}">Volver al menú principal</a>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Título</th>
+            <th>Tipo Incidencia</th>
+            <th>Descripción</th>
+            <th>Preguntas</th>  <!-- NUEVA COLUMNA -->
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for encuesta in encuestas %}
+        <tr>
+            <td>{{ encuesta.id_encuesta }}</td>
+            <td>{{ encuesta.titulo }}</td>
+            <td>{{ encuesta.id_tipo_incidencia.nombre }}</td>
+            <td>{{ encuesta.descripcion|truncatewords:10 }}</td>  <!-- Descripción acortada -->
+            <td>{{ encuesta.preguntas.count }} preguntas</td>  <!-- Número de preguntas -->
+            <td>{% if encuesta.activo %}Activo{% else %}Bloqueado{% endif %}</td>
+            <td>
+                <a href="{% url 'encuesta_view' encuesta.id_encuesta %}">Ver</a>
+                <a href="{% url 'encuesta_edit' encuesta.id_encuesta %}">Editar</a>
+                <a href="{% url 'encuesta_toggle' encuesta.id_encuesta %}">
+                    {% if encuesta.activo %}Bloquear{% else %}Desbloquear{% endif %}
+                </a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7">No hay encuestas registradas</td>  <!-- Cambiado a 7 columnas -->
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

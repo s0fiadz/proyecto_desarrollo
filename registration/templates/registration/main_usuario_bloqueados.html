@@ -1,0 +1,40 @@
+<h2>Usuarios bloqueados</h2>
+</hr>
+<a href = "{% url 'main_usuario' %}">Volver a la lista de usuarios</a>
+<br/><br/>
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" style="margin-top:10px;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+<hr/>
+<table border="1">
+    <thead>
+            <th>Nombre de Usuario</th>
+            <th>Contraseña</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Email</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+    </thead>
+    {% for usuario in usuario_bloqueado_listado %}
+        <tr>
+            <td>{{ usuario.username }}</td>
+            <td>{{usuario.password}}</td>
+            <td>{{ usuario.first_name }}</td>
+            <td>{{ usuario.last_name }}</td>
+            <td>{{ usuario.email }}</td>
+            <td>{{ usuario.is_active }}</td>
+            <td>
+                <a href="{% url 'bloquear_desbloquear_usuario' usuario.id%}">Desbloquear</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4">No hay usuarios bloqueados</td>
+        </tr>
+    {% endfor %}
+</table>

@@ -1,0 +1,8 @@
+<h2>Ver Usuario</h2>
+<a href = "{% url 'main_usuario' %}">Volver a la lista de usuarios</a>
+</hr>
+<p><strong>Nombre Usuario:</strong> {{ usuario_data.username }}</p>
+<p><strong>Nombre:</strong> {{ usuario_data.first_name }}</p>
+<p><strong>Apellido:</strong> {{ usuario_data.last_name }}</p>
+<p><strong>Email:</strong> {{ usuario_data.email }}</p>
+<p><strong>Estado:</strong> {{ usuario_data.is_active }}</p>

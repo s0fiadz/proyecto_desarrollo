@@ -1,0 +1,68 @@
+<h4>Crear Encuesta</h4>
+
+{% if error %}
+<p style="color: red;"><strong>Error:</strong> {{ error }}</p>
+{% endif %}
+
+<form method="post" action="{% url 'encuesta_create' %}">
+    {% csrf_token %}
+    
+    <p><strong>Datos de la Encuesta:</strong></p>
+    <p><input type="text" name="titulo" placeholder="Ingrese el título" required /></p>
+    
+    <p>
+        <select name="tipo_incidencia" required>
+            <option value="">Seleccione tipo de incidencia</option>
+            {% for tipo in tipos_incidencia %}
+            <option value="{{ tipo.id_tipo }}">{{ tipo.nombre }}</option>
+            {% endfor %}
+        </select>
+    </p>
+    
+    <p><textarea name="descripcion" placeholder="Ingrese la descripción"></textarea></p>
+    
+    <p>
+        <label>Activo:
+            <input type="checkbox" name="activo" checked />
+        </label>
+    </p>
+    
+    <hr>
+    <p><strong>Preguntas de la Encuesta:</strong></p>
+    <div id="preguntas-container">
+        <div class="pregunta-item">
+            <input type="text" name="preguntas[]" placeholder="Ingrese una pregunta" style="width: 80%;" required />
+            <button type="button" onclick="eliminarPregunta(this)" style="color: red; margin-left: 10px;">✕</button>
+        </div>
+    </div>
+    
+    <p>
+        <button type="button" onclick="agregarPregunta()">+ Agregar otra pregunta</button>
+    </p>
+    
+    <p><input type="submit" value="Crear Encuesta"/></p>
+</form>
+
+<script>
+function agregarPregunta() {
+    const container = document.getElementById('preguntas-container');
+    const newPregunta = document.createElement('div');
+    newPregunta.className = 'pregunta-item';
+    newPregunta.innerHTML = `
+        <input type="text" name="preguntas[]" placeholder="Ingrese una pregunta" style="width: 80%;" />
+        <button type="button" onclick="eliminarPregunta(this)" style="color: red; margin-left: 10px;">✕</button>
+    `;
+    container.appendChild(newPregunta);
+}
+
+function eliminarPregunta(button) {
+    const preguntas = document.querySelectorAll('.pregunta-item');
+    if (preguntas.length > 1) {
+        button.parentElement.remove();
+    } else {
+        alert('Debe haber al menos una pregunta');
+    }
+}
+</script>
+
+<a href="{% url 'encuesta_list' %}">Volver a Encuestas</a>

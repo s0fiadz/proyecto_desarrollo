@@ -1,0 +1,30 @@
+<h2>Asignar Departamento a la Cuadrilla "{{ cuadrilla.nombre_cuadrilla }}"</h2>
+
+<!-- Mostrar mensajes -->
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" style="margin-top:10px;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<form method="post">
+  {% csrf_token %}
+  <label for="departamento">Seleccione un Departamento:</label>
+  <select name="departamento_id" id="departamento" required>
+    <option value="" disabled selected>-- Seleccione --</option>
+    {% for departamento in departamentos_disponibles %}
+      <option value="{{ departamento.id }}"
+        {% if cuadrilla.departamento and cuadrilla.departamento.id == departamento.id %}selected{% endif %}
+      >
+        {{ departamento.nombre_dpto }}
+      </option>
+    {% endfor %}
+  </select>
+  
+  <br><br>
+  <button type="submit">Asignar Departamento</button>
+</form>
+
+<a href="{% url 'main_cuadrilla' %}">Volver a la lista de cuadrillas</a>

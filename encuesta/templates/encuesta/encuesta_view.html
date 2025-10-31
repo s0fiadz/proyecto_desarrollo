@@ -1,0 +1,21 @@
+<h4>Ver Encuesta</h4>
+
+<p><strong>ID:</strong> {{ encuesta.id_encuesta }}</p>
+<p><strong>Título:</strong> {{ encuesta.titulo }}</p>
+<p><strong>Tipo de Incidencia:</strong> {{ encuesta.id_tipo_incidencia.nombre }}</p>
+<p><strong>Descripción:</strong> {{ encuesta.descripcion }}</p>
+<p><strong>Estado:</strong> {% if encuesta.activo %}Activo{% else %}Bloqueado{% endif %}</p>
+
+<p><strong>Preguntas:</strong></p>
+{% if preguntas %}
+<ol>
+    {% for pregunta in preguntas %}
+    <li>{{ pregunta.pregunta }}</li>
+    {% endfor %}
+</ol>
+{% else %}
+<p>No hay preguntas definidas para esta encuesta.</p>
+{% endif %}
+
+<a href="{% url 'encuesta_edit' encuesta.id_encuesta %}">Editar</a>
+<a href="{% url 'encuesta_list' %}">Volver a Encuestas</a>

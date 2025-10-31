@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cuadrillas Bloqueadas</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .btn { padding: 5px 10px; text-decoration: none; border-radius: 3px; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .bloqueado { color: #dc3545; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Cuadrillas Bloqueadas</h1>
+    
+    <a href="{% url 'main_cuadrilla' %}" class="btn btn-primary">← Volver a Cuadrillas</a>
+    
+    <br/><br/>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    {% if cuadrillas_bloqueadas %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre de Cuadrilla</th>
+                    <th>Jefe de Cuadrilla</th>
+                    <th>Departamento</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cuadrilla in cuadrillas_bloqueadas %}
+                <tr>
+                    <td>{{ cuadrilla.id_cuadrilla }}</td>
+                    <td>{{ cuadrilla.nombre_cuadrilla }}</td>
+                    <td>
+                        {% if cuadrilla.jefe_cuadrilla %}
+                            {{ cuadrilla.jefe_cuadrilla.usuario.first_name }} {{ cuadrilla.jefe_cuadrilla.usuario.last_name }}
+                        {% else %}
+                            No asignado
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if cuadrilla.departamento %}
+                            {{ cuadrilla.departamento.nombre }}
+                        {% else %}
+                            No asignado
+                        {% endif %}
+                    </td>
+                    <td class="bloqueado">BLOQUEADA</td>
+                    <td>
+                        <a href="{% url 'desbloquear_cuadrilla' cuadrilla.id_cuadrilla %}" class="btn btn-success">Desbloquear</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No hay cuadrillas bloqueadas</p>
+    {% endif %}
+</body>
+</html>

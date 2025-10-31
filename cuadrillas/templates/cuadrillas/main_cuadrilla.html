@@ -1,0 +1,54 @@
+<h2>Gestión de Cuadrillas</h2>
+</hr>
+<a href="{% url 'crear_cuadrilla' %}">Nueva Cuadrilla</a>
+<br>
+<a href="{% url  'listar_cuadrillas_bloqueadas' %}" class="btn btn-warning">Ver cuadrillas bloqueadas</a>
+<br>
+<a href = "{% url 'main_operario' %}">Gestión de Operarios</a>
+<br>
+<a href = "{% url 'main_admin' %}">Volver al menú principal</a>
+<br/><br/>
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" style="margin-top:10px;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+<hr/>
+<table border="1">
+    <thead>
+            <th>Nombre de Cuadrilla</th>
+            <th>Jefe de Cuadrilla</th>
+            <th>Departamento</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+    </thead>
+    {% for cuadrilla in cuadrilla_listado %}
+        <tr>
+            <td>{{ cuadrilla.nombre_cuadrilla }}</td>
+            <td>
+                {% if cuadrilla.jefe_cuadrilla %}
+                    {{ cuadrilla.jefe_cuadrilla.usuario.first_name }} {{ cuadrilla.jefe_cuadrilla.usuario.last_name }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td>
+                {% if cuadrilla.departamento %}
+                    {{ cuadrilla.departamento.nombre }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td>{{ cuadrilla.state }}</td>
+            <td>
+                <a href="{% url 'ver_cuadrillas' cuadrilla.id_cuadrilla %}" class="btn btn-info btn-sm">Ver</a>
+                <a href="{% url 'editar_cuadrillas' cuadrilla.id_cuadrilla %}">Editar</a>
+                <a href="{% url 'bloquear_cuadrilla' cuadrilla.id_cuadrilla %}">Bloquear</a>
+                <a href="{% url 'asignar_jefe_cuadrilla' cuadrilla.id_cuadrilla %}" class="btn btn-primary">Asignar jefe</a>
+                <a href="{% url 'asignar_departamento_cuadrilla' cuadrilla.id_cuadrilla %}"class="btn btn-primary">Asignar Departamento</a>
+            </td>
+        </tr>
+    {% endfor %}
+</table>

@@ -1,0 +1,47 @@
+<h4>Gestión de Operarios</h4>
+<hr/>
+<br>
+<a href="{% url 'listar_operarios_bloqueados' %}" class="btn btn-warning">Ver Operarios Bloqueados</a>
+<br>
+<a href = "{% url 'main_cuadrilla' %}">Volver a Gestión de Cuadrillas</a>
+<br/><br/>
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" style="margin-top:10px;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+<hr/>
+<table border="1">
+    <thead>
+            <th>Nombre de Usuario</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Cargo</th>
+            <th>Email</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+    </thead>
+    {% for operario in operario_listado %}
+        <tr>
+            <td>{{operario.usuario.username}}</td>
+            <td>{{operario.usuario.first_name}}</td>
+            <td>{{operario.usuario.last_name}}</td>
+            <td>{{operario.cargo}}</td>
+            <td>{{operario.usuario.email}}</td>
+            <td>{{operario.usuario.is_active}}</td>
+            <td>
+                <a href="{% url 'ver_operario' operario.usuario.id %}" class="btn btn-info">Ver</a>
+                <a href="{% url 'bloquear_operario' operario.usuario_id %}">Bloquear</a>
+                <!-- Botón para cambiar cargo -->
+                <a href="{% url 'cambiar_cargo' operario.id %}" class="btn btn-info">Cambiar cargo</a>
+                {% if operario.cargo == 'Jefe de Cuadrilla' %}
+                    <span class="badge bg-primary">Jefe de Cuadrilla</span>
+                {% else %}  
+                    <span class="badge bg-secondary">Operario</span>
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+</table>
