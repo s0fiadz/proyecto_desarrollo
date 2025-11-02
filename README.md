@@ -20,60 +20,30 @@ git config user.email "tu_correo_vinculado_en_GitHub@ejemplo.com"
 ```
 (recuerda usar tus mismas credenciales que tienes en tu cuenta de GitHub)
 
+# 🗂️ Crear una base de datos
+Cree una base de datos con el nombre de: proyectoweb
 
 # 🌱 Clonar el repositorio
 ```
 cd (ingresa la dirección donde dejarás el proyecto)
-git clone https://github.com/s0fiadz/Desarrollo_App.git
+git clone https://github.com/s0fiadz/proyecto_desarrollo.git
 ```
+# 🌿 Flujo de Trabajo con Git
 
+| Acción                                    | Comando                                                       |
+| ----------------------------------------- | ------------------------------------------------------------- |
+| **Actualizar la rama principal**          | `git checkout main`<br>`git pull origin main`                 |
+| **Crear una nueva rama para tu feature**  | `git checkout -b feature/nombre-de-la-feature`                |
+| **Sincronizar con los cambios del main**  | `git fetch origin`                                            |
+| **Guardar tus cambios**                   | `git add .`<br>`git commit -m "Descripción clara del cambio"` |
+| **Subir tu rama y crear un Pull Request** | `git push -u origin feature/nombre-de-la-feature`             |
 
-# 🌿 Crear una rama para trabajar
-Las ramas permiten trabajar por separado en equipo.
-No ocupen el nombre main para no confundir con la rama principal.
-```
-git branch nombre-de-la-rama
-git checkout nombre-de-la-rama
-```
-
-Si deseas eliminar una rama por algún motivo, debes comunicarlo a la encargada del Git.
-
-
-# 📦 Hacer cambios y commitear
-```
-git add .
-git commit -m "inserte_mensaje"
-```
-
-El mensaje debe incluir una palabra o frase clave que describa lo que se modificó.
-
-
-# 🔄 Sincronizar con el repositorio remoto
-Antes de hacer push, actualiza tu rama local:
-```
-git pull origin main
-git push origin nombre-de-la-rama
-```
-"git pull origin main" : nos sirve para actualizar tu rama local "main" con lo que está en el GitHub.
-
-# 🔁 Actualización de cambios desde tu rama
-Este comando fusiona los cambios de tu rama con la rama main, es decir, si estas trabajando en una rama llamada "ejemplo", al ejecutar:
-```
-git checkout main
-git merge nombre-de-la-rama
-git push origin main
-```
-Git traerá todos los cambios que estén en la rama "ejemplo" y los integrara en el main
-Recuerda: no puedes hacer merge sin haber commiteado tus cambios.
-
-"git checkout main": cambiamos a la rama main
-"git merge nombre-de-la-rama": combinamos los cambio de tu rama
-"git push origin main": subimos todo al GitHub
+nombre-de-la-feature: ingresar nombre simple y breve de la tarea que estas haciendo 
 
 
 # ✅ Buenas prácticas
 - No trabajar directamente en main
-- Hacer commits frecuentes y descriptivos
+- Hacer commits de tus tareas y descriptivos
 - Revisar que todo esté funcionando antes de subir
 - Mantener la documentación actualizada
 - Avisar cuando se termine de usar una rama (cuando se haya completado la tarea)
