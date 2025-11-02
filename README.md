@@ -20,14 +20,30 @@ git config user.email "tu_correo_vinculado_en_GitHub@ejemplo.com"
 ```
 (recuerda usar tus mismas credenciales que tienes en tu cuenta de GitHub)
 
-# 🗂️ Crear una base de datos
-Cree una base de datos con el nombre de: proyectoweb
-
 # 🌱 Clonar el repositorio
 ```
 cd (ingresa la dirección donde dejarás el proyecto)
 git clone https://github.com/s0fiadz/proyecto_desarrollo.git
 ```
+
+# 🗂️ Base de datos
+1. Primero eliminar la base de datos que ya tenían y crean una nueva con el mismo nombre: 'proyectoweb'
+2. Luego se van a la consola y hacen 'python manage.py makemigrations' y luego 'python manage.py migrate'
+3. Luego insertan estos datos en la base de datos:
+```
+insert into auth_group VALUES(1, 'Admin')
+insert into auth_group VALUES(2, 'SECPLA')
+insert into auth_group VALUES(3, 'Direccion')
+insert into auth_group VALUES(4, 'Departamento')
+insert into auth_group VALUES(5, 'Territorial')
+insert into auth_group VALUES(6, 'Cuadrilla')
+```
+4. Luego creen el super usuario con 'python manage.py createsuperuser'
+5. Una vez creado, ingresan esto en la base de datos:
+```
+insert into registration_profile VALUES(0, 'Default','Default', 88738473, 1,1)
+```
+
 # 🌿 Flujo de Trabajo con Git
 
 | Acción                                    | Comando                                                       |
