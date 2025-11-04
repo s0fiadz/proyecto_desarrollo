@@ -1,43 +1,166 @@
-<h2>Gestión de Direcciones</h2>
-</hr>
-<a href="{% url 'crear_direccion' %}">Nueva Dirección</a>
-<br>
-<a href="{% url 'main_direcciones_bloqueadas' %}" class="btn btn-warning">Ver direcciones bloqueadas</a>
-<br>
-<a href = "{% url 'main_admin' %}">Volver al menú principal</a>
-<br/><br/>
-{% if messages %}
-    {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}" style="margin-top:10px;">
-            {{ message }}
-        </div>
-    {% endfor %}
-{% endif %}
-<hr/>
-<table border="1">
-    <thead>
-            <th>Nombre de Dirección</th>
-            <th>Encargado de Dirección</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-    </thead>
-    {% for direccion in direccion_listado %}
-        <tr>
-            <td>{{ direccion.nombre_direccion }}</td>
-            <td>
-                {% if direccion.encargado %}
-                    {{ direccion.encargado.usuario.first_name }} {{ direccion.encargado.usuario.last_name }}
-                {% else %}
-                -
-                {% endif %}
-            </td>
-            <td>{{ direccion.state }}</td>
-            <td>
-                <a href="{% url 'ver_direccion' direccion.id_direccion %}">Ver</a>
-                <a href="{% url 'asignar_encargado' direccion.id_direccion %}">Asignar Encargado</a>
-                <a href="{% url 'editar_direccion' direccion.id_direccion %}">Editar</a>
-                <a href="{% url 'bloquear_desbloquear_direccion' direccion.id_direccion %}">Bloquear</a>
-            </td>
-        </tr>
-    {% endfor %}
-</table>
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Direcciones</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container mt-4">
+    <h2 class="mb-3">Gestión de Direcciones</h2>
+    <hr>
+    <div class="d-flex justify-content-between mb-4">
+        <form method="GET" class="d-flex" action="{% url 'main_direccion' %}">
+            <div>
+                <a href="{% url 'crear_direccion' %}" class="btn btn-success me-2">Nueva Direccion</a>
+                <a href="{% url 'main_direcciones_bloqueadas' %}" class="btn btn-warning me-2">Ver direcciones bloqueadas</a> 
+                <a href="{% url 'main_admin' %}" class="btn btn-secondary">Volver al menú principal</a>
+            </div>
+            <input type="search" name="search" class="form-control me-2"
+                    placeholder="Buscar dirección..." value="{{ search_query|default:'' }}">
+            <button class="btn btn-outline-primary" type="submit">Buscar</button>
+            {% if search_query %}
+                <a href="{% url 'main_direccion' %}" class="btn btn-outline-danger ms-2">Limpiar</a>
+            {% endif %}
+        </form>
+    </div>
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" id="ordenarDropdown"
+                data-bs-toggle="dropdown" aria-expanded="false">
+            Ordenar
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="ordenarDropdown">
+            <li><h6 class="dropdown-header">Por nombre</h6></li>
+            <li>
+                <a class="dropdown-item {% if ordenar == 'alfabetico' %}active{% endif %}"
+                    href="?ordenar=alfabetico&search={{ search_query }}">
+                    Nombre (A → Z)
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item {% if ordenar == 'alfabetico_desc' %}active{% endif %}"
+                    href="?ordenar=alfabetico_desc&search={{ search_query }}">
+                    Nombre (Z → A)
+                </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li><h6 class="dropdown-header">Por ID</h6></li>
+            <li>
+                <a class="dropdown-item {% if ordenar == 'id_asc' %}active{% endif %}"
+                    href="?ordenar=id_asc&search={{ search_query }}">
+                    ID (menor → mayor)
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item {% if ordenar == 'id_desc' %}active{% endif %}"
+                    href="?ordenar=id_desc&search={{ search_query }}">
+                    ID (mayor → menor)
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Nombre de Dirección</th>
+                    <th>Encargado</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for direccion in direccion_listado %}
+                <tr>
+                    <td>{{ direccion.nombre_direccion }}</td>
+                    <td>
+                        {% if direccion.encargado %}
+                            {{ direccion.encargado.usuario.first_name }} {{ direccion.encargado.usuario.last_name }}
+                        {% else %}
+                            <span class="text-muted">Sin asignar</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge bg-{% if direccion.state == 'Activo' %}success{% else %}danger{% endif %}">
+                            {{ direccion.state }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'ver_direccion' direccion.id_direccion %}" class="btn btn-sm btn-info me-1">Ver</a>
+                        <a href="{% url 'editar_direccion' direccion.id_direccion %}" class="btn btn-sm btn-primary me-1">Editar</a>
+                        <a href="{% url 'bloquear_desbloquear_direccion' direccion.id_direccion %}" class="btn btn-sm btn-{% if direccion.state == 'Activo' %}danger{% else %}success{% endif %}">
+                            {% if direccion.state == True %}Bloquear{% else %}Desbloquear{% endif %}
+                        </a>
+                        <a href="{% url 'asignar_encargado' direccion.id_direccion %}" class="btn btn-sm btn-warning mt-1">Asignar Encargado</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center">No hay direcciones registradas.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if direccion_listado.paginator.num_pages > 1 %}
+    <nav aria-label="Paginación de Direcciones">
+    <ul class="pagination justify-content-center">
+        {% if direccion_listado.has_previous %}
+            <li class="page-item">
+                <a class="page-link"
+                    href="?page={{ direccion_listado.previous_page_number }}&search={{ search_query }}&ordenar={{ ordenar }}">
+                    Anterior
+                </a>
+            </li>
+        {% else %}
+            <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+        {% endif %}
+
+        {% for i in direccion_listado.paginator.page_range %}
+            {% if direccion_listado.number == i %}
+                <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+            {% else %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?page={{ i }}&search={{ search_query }}&ordenar={{ ordenar }}">
+                        {{ i }}
+                    </a>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+        {% if direccion_listado.has_next %}
+            <li class="page-item">
+                <a class="page-link"
+                    href="?page={{ direccion_listado.next_page_number }}&search={{ search_query }}&ordenar={{ ordenar }}">
+                    Siguiente
+                </a>
+            </li>
+        {% else %}
+            <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+        {% endif %}
+    </ul>
+</nav>
+    <div class="text-center mb-4">
+        <p class="text-muted">Página {{ direccion_listado.number }} de {{ direccion_listado.paginator.num_pages }}</p>
+    </div>
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

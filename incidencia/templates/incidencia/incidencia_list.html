@@ -1,35 +1,176 @@
-<h4>Lista de Incidencias</h4>
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Incidencias</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
 
-<a href="{% url 'incidencia_create' %}">Crear Nueva Incidencia</a>
+<div class="container mt-4">
+    <h2 class="mb-3">Gestión de Incidencias</h2>
+    <hr>
 
-<table>
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Dirección</th>
-            <th>Prioridad</th>
-            <th>Estado</th>
-            <th>Fecha</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for incidencia in incidencias %}
-        <tr>
-            <td>{{ incidencia.id_incidencia }}</td>
-            <td>{{ incidencia.direccion }}</td>
-            <td>{{ incidencia.get_prioridad_display }}</td>
-            <td>{{ incidencia.get_estado_display }}</td>
-            <td>{{ incidencia.fecha_creacion|date:"d/m/Y" }}</td>
-            <td>
-                <a href="{% url 'incidencia_view' incidencia.id_incidencia %}">Ver</a>
-                <a href="{% url 'cambiar_estado' incidencia.id_incidencia %}">Cambiar Estado</a>
-            </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="6">No hay incidencias registradas</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+
+    <div class="d-flex justify-content-between mb-4">
+        <div>
+            <a href="{% url 'incidencia:incidencia_create' %}" class="btn btn-success me-2">Nueva Incidencia</a>
+            <a href="{% url 'incidencia:main_territorial' %}" class="btn btn-secondary">Volver al menú principal</a>
+        </div>
+
+        <form method="GET" class="d-flex" action="{% url 'incidencia:incidencia_list' %}">
+            <input type="search" name="search" class="form-control me-2"
+                    placeholder="Buscar incidencia..." value="{{ search_query|default:'' }}">
+            <button class="btn btn-outline-primary" type="submit">Buscar</button>
+            {% if search_query %}
+                <a href="{% url 'incidencia:incidencia_list' %}" class="btn btn-outline-danger ms-2">Limpiar</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <label for="estado" class="form-label">Filtrar por Estado:</label>
+            <select id="estado" name="estado" class="form-select"
+                    onchange="this.form.submit()" form="filterForm">
+                <option value="">Todos</option>
+                <option value="abierta" {% if estado == 'abierta' %}selected{% endif %}>Abierta</option>
+                <option value="derivada" {% if estado == 'derivada' %}selected{% endif %}>Derivada</option>
+                <option value="rechazada" {% if estado == 'rechazada' %}selected{% endif %}>Rechazada</option>
+                <option value="proceso" {% if estado == 'proceso' %}selected{% endif %}>En Proceso</option>
+                <option value="finalizada" {% if estado == 'finalizada' %}selected{% endif %}>Finalizada</option>
+                <option value="cerrada" {% if estado == 'cerrada' %}selected{% endif %}>Cerrada</option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label for="prioridad" class="form-label">Filtrar por Prioridad:</label>
+            <select id="prioridad" name="prioridad" class="form-select"
+                    onchange="this.form.submit()" form="filterForm">
+                <option value="">Todas</option>
+                <option value="baja" {% if prioridad == 'baja' %}selected{% endif %}>Baja</option>
+                <option value="media" {% if prioridad == 'media' %}selected{% endif %}>Media</option>
+                <option value="alta" {% if prioridad == 'alta' %}selected{% endif %}>Alta</option>
+                <option value="urgente" {% if prioridad == 'urgente' %}selected{% endif %}>Urgente</option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Ordenar:</label>
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                    Ordenar
+                </button>
+                <ul class="dropdown-menu">
+                    <li><h6 class="dropdown-header">Por dirección</h6></li>
+                    <li><a class="dropdown-item {% if ordenar == 'direccion_asc' %}active{% endif %}"
+                            href="?ordenar=direccion_asc&search={{ search_query }}&estado={{ estado }}&prioridad={{ prioridad }}">Dirección (A → Z)</a></li>
+                    <li><a class="dropdown-item {% if ordenar == 'direccion_desc' %}active{% endif %}"
+                            href="?ordenar=direccion_desc&search={{ search_query }}&estado={{ estado }}&prioridad={{ prioridad }}">Dirección (Z → A)</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><h6 class="dropdown-header">Por ID</h6></li>
+                    <li><a class="dropdown-item {% if ordenar == 'id_asc' %}active{% endif %}"
+                            href="?ordenar=id_asc&search={{ search_query }}&estado={{ estado }}&prioridad={{ prioridad }}">ID (menor → mayor)</a></li>
+                    <li><a class="dropdown-item {% if ordenar == 'id_desc' %}active{% endif %}"
+                            href="?ordenar=id_desc&search={{ search_query }}&estado={{ estado }}&prioridad={{ prioridad }}">ID (mayor → menor)</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Dirección</th>
+                    <th>Prioridad</th>
+                    <th>Estado</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for incidencia in incidencias_listado %}
+                <tr>
+                    <td>{{ incidencia.id_incidencia }}</td>
+                    <td>{{ incidencia.direccion }}</td>
+                    <td>
+                        <span class="badge 
+                            {% if incidencia.prioridad == 'baja' %}bg-success
+                            {% elif incidencia.prioridad == 'media' %}bg-info
+                            {% elif incidencia.prioridad == 'alta' %}bg-warning
+                            {% else %}bg-danger{% endif %}">
+                            {{ incidencia.get_prioridad_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge 
+                            {% if incidencia.estado == 'abierta' %}bg-primary
+                            {% elif incidencia.estado == 'finalizada' %}bg-success
+                            {% elif incidencia.estado == 'rechazada' %}bg-danger
+                            {% elif incidencia.estado == 'proceso' %}bg-warning
+                            {% else %}bg-secondary{% endif %}">
+                            {{ incidencia.get_estado_display }}
+                        </span>
+                    </td>
+                    <td>{{ incidencia.fecha_creacion|date:"d/m/Y" }}</td>
+                    <td>
+                        <a href="{% url 'incidencia:incidencia_view' incidencia.id_incidencia %}" class="btn btn-sm btn-info me-1">Ver</a>
+                        <a href="{% url 'incidencia:cambiar_estado' incidencia.id_incidencia %}" class="btn btn-sm btn-warning">Cambiar Estado</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center">No hay incidencias registradas.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if incidencias_listado.paginator.num_pages > 1 %}
+    <nav aria-label="Paginación de Incidencias">
+        <ul class="pagination justify-content-center">
+            {% if incidencias_listado.has_previous %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?page={{ incidencias_listado.previous_page_number }}&search={{ search_query }}&estado={{ estado }}&prioridad={{ prioridad }}&ordenar={{ ordenar }}">
+                        Anterior
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+            {% endif %}
+
+            {% for i in incidencias_listado.paginator.page_range %}
+                {% if incidencias_listado.number == i %}
+                    <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                {% else %}
+                    <li class="page-item"><a class="page-link"
+                        href="?page={{ i }}&search={{ search_query }}&estado={{ estado }}&prioridad={{ prioridad }}&ordenar={{ ordenar }}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if incidencias_listado.has_next %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?page={{ incidencias_listado.next_page_number }}&search={{ search_query }}&estado={{ estado }}&prioridad={{ prioridad }}&ordenar={{ ordenar }}">
+                        Siguiente
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="text-center mb-4">
+        <p class="text-muted">Página {{ incidencias_listado.number }} de {{ incidencias_listado.paginator.num_pages }}</p>
+    </div>
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

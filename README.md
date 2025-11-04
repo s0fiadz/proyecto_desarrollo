@@ -32,11 +32,10 @@ git clone https://github.com/s0fiadz/proyecto_desarrollo.git
 3. Luego insertan estos datos en la base de datos:
 ```
 insert into auth_group VALUES(1, 'Admin')
-insert into auth_group VALUES(2, 'SECPLA')
-insert into auth_group VALUES(3, 'Direccion')
-insert into auth_group VALUES(4, 'Departamento')
-insert into auth_group VALUES(5, 'Territorial')
-insert into auth_group VALUES(6, 'Cuadrilla')
+insert into auth_group VALUES(2, 'Direccion')
+insert into auth_group VALUES(3, 'Departamento')
+insert into auth_group VALUES(4, 'Territorial')
+insert into auth_group VALUES(5, 'Cuadrilla')
 ```
 4. Luego creen el super usuario con 'python manage.py createsuperuser'
 5. Una vez creado, ingresan esto en la base de datos:

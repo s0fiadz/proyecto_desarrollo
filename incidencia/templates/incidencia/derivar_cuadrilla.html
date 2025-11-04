@@ -1,0 +1,17 @@
+<h2>Derivar Incidencia a Cuadrilla</h2>
+
+<p><strong>Incidencia:</strong> {{ incidencia.id_incidencia }} - {{ incidencia.direccion }}</p>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <label>Seleccionar Cuadrilla:</label><br>
+    <select name="cuadrilla" required>
+        {% for c in cuadrillas %}
+            <option value="{{ c.id_cuadrilla }}">{{ c.nombre_cuadrilla }}</option>
+        {% endfor %}
+    </select>
+    <br><br>
+
+    <button type="submit">Derivar</button>
+</form>

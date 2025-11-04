@@ -1,14 +1,34 @@
 from django.shortcuts import render
-
 # Create your views here.
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import JsonResponse
 from .models import Incidencia, DatosVecino, ArchivosMultimedia, RegistrosRespuestas
-from encuesta.models import Encuesta, Preguntas
+from encuesta.models import Encuesta, Preguntas, TipoIncidencia
+from django.core.paginator import Paginator
+from cuadrillas.models import Cuadrilla
+from django.contrib.auth.models import Group
+from django.contrib.auth.models import User
+from django.db.models import Q
+from registration.models import Profile
 
 def es_territorial(user):
-    return user.groups.filter(name='Territorial').exists() or user.groups.filter(id=5).exists()
+    return user.groups.filter(name='Territorial').exists() or user.groups.filter(id=4).exists()
+
+def es_territorial_o_admin(user):
+    return user.groups.filter(id=1).exists() or user.groups.filter(id=4).exists()
+
+@login_required
+def main_tipo_incidencia(request):
+    try:
+        profile = Profile.objects.get(user=request.user)
+    except Profile.DoesNotExist:
+        messages.error(request, 'Tu perfil de usuario no fue encontrado.')
+        return redirect('login')
+    if profile.group_id ==1:
+        return render(request, 'incidencia/main_tipo_incidencia.html')
+    else:
+        return redirect('logout')
 
 @login_required
 @user_passes_test(es_territorial, login_url='/accounts/login/')
@@ -16,10 +36,45 @@ def main_territorial(request):
     return render(request, 'incidencia/main_territorial.html')
 
 @login_required
-@user_passes_test(es_territorial, login_url='/accounts/login/')
+@user_passes_test(es_territorial_o_admin, login_url='/accounts/login/')
 def incidencia_list(request):
     incidencias = Incidencia.objects.filter(id_territorial=request.user)
-    return render(request, 'incidencia/incidencia_list.html', {'incidencias': incidencias})
+
+    search_query = request.GET.get('search', '')
+    estado = request.GET.get('estado', '')
+    prioridad = request.GET.get('prioridad', '')
+    ordenar = request.GET.get('ordenar', 'id_asc')
+
+    if search_query:
+        incidencias = incidencias.filter(direccion__icontains=search_query)
+    if estado:
+        incidencias = incidencias.filter(estado=estado)
+    if prioridad:
+        incidencias = incidencias.filter(prioridad=prioridad)
+
+    if ordenar == 'id_desc':
+        incidencias = incidencias.order_by('-id_incidencia')
+    elif ordenar == 'direccion_asc':
+        incidencias = incidencias.order_by('direccion')
+    elif ordenar == 'direccion_desc':
+        incidencias = incidencias.order_by('-direccion')
+    else:
+        incidencias = incidencias.order_by('id_incidencia')
+
+    paginator = Paginator(incidencias, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'incidencias_listado': page_obj,
+        'page_obj': page_obj,
+        'search_query': search_query,
+        'estado': estado,
+        'prioridad': prioridad,
+        'ordenar': ordenar,
+    }
+
+    return render(request, 'incidencia/incidencia_list.html', context)
 
 @login_required
 @user_passes_test(es_territorial, login_url='/accounts/login/')
@@ -77,7 +132,7 @@ def incidencia_create(request):
                     descripcion=request.POST.get('descripcion_archivo', '')
                 )
             
-            return redirect('incidencia_list')
+            return redirect('incidencia:incidencia_list')
             
         except Exception as e:
             return render(request, 'incidencia/incidencia_create.html', {
@@ -103,7 +158,7 @@ def determinar_tipo_archivo(nombre_archivo):
         return 'otro'
 
 @login_required
-@user_passes_test(es_territorial, login_url='/accounts/login/')
+@user_passes_test(es_territorial_o_admin, login_url='/accounts/login/')
 def incidencia_view(request, id):
     incidencia = get_object_or_404(Incidencia, id_incidencia=id, id_territorial=request.user)
     datos_vecino = get_object_or_404(DatosVecino, id_incidencia=incidencia)
@@ -119,6 +174,27 @@ def incidencia_view(request, id):
 
 @login_required
 @user_passes_test(es_territorial, login_url='/accounts/login/')
+def derivar_cuadrilla(request, id):
+    incidencia = get_object_or_404(Incidencia, id_incidencia=id, id_territorial=request.user)
+    cuadrillas = Cuadrilla.objects.filter(state=True).order_by('nombre_cuadrilla')
+
+    if request.method == 'POST':
+        id_cuadrilla = request.POST.get('cuadrilla')
+        if id_cuadrilla:
+            incidencia.cuadrilla_id = id_cuadrilla
+            incidencia.estado = 'derivada'
+            incidencia.save()
+        return redirect('incidencia:incidencia_list')
+
+    return render(request, 'incidencia/derivar_cuadrilla.html', {
+        'incidencia': incidencia,
+        'cuadrillas': cuadrillas
+    })
+
+
+
+@login_required
+@user_passes_test(es_territorial, login_url='/accounts/login/')
 def cambiar_estado_incidencia(request, id):
     incidencia = get_object_or_404(Incidencia, id_incidencia=id, id_territorial=request.user)
     
@@ -128,7 +204,7 @@ def cambiar_estado_incidencia(request, id):
             incidencia.estado = nuevo_estado
             incidencia.save()
         
-        return redirect('incidencia_list')
+        return redirect('incidencia:incidencia_list')
     
     return render(request, 'incidencia/cambiar_estado.html', {
         'incidencia': incidencia,
@@ -138,12 +214,139 @@ def cambiar_estado_incidencia(request, id):
 def get_preguntas_encuesta(request):
     id_encuesta = request.GET.get('id_encuesta')
     preguntas = Preguntas.objects.filter(id_encuesta_id=id_encuesta)
-    
-    data = []
-    for pregunta in preguntas:
-        data.append({
-            'id_preguntas': pregunta.id_preguntas,
-            'pregunta': pregunta.pregunta
-        })
-    
+    data = [{'id_preguntas': p.id_preguntas, 'pregunta': p.pregunta} for p in preguntas]
     return JsonResponse(data, safe=False)
+
+#-------------------SUPERUSUARIO VIEWS-------------------#
+@login_required
+def tipo_incidencia_create(request):
+    try:
+        profile = Profile.objects.get(user=request.user)
+    except Profile.DoesNotExist:
+        messages.error(request, 'Tu perfil de usuario no fue encontrado.')
+        return redirect('login')
+
+    if profile.group_id == 1:
+        if request.method == 'POST':
+            nombre = request.POST.get('nombre', '').strip()
+            if nombre:
+                TipoIncidencia.objects.create(nombre=nombre)
+                return redirect('incidencia:tipo_incidencia_list')
+            else:
+                error = "Debe ingresar un nombre para el tipo de incidencia"
+                return render(request, 'incidencia/tipo_incidencia_create.html', {'error': error})
+
+        # ✅ Agregamos este bloque para manejar el método GET
+        return render(request, 'incidencia/tipo_incidencia_create.html')
+    else:
+        return redirect('logout')
+
+
+@login_required
+def tipo_incidencia_list(request):
+    try:
+        profile = Profile.objects.get(user=request.user)
+    except Profile.DoesNotExist:
+        messages.error(request, 'Tu perfil de usuario no fue encontrado.')
+        return redirect('login')
+    if profile.group_id ==1:
+        tipos = TipoIncidencia.objects.all()
+        return render(request, 'incidencia/tipo_incidencia_list.html', {'tipos': tipos})
+    else:
+        return redirect('logout')
+
+@login_required
+def incidencia_list_secpla(request):
+    try:
+        profile = Profile.objects.get(user=request.user)
+    except Profile.DoesNotExist:
+        messages.error(request, 'Tu perfil de usuario no fue encontrado.')
+        return redirect('login')
+
+    # 🔹 Solo si el usuario pertenece al grupo 1
+    if profile.group_id == 1:
+        # ✅ Traer todas las incidencias primero
+        incidencias_listado = Incidencia.objects.all()
+
+        # 🔹 Calcular totales generales
+        total_incidencias = incidencias_listado.count()
+        total_abiertas = incidencias_listado.filter(estado='abierta').count()
+        total_proceso = incidencias_listado.filter(estado='proceso').count()
+        total_finalizadas = incidencias_listado.filter(estado='finalizada').count()
+        total_cerradas = incidencias_listado.filter(estado='cerrada').count()
+        total_rechazadas = incidencias_listado.filter(estado='rechazada').count()
+        total_derivadas = incidencias_listado.filter(estado='derivada').count()
+
+        # ✅ Aplicar filtros
+        search_query = request.GET.get('search', '')
+        estado = request.GET.get('estado', '')
+        prioridad = request.GET.get('prioridad', '')
+        ordenar = request.GET.get('ordenar', 'id_asc')
+
+        if search_query:
+            incidencias_listado = incidencias_listado.filter(
+                direccion__icontains=search_query
+            )
+        if estado:
+            incidencias_listado = incidencias_listado.filter(estado=estado)
+        if prioridad:
+            incidencias_listado = incidencias_listado.filter(prioridad=prioridad)
+
+        # ✅ Ordenar resultados
+        if ordenar == 'id_desc':
+            incidencias_listado = incidencias_listado.order_by('-id_incidencia')
+        elif ordenar == 'direccion_asc':
+            incidencias_listado = incidencias_listado.order_by('direccion')
+        elif ordenar == 'direccion_desc':
+            incidencias_listado = incidencias_listado.order_by('-direccion')
+        else:
+            incidencias_listado = incidencias_listado.order_by('id_incidencia')
+
+        # ✅ Paginación
+        paginator = Paginator(incidencias_listado, 10)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        # ✅ Contexto
+        context = {
+            'incidencias_listado': page_obj,
+            'page_obj': page_obj,
+            'search_query': search_query,
+            'estado': estado,
+            'prioridad': prioridad,
+            'ordenar': ordenar,
+            'total_incidencias': total_incidencias,
+            'total_abiertas': total_abiertas,
+            'total_proceso': total_proceso,
+            'total_finalizadas': total_finalizadas,
+            'total_cerradas': total_cerradas,
+            'total_rechazadas':total_rechazadas,
+            'total_derivadas':total_derivadas,
+        }
+
+        return render(request, 'incidencia/incidencia_list_secpla.html', context)
+    else:
+        return redirect('logout')
+
+@login_required
+def incidencia_view_secpla(request, id_incidencia):
+    try:
+        profile = Profile.objects.get(user=request.user)
+    except Profile.DoesNotExist:
+        messages.error(request, 'Tu perfil de usuario no fue encontrado.')
+        return redirect('login')
+
+    if profile.group_id == 1:
+        incidencia = get_object_or_404(Incidencia, id_incidencia=id_incidencia)
+        datos_vecino = get_object_or_404(DatosVecino, id_incidencia=incidencia)
+        archivos = ArchivosMultimedia.objects.filter(id_incidencia=incidencia)
+        respuestas = RegistrosRespuestas.objects.filter(id_incidencia=incidencia)
+    
+        return render(request, 'incidencia/incidencia_view_secpla.html', {
+            'incidencia': incidencia,
+            'datos_vecino': datos_vecino,
+            'archivos': archivos,
+            'respuestas': respuestas
+        })
+    else:
+        return redirect('logout')

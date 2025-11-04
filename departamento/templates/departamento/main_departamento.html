@@ -25,7 +25,7 @@
             <button class="btn btn-outline-primary" type="submit">Buscar</button>
             {% if search_query %}
                 <a href="{% url 'main_departamento' %}?direccion_id={{ direccion_id_seleccionada|default:'' }}&ordenar={{ orden_seleccionado|default:'' }}" 
-                   class="btn btn-outline-danger ms-2">Limpiar</a>
+                    class="btn btn-outline-danger ms-2">Limpiar</a>
             {% endif %}
         </form>
     </div>
@@ -48,7 +48,7 @@
             {% for direccion in todas_las_direcciones %}
                 <li>
                     <a class="dropdown-item {% if direccion.pk|stringformat:'s' == direccion_id_seleccionada %}active{% endif %}" 
-                       href="{% url 'main_departamento' %}?direccion_id={{ direccion.pk }}&{{ query_params|urlencode }}">
+                        href="{% url 'main_departamento' %}?direccion_id={{ direccion.pk }}&{{ query_params|urlencode }}">
                         {{ direccion.nombre_direccion }}
                     </a>
                 </li>
@@ -56,7 +56,7 @@
             <li><hr class="dropdown-divider"></li>
             <li>
                 <a class="dropdown-item {% if not direccion_id_seleccionada %}active{% endif %}" 
-                   href="{% url 'main_departamento' %}?ordenar={{ orden_seleccionado|default:'alfabeticamente' }}&search={{ search_query|default:'' }}&page=1">
+                    href="{% url 'main_departamento' %}?ordenar={{ orden_seleccionado|default:'alfabeticamente' }}&search={{ search_query|default:'' }}&page=1">
                     Mostrar Todos (Limpiar Filtro)
                 </a>
             </li>
@@ -65,14 +65,14 @@
             
             <li>
                 <a class="dropdown-item {% if orden_seleccionado == 'alfabeticamente' or not orden_seleccionado %}active{% endif %}" 
-                   href="{% url 'main_departamento' %}?ordenar=alfabeticamente&direccion_id={{ direccion_id_seleccionada|default:'' }}&search={{ search_query|default:'' }}&page=1">
+                    href="{% url 'main_departamento' %}?ordenar=alfabeticamente&direccion_id={{ direccion_id_seleccionada|default:'' }}&search={{ search_query|default:'' }}&page=1">
                     Alfabéticamente (Nombre)
                 </a>
             </li>
             
             <li>
                 <a class="dropdown-item {% if orden_seleccionado == 'direccion' %}active{% endif %}" 
-                   href="{% url 'main_departamento' %}?ordenar=direccion&direccion_id={{ direccion_id_seleccionada|default:'' }}&search={{ search_query|default:'' }}&page=1">
+                    href="{% url 'main_departamento' %}?ordenar=direccion&direccion_id={{ direccion_id_seleccionada|default:'' }}&search={{ search_query|default:'' }}&page=1">
                     Dirección
                 </a>
             </li>

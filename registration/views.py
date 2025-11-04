@@ -16,6 +16,8 @@ import string
 from django.core.paginator import Paginator
 from django.db.models.query import QuerySet 
 from .forms import CustomUserCreationForm, ProfileForm
+from django.db.models import Q
+from incidencia.models import Incidencia
 
 class SignUpView(CreateView):
     form_class = UserCreationFormWithEmail
@@ -91,6 +93,8 @@ def main_usuario(request):
         usuario_listado = User.objects.filter(is_active=True)
         usuario_listado = filtrar_usuarios_por_rol(request, usuario_listado)
         usuario_listado = usuario_listado.order_by('username')
+        cantidad_activos=User.objects.filter(is_active=True).count()
+        cantidad_incidencias=Incidencia.objects.count()
         paginator = Paginator(usuario_listado, 8) #para que funcione esta variable: from django.core.paginator import Paginator
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
@@ -99,7 +103,7 @@ def main_usuario(request):
         if 'page' in query_params:
             del query_params['page']
         query_params = query_params.urlencode()
-        return render(request, 'registration/main_usuario.html', {'page_obj': page_obj, 'todos_los_roles': todos_los_roles,'query_params': query_params,})
+        return render(request, 'registration/main_usuario.html', {'page_obj': page_obj, 'todos_los_roles': todos_los_roles,'query_params': query_params, 'cantidad_activos':cantidad_activos,'cantidad_incidencias':cantidad_incidencias})
     else:
         messages.error(request, 'No tienes permisos para acceder a esta página.')
         return redirect('logout')

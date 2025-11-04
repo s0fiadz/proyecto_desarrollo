@@ -4,10 +4,96 @@ from django.shortcuts import redirect, render, get_object_or_404
 from registration.models import Profile
 from direcciones.models import Direccion, encargado_direccion
 from django.contrib.auth.models import User
-
+from django.core.paginator import Paginator
+from django.db.models.query import QuerySet
+from incidencia.models import Incidencia, DatosVecino, ArchivosMultimedia, RegistrosRespuestas
+from django.contrib.auth.decorators import user_passes_test
 
 
 # Create your views here.
+#----------------------------------------------------DASHBOARD DIRECCIÓN------------------------------------------------------------------------------
+def es_encargado_direccion(user):
+    return user.groups.filter(id=2).exists()
+
+def filtrar_incidencias_por_estado(request, incidencias: QuerySet) -> QuerySet:
+    estado_filtro = request.GET.get('estado', None)
+    if estado_filtro:
+        if any(estado_filtro == e[0] for e in Incidencia.ESTADOS):
+            return incidencias.filter(estado=estado_filtro)
+    return incidencias
+
+def ordenar_incidencias(request, incidencias: QuerySet) -> QuerySet:
+    orden = request.GET.get('ordenar', 'recientes')
+    if orden == 'antiguas':
+        return incidencias.order_by('fecha_creacion')
+    if orden == 'prioridad':
+        return incidencias.order_by('-prioridad')
+    return incidencias.order_by('-fecha_creacion')
+
+@login_required
+@user_passes_test(es_encargado_direccion, login_url='/accounts/login/')
+def dashboard_direccion(request):
+    try:
+        encargado = encargado_direccion.objects.get(usuario=request.user)
+        direccion_usuario = encargado.direccion
+        id_direccion = direccion_usuario.id_direccion
+    except encargado_direccion.DoesNotExist:
+        messages.error(request, 'Usted no está asignado a ninguna dirección.')
+        return render(request, 'direcciones/dashboard_direccion.html', {
+            'error': True,
+            'estados': Incidencia.ESTADOS
+        })
+
+    incidencias_listado = Incidencia.objects.filter(id_direuntamiento=id_direccion)
+    incidencias_listado = filtrar_incidencias_por_estado(request, incidencias_listado)
+    incidencias_listado = ordenar_incidencias(request, incidencias_listado)
+
+    paginator = Paginator(incidencias_listado, 8)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    query_params = request.GET.copy()
+    if 'page' in query_params:
+        del query_params['page']
+    query_params = query_params.urlencode()
+
+    context = {
+        'page_obj': page_obj,
+        'query_params': query_params,
+        'estados': Incidencia.ESTADOS,
+        'estado_seleccionado': request.GET.get('estado', ''),
+        'orden_seleccionado': request.GET.get('ordenar', 'recientes'),
+        'direccion_usuario': direccion_usuario
+    }
+    return render(request, 'direcciones/dashboard_direccion.html', context)
+
+@login_required
+@user_passes_test(es_encargado_direccion, login_url='/accounts/login/')
+def ver_incidencia_direccion(request, id):
+    try:
+        encargado = encargado_direccion.objects.get(usuario=request.user)
+        id_direccion = encargado.direccion.id_direccion
+    except encargado_direccion.DoesNotExist:
+        messages.error(request, 'No tiene dirección asignada.')
+        return redirect('dashboard_direccion')
+
+    incidencia = get_object_or_404(
+        Incidencia,
+        id_incidencia=id,
+        id_direuntamiento=id_direccion
+    )
+
+    datos_vecino = get_object_or_404(DatosVecino, id_incidencia=incidencia)
+    archivos = ArchivosMultimedia.objects.filter(id_incidencia=incidencia)
+    respuestas = RegistrosRespuestas.objects.filter(id_incidencia=incidencia)
+
+    return render(request, 'direcciones/ver_incidencia_direccion.html', {
+        'incidencia': incidencia,
+        'datos_vecino': datos_vecino,
+        'archivos': archivos,
+        'respuestas': respuestas
+    })
+#----------------------------------------------------------------------------------------------------------------------------------
 
 @login_required
 def main_direccion(request):
@@ -18,9 +104,28 @@ def main_direccion(request):
         return redirect('login')
 
     if profile.group_id == 1:
+        search_query = request.GET.get('search', '')
+        ordenar=request.GET.get('ordenar', 'alfabetico')
         direccion_listado = Direccion.objects.filter(state=True).order_by('nombre_direccion')
+
+        if search_query:
+            direccion_listado = direccion_listado.filter(nombre_direccion__icontains=search_query)
+        if ordenar == 'alfabetico':
+            direccion_listado = direccion_listado.order_by('nombre_direccion')
+        elif ordenar == 'alfabetico_desc':
+            direccion_listado = direccion_listado.order_by('-nombre_direccion')
+        elif ordenar == 'id_asc':
+            direccion_listado = direccion_listado.order_by('id_direccion')
+        elif ordenar == 'id_desc':
+            direccion_listado = direccion_listado.order_by('-id_direccion')
+        
+        paginator = Paginator(direccion_listado, 5)
+        page_number = request.GET.get('page')
+        page_object = paginator.get_page(page_number)
+
+        direccion_listado = paginator.get_page(page_number)
         template_name = 'direcciones/main_direccion.html'
-        return render(request, template_name,{'direccion_listado': direccion_listado})
+        return render(request, template_name,{'direccion_listado': page_object,'search_query': search_query, 'ordenar': ordenar})
     else:
         return redirect('logout')
 
@@ -113,8 +218,8 @@ def ver_direccion(request, id_direccion):
         try: 
             direccion_count = Direccion.objects.filter(pk=id_direccion).count()
             if direccion_count <= 0:
-              messages.add_message(request, messages.INFO, 'Hubo un error')
-              return redirect('check_profile')
+                messages.add_message(request, messages.INFO, 'Hubo un error')
+                return redirect('check_profile')
             direccion_data = Direccion.objects.get(pk=id_direccion)
         except:
             messages.add_message(request, messages.INFO, 'Hubo un error')

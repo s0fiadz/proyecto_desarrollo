@@ -22,7 +22,14 @@
         <tr>
             <td>{{ departamento.nombre_dpto }}</td>
             <td>{{ departamento.direccion }}</td>
-            <td>{{ departamento.encargado }}</td>
+            <td>{% with encargado=d.encargadodepartamento_set.first %}
+                            {% if encargado %}
+                                {{ encargado.usuario.username }}
+                            {% else %}
+                                <span class="text-muted">Sin asignar</span>
+                            {% endif %}
+                        {% endwith %}
+            </td>
             <td>{{ departamento.state }}</td>
             <td>
                 <a href="{% url 'bloquear_desbloquear_departamento' departamento.id%}">Desbloquear</a>
