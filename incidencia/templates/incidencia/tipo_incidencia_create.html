@@ -1,0 +1,19 @@
+<h4>Crear Tipo de Incidencia</h4>
+
+{% if error %}
+<p style="color: red;"><strong>Error:</strong> {{ error }}</p>
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+    <p>
+        <input type="text" name="nombre" placeholder="Nombre del tipo de incidencia" required />
+    </p>
+    <p>
+        <input type="submit" value="Crear Tipo de Incidencia" />
+    </p>
+</form>
+
+<p>
+    <a href="{% url 'incidencia:main_tipo_incidencia' %}">Volver al menú</a>
+</p>

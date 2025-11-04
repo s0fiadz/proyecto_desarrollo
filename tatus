@@ -1,0 +1,214 @@
+[33mcommit 1f9f56bd2aac5457fbb5f2f73ac28b5089676a8a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mrama_edu[m[33m, [m[1;31morigin/rama_edu[m[33m)[m
+Author: esoto8543 <esoto8543@gmail.com>
+Date:   Wed Oct 1 23:44:40 2025 -0300
+
+    actualizacion urls.py de carpeta proyectoweb
+
+[33mcommit 4a5c9972cea120117ab4828adfb52e92e72dbba9[m
+Author: esoto8543 <esoto8543@gmail.com>
+Date:   Wed Oct 1 23:34:16 2025 -0300
+
+    Agrego función crear_departamento con validaciones y template
+
+[33mcommit 13a7cc77e7173ceb4f9f1b57b15031a337772d5f[m
+Author: esoto8543 <esoto8543@gmail.com>
+Date:   Wed Oct 1 22:59:42 2025 -0300
+
+    Cambios finales app departamento
+
+[33mcommit 85ac62ec5f803ff376752d0e3caddbe0c7d2f0eb[m
+Author: esoto8543 <esoto8543@gmail.com>
+Date:   Wed Oct 1 22:37:40 2025 -0300
+
+    Corrección: guardados cambios en urls.py, views.py y template de departamento
+
+[33mcommit 9c5d51850efbd47e772b80187fa8df099311ba8f[m
+Author: esoto8543 <esoto8543@gmail.com>
+Date:   Wed Oct 1 22:03:39 2025 -0300
+
+    Agregada app departamento y registrada en settings.py
+
+[33mcommit fee3fbdf960844ab571b09e00d0d4c3c246603a6[m
+Author: esoto8543 <esoto8543@gmail.com>
+Date:   Mon Sep 29 20:37:36 2025 -0300
+
+    Agregada función eliminar usuario, urls.py y template main_usuario actualizado
+
+[33mcommit ddb22179d5dfd1d24b9271e1582887f6d19a95a9[m[33m ([m[1;32mmain[m[33m)[m
+Author: e-smp <e.sanmartinpez@gmail.com>
+Date:   Sat Sep 27 21:00:51 2025 -0600
+
+    Revisión de función Bloquear/Desbloquear, la cual fue realizada por Equipo de Sofía Díaz y Alejandra Ulloa.
+
+[33mcommit 16c3fefb88222d1886dc38313de853a68a106eea[m
+Author: e-smp <e.sanmartinpez@gmail.com>
+Date:   Sat Sep 27 20:41:23 2025 -0600
+
+    :b
+
+[33mcommit 83bb189782fdf76233ba3878e9e3508d48af0a0c[m
+Author: e-smp <e.sanmartinpez@gmail.com>
+Date:   Sat Sep 27 20:36:05 2025 -0600
+
+    :bb
+
+[33mcommit 8264018497bb7877b3434e9d5fff36d128787565[m
+Author: e-smp <e.sanmartinpez@gmail.com>
+Date:   Sat Sep 27 19:12:21 2025 -0600
+
+    error crear usuario arreglado
+
+[33mcommit c48453da4d85d3d6f3161bf11833bfdc50f67cbb[m
+Author: s0fiadz <sofitapazdiaz@gmail.com>
+Date:   Sat Sep 27 18:15:16 2025 -0300
+
+    borrar los caches
+
+[33mcommit 4e7f9b4e91e3de09141ef0d147bcb7e1d7120821[m
+Merge: c8b6b46 f43a077
+Author: s0fiadz <sofitapazdiaz@gmail.com>
+Date:   Sat Sep 27 17:58:39 2025 -0300
+
+    Merge branch 'main' of https://github.com/s0fiadz/Desarrollo_App
+
+[33mcommit c8b6b46b175eb7af8464ea3b09a063a0a41cd0aa[m
+Author: s0fiadz <sofitapazdiaz@gmail.com>
+Date:   Sat Sep 27 17:57:03 2025 -0300
+
+    Remove __pycache__ from repository
+
+[33mcommit f43a0770db93e6b02cddf10bea71ea79df76ac68[m[33m ([m[1;31morigin/rama_ale[m[33m)[m
+Merge: e27ee07 35ae885
+Author: xinobuu <alejandra.ulloa1@cloud.uautonoma.cl>
+Date:   Sat Sep 27 17:46:36 2025 -0300
+
+    Merge branch main' of https://github.com/s0fiadz/Desarrollo_App into rama_ale
+
+[33mcommit e27ee07cbd58279818c375b49f034fbbf699d029[m
+Author: xinobuu <alejandra.ulloa1@cloud.uautonoma.cl>
+Date:   Sat Sep 27 17:39:46 2025 -0300
+
+    Elimino archivos .pyc y actualizo .gitignore
+
+[33mcommit 40dd22a816aef1cc60f057ccbde461950cf02775[m
+Author: xinobuu <alejandra.ulloa1@cloud.uautonoma.cl>
+Date:   Sat Sep 27 17:36:12 2025 -0300
+
+    mensaje de bloqueo
+
+[33mcommit 35ae8858706073fe1c0618b134dc27b12a0cf7e0[m
+Merge: efc5ab4 8532e9d
+Author: xinobuu <alejandra.ulloa1@cloud.uautonoma.cl>
+Date:   Sat Sep 27 17:18:49 2025 -0300
+
+    Resuelvo conflicto eliminando .pyc del control de versiones
+
+[33mcommit 8532e9d633cce23bafd23b6f58f98131a805f09d[m
+Author: xinobuu <alejandra.ulloa1@cloud.uautonoma.cl>
+Date:   Sat Sep 27 17:12:43 2025 -0300
+
+    Elimino .pyc del control de versiones
+
+[33mcommit efc5ab4df46a91fb41bb94d2114bee3cb8528686[m
+Author: xinobuu <alejandra.ulloa1@cloud.uautonoma.cl>
+Date:   Sat Sep 27 17:10:40 2025 -0300
+
+    Agrego .pyc y __pycache__ al .gitignore
+
+[33mcommit 00a384ca2cf8fb2a903e944661e21ab21052b224[m
+Author: xinobuu <alejandra.ulloa1@cloud.uautonoma.cl>
+Date:   Sat Sep 27 17:04:10 2025 -0300
+
+    No bloquear superusuarios
+
+[33mcommit fd92efeac4df5c5a66bdf6124516085726d537a3[m
+Author: xinobuu <alejandra.ulloa1@cloud.uautonoma.cl>
+Date:   Sat Sep 27 16:36:09 2025 -0300
+
+    :c
+
+[33mcommit c481461276f4966beddf7740a5af0b4bae065d2f[m
+Author: s0fiadz <sofitapazdiaz@gmail.com>
+Date:   Sat Sep 27 16:26:52 2025 -0300
+
+    segunda parte de bloquear :P
+
+[33mcommit 8de7a01cbedc31577e27c8e4d02b341d341138e5[m
+Author: s0fiadz <sofitapazdiaz@gmail.com>
+Date:   Sat Sep 27 16:11:22 2025 -0300
+
+    Update README.md
+    
+    :(
+
+[33mcommit 0456d08dc93b6f8900b422e52a45ffea60a4a90e[m
+Author: xinobuu <alejandra.ulloa1@cloud.uautonoma.cl>
+Date:   Sat Sep 27 15:54:55 2025 -0300
+
+    primera parte bloquear usuarios y act de git.ignore
+
+[33mcommit a510f980b05da44d011d27e0b1bce593c8b5f2ed[m
+Author: s0fiadz <sofitapazdiaz@gmail.com>
+Date:   Sat Sep 27 15:50:08 2025 -0300
+
+    Revert commit HEAD
+
+[33mcommit 91756136405cce049a02d01cc1cb9d3bd5223da3[m
+Author: s0fiadz <sofitapazdiaz@gmail.com>
+Date:   Sat Sep 27 14:56:31 2025 -0300
+
+    actualizacion 2 del .gitignore :(
+
+[33mcommit 781da661bce93ff15a5d3463da4a2587c6d8939f[m
+Author: s0fiadz <sofitapazdiaz@gmail.com>
+Date:   Sat Sep 27 14:01:06 2025 -0300
+
+    README.md
+
+[33mcommit a890960a7b0527297ba7e9ada510abc67e0dae59[m
+Author: e-smp <e.sanmartinpez@gmail.com>
+Date:   Sat Sep 27 00:26:11 2025 -0600
+
+    Función Editar creada por el equipo mas grande de chile
+
+[33mcommit 69a705355b7aa7920bf06122e780a8692ce5d697[m[33m ([m[1;31morigin/rama_emilio[m[33m)[m
+Author: e-smp <e.sanmartinpez@gmail.com>
+Date:   Fri Sep 26 19:09:45 2025 -0600
+
+    Comentarios actualizados
+
+[33mcommit 6fe296cad0f38f188a9fdc466a4c0812bfea2963[m
+Author: s0fiadz <sofitapazdiaz@gmail.com>
+Date:   Fri Sep 26 16:47:31 2025 -0300
+
+    README.md
+
+[33mcommit 4a7753a1d6a57535be65a880ffff1283afd0b831[m
+Author: s0fiadz <sofitapazdiaz@gmail.com>
+Date:   Fri Sep 26 16:45:09 2025 -0300
+
+    README.md
+
+[33mcommit 3623ef22ede5824840be38b820fc90397bdaaea4[m
+Author: s0fiadz <sofitapazdiaz@gmail.com>
+Date:   Fri Sep 26 13:42:04 2025 -0300
+
+    README.md
+
+[33mcommit 17d51d19981058c441b5f8053f9874d062540878[m
+Author: s0fiadz <sofitapazdiaz@gmail.com>
+Date:   Fri Sep 26 13:23:47 2025 -0300
+
+    actualización del .gitignore
+
+[33mcommit eb16f6c7c5d751cb392cfc81679bf2b44fca0809[m
+Author: s0fiadz <sofitapazdiaz@gmail.com>
+Date:   Fri Sep 26 13:17:40 2025 -0300
+
+    se agregó el .gitignore
+
+[33mcommit 733c16d75a70936af5eecda21ac029351bf8530c[m
+Author: s0fiadz <sofitapazdiaz@gmail.com>
+Date:   Fri Sep 26 12:58:41 2025 -0300
+
+    Primer commit

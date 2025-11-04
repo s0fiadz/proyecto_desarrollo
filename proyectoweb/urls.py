@@ -24,6 +24,7 @@ from django.conf import settings
 from encuesta import urls as encuesta_urls
 from incidencia import urls as incidencia_urls
 from cuadrillas import urls as cuadrillas_urls
+
 urlpatterns = [
     path('', include(core_urlpatterns)),
     path('admin/', admin.site.urls),
@@ -32,7 +33,7 @@ urlpatterns = [
     path('departamento/', include(departamento_urls.departamento_urlpatterns)),
     path('direcciones/', include(direcciones_urls.direcciones_urlpatterns)),
     path('encuesta/', include(encuesta_urls.encuesta_urlpatterns)),
-    path('incidencia/', include(incidencia_urls.incidencia_urlpatterns)),
+    path('incidencia/', include((incidencia_urls.incidencia_urlpatterns, 'incidencia'), namespace='incidencia')),
     path('cuadrillas/', include(cuadrillas_urls.cuadrillas_urlpatterns))
 ]    
 if settings.DEBUG:

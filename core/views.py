@@ -25,12 +25,17 @@ def pre_check_profile(request):
 
 @login_required
 def check_profile(request):
-    # Verificar si el usuario pertenece al grupo territorial (ID 5)
-    if request.user.groups.filter(id=5).exists():
-        return redirect('/incidencia/')  # URL directa sin usar namespace
-    # Verificar si es superusuario (para las otras apps)
-    elif request.user.is_superuser:
+    if request.user.is_superuser or request.user.groups.filter(id=1).exists():
         return redirect('main_admin')
+    elif request.user.groups.filter(id=2).exists():
+        return redirect('dashboard_direccion') 
+    elif request.user.groups.filter(id=4).exists():
+        return redirect('/incidencia/')
+    elif request.user.groups.filter(id=3).exists():
+        return redirect('home')
+    elif request.user.groups.filter(id=5).exists():
+        return redirect('main_cuadrilla') 
+
     else:
         return redirect('main_admin')
 
@@ -46,4 +51,5 @@ def main_admin(request):
         template_name = 'core/main_admin.html'
         return render(request,template_name)
     else:
+        messages.add_message(request, messages.INFO, 'No tiene permisos para ver esta página')              
         return redirect('logout')

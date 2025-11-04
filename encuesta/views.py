@@ -1,7 +1,49 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Encuesta, TipoIncidencia, Preguntas
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.models import User
+from incidencia.models import Incidencia
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Q
+
+
+def filtrar_encuestas(request, queryset):
+    tipo_incidencia_id = request.GET.get('tipo_incidencia_id')
+    estado = request.GET.get('estado')
+    search_query = request.GET.get('search')
+
+    # Filtrar por tipo de incidencia
+    if tipo_incidencia_id and tipo_incidencia_id.isdigit():
+        queryset = queryset.filter(id_tipo_incidencia_id=tipo_incidencia_id)
+
+    # 🔹 Filtrar por estado (Activo/Inactivo)
+    if estado in ['True', 'False']:
+        queryset = queryset.filter(activo=(estado == 'True'))
+
+    # Filtrar por búsqueda en título o descripción
+    if search_query:
+        queryset = queryset.filter(
+            Q(titulo__icontains=search_query) |
+            Q(descripcion__icontains=search_query)
+        )
+
+    return queryset
+
+
+def ordenar_encuestas(request, queryset):
+    orden = request.GET.get('ordenar')
+
+    if orden == 'titulo_asc':
+        return queryset.order_by('titulo')
+    elif orden == 'titulo_desc':
+        return queryset.order_by('-titulo')
+    elif orden == 'tipo_incidencia':
+        return queryset.order_by('id_tipo_incidencia__nombre')
+
+    return queryset.order_by('-id_encuesta')
 
 def encuesta_create(request):
+    
     tipos_incidencia = TipoIncidencia.objects.all()
     
     if request.method == 'POST':
@@ -111,8 +153,44 @@ def encuesta_edit(request, id):
     })
 
 def encuesta_list(request):
-    encuestas = Encuesta.objects.all()
-    return render(request, 'encuesta/encuesta_list.html', {'encuestas': encuestas})
+    encuestas_list = Encuesta.objects.all().select_related('id_tipo_incidencia')
+
+    encuestas_list = filtrar_encuestas(request, encuestas_list)
+    encuestas_list = ordenar_encuestas(request, encuestas_list)
+
+    page = request.GET.get('page', 1)
+    try:
+        per_page = int(request.GET.get('per_page', 10))
+    except ValueError:
+        per_page = 10
+
+    paginator = Paginator(encuestas_list, per_page)
+
+    try:
+        encuestas = paginator.page(page)
+    except PageNotAnInteger:
+        encuestas = paginator.page(1)
+    except EmptyPage:
+        encuestas = paginator.page(paginator.num_pages)
+
+    todos_los_tipos = TipoIncidencia.objects.all()
+
+    query_params = request.GET.copy()
+    if 'page' in query_params:
+        del query_params['page']
+    query_params_str = query_params.urlencode()
+
+    context = {
+        'encuestas': encuestas,
+        'todos_los_tipos': todos_los_tipos,
+        'selected_tipo_id': request.GET.get('tipo_incidencia_id'),
+        'selected_estado': request.GET.get('estado'),
+        'selected_orden': request.GET.get('ordenar'),
+        'search_query': request.GET.get('search'),
+        'query_params': query_params_str,
+    }
+
+    return render(request, 'encuesta/encuesta_list.html', context)
 
 def encuesta_toggle(request, id):
     encuesta = get_object_or_404(Encuesta, id_encuesta=id)

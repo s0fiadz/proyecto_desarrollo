@@ -3,7 +3,7 @@ from incidencia.models import Incidencia  # IMPORTAR desde la app incidencia
 
 class TipoIncidencia(models.Model):
     id_tipo = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=100)
+    nombre = models.CharField(max_length=100, unique=True)
     
     class Meta:
         db_table = 'tipo_incidencia'

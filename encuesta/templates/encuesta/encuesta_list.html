@@ -1,41 +1,151 @@
-<h4>Lista de Encuestas</h4>
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listado de Encuestas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
 
-<a href="{% url 'encuesta_create' %}">Crear Nueva Encuesta</a>
-<br>
-<a href="{% url 'main_admin' %}">Volver al menú principal</a>
-<table>
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Título</th>
-            <th>Tipo Incidencia</th>
-            <th>Descripción</th>
-            <th>Preguntas</th>  <!-- NUEVA COLUMNA -->
-            <th>Estado</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for encuesta in encuestas %}
-        <tr>
-            <td>{{ encuesta.id_encuesta }}</td>
-            <td>{{ encuesta.titulo }}</td>
-            <td>{{ encuesta.id_tipo_incidencia.nombre }}</td>
-            <td>{{ encuesta.descripcion|truncatewords:10 }}</td>  <!-- Descripción acortada -->
-            <td>{{ encuesta.preguntas.count }} preguntas</td>  <!-- Número de preguntas -->
-            <td>{% if encuesta.activo %}Activo{% else %}Bloqueado{% endif %}</td>
-            <td>
-                <a href="{% url 'encuesta_view' encuesta.id_encuesta %}">Ver</a>
-                <a href="{% url 'encuesta_edit' encuesta.id_encuesta %}">Editar</a>
-                <a href="{% url 'encuesta_toggle' encuesta.id_encuesta %}">
-                    {% if encuesta.activo %}Bloquear{% else %}Desbloquear{% endif %}
-                </a>
-            </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="7">No hay encuestas registradas</td>  <!-- Cambiado a 7 columnas -->
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="container mt-4">
+
+    <h2 class="mb-3">Listado de Encuestas</h2>
+    <hr>
+
+    <div class="mb-4">
+        <a href="{% url 'encuesta_create' %}" class="btn btn-success">Crear Nueva Encuesta</a>
+        <a href="{% url 'main_admin' %}" class="btn btn-secondary">Volver al menú principal</a>
+    </div>
+
+    <!-- 🔹 Formulario de filtros -->
+    <form method="GET" action="" class="card card-body mb-4">
+        <div class="row g-3 align-items-end">
+
+            <!-- Buscar por título -->
+            <div class="col-md-3">
+                <label for="search" class="form-label">Buscar por Título</label>
+                <input type="text" name="search" id="search" class="form-control"
+                        value="{{ search_query|default:'' }}" placeholder="Buscar...">
+            </div>
+
+            <!-- Tipo de incidencia -->
+            <div class="col-md-3">
+                <label for="tipo_incidencia_id" class="form-label">Tipo de Incidencia</label>
+                <select name="tipo_incidencia_id" id="tipo_incidencia_id" class="form-select">
+                    <option value="">Todos</option>
+                    {% for tipo in todos_los_tipos %}
+                        <option value="{{ tipo.id_tipo }}" {% if selected_tipo_id == tipo.id_tipo|stringformat:"s" %}selected{% endif %}>
+                            {{ tipo.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- 🔹 Nuevo filtro por estado -->
+            <div class="col-md-3">
+                <label for="estado" class="form-label">Estado</label>
+                <select name="estado" id="estado" class="form-select">
+                    <option value="">Todos</option>
+                    <option value="True" {% if selected_estado == 'True' %}selected{% endif %}>Activo</option>
+                    <option value="False" {% if selected_estado == 'False' %}selected{% endif %}>Inactivo</option>
+                </select>
+            </div>
+
+            <!-- Botones -->
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary">Filtrar</button>
+                <a href="{% url 'encuesta_list' %}" class="btn btn-outline-secondary">Limpiar</a>
+            </div>
+        </div>
+    </form>
+
+    <!-- 🔹 Tabla de encuestas -->
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Título</th>
+                    <th>Tipo Incidencia</th>
+                    <th>Descripción</th>
+                    <th>Preguntas</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for encuesta in encuestas %}
+                <tr>
+                    <td>{{ encuesta.id_encuesta }}</td>
+                    <td>{{ encuesta.titulo }}</td>
+                    <td>{{ encuesta.id_tipo_incidencia.nombre }}</td>
+                    <td>{{ encuesta.descripcion|truncatewords:10 }}</td>
+                    <td>{{ encuesta.preguntas_set.count }} preguntas</td>
+                    <td>
+                        {% if encuesta.activo %}
+                            <span class="badge bg-success">Activo</span>
+                        {% else %}
+                            <span class="badge bg-danger">Bloqueado</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'encuesta_view' encuesta.id_encuesta %}" class="btn btn-sm btn-info">Ver</a>
+                        <a href="{% url 'encuesta_edit' encuesta.id_encuesta %}" class="btn btn-sm btn-warning">Editar</a>
+                        <a href="{% url 'encuesta_toggle' encuesta.id_encuesta %}" class="btn btn-sm btn-{% if encuesta.activo %}danger{% else %}success{% endif %}">
+                            {% if encuesta.activo %}Bloquear{% else %}Activar{% endif %}
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center">
+                        No hay encuestas que coincidan con los filtros.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 🔹 Paginación -->
+    {% if encuestas.paginator.num_pages > 1 %}
+    <nav aria-label="Paginación de Encuestas">
+        <ul class="pagination justify-content-center">
+
+            {% if encuestas.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?{{ query_params }}&page={{ encuestas.previous_page_number }}">Anterior</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+            {% endif %}
+
+            {% for i in encuestas.paginator.page_range %}
+                {% if encuestas.number == i %}
+                    <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                {% else %}
+                    <li class="page-item"><a class="page-link" href="?{{ query_params }}&page={{ i }}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if encuestas.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?{{ query_params }}&page={{ encuestas.next_page_number }}">Siguiente</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="text-center mb-4">
+        <p class="text-muted">Página {{ encuestas.number }} de {{ encuestas.paginator.num_pages }}</p>
+    </div>
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

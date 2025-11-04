@@ -1,6 +1,7 @@
 from django.urls import path
 from direcciones import views
 
+
 direcciones_urlpatterns = [
     path('main_direccion/', views.main_direccion, name='main_direccion'),
     path('crear_direccion/', views.crear_direccion, name='crear_direccion'),
@@ -11,4 +12,6 @@ direcciones_urlpatterns = [
     path('bloquear_desbloquear_direccion/<int:id_direccion>/', views.bloquear_desbloquear_direccion, name='bloquear_desbloquear_direccion'),
     path('direcciones_bloqueadas/', views.main_direcciones_bloqueadas, name='main_direcciones_bloqueadas'),
     path('asignar_encargado/<int:id_direccion>/', views.asignar_encargado, name='asignar_encargado'),
+    path('dashboard/', views.dashboard_direccion, name='dashboard_direccion'),
+    path('dashboard/incidencia/<int:id>/', views.ver_incidencia_direccion, name='ver_incidencia_direccion'),
 ]

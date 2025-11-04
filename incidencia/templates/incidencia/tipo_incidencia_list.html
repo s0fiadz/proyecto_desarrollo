@@ -1,0 +1,13 @@
+<h4>Lista de Tipos de Incidencia</h4>
+
+<ul>
+{% for tipo in tipos %}
+    <li>{{ tipo.nombre }}</li>
+{% empty %}
+    <li>No hay tipos de incidencia registrados.</li>
+{% endfor %}
+</ul>
+
+<p>
+    <a href="{% url 'incidencia:main_tipo_incidencia' %}">Volver al menú</a>
+</p>

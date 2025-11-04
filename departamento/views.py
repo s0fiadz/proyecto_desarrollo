@@ -306,51 +306,48 @@ def departamentos_json_list(request):
 @login_required
 def asignar_encargado_depto(request, id_departamento):
     try:
-        profile = Profile.objects.filter(user_id=request.user.id).get()
+        profile = Profile.objects.get(user_id=request.user.id)
     except Profile.DoesNotExist:
-        messages.add_message(request, messages.INFO, 'Hubo un error de autenticación.')
+        messages.info(request, 'Hubo un error de autenticación.')
         return redirect('logout')
 
     if profile.group_id != 1:
-        messages.add_message(request, messages.INFO, 'No tiene permisos para realizar esta acción.')
+        messages.info(request, 'No tiene permisos para realizar esta acción.')
         return redirect('logout')
-
     try:
         departamento = Departamento.objects.get(pk=id_departamento)
     except Departamento.DoesNotExist:
-        messages.add_message(request, messages.INFO, 'El departamento no existe.')
+        messages.info(request, 'El departamento no existe.')
         return redirect('main_departamento')
-
-    usuarios = User.objects.all().order_by('username')
-
+    usuarios = (
+        User.objects
+        .filter(groups__id=3, is_active=True)
+        .distinct()
+        .order_by('first_name', 'last_name')
+    )
     if request.method == 'POST':
         id_usuario = request.POST.get('usuario', '').strip()
-
         if not id_usuario:
-            messages.add_message(request, messages.INFO, 'Debe seleccionar un usuario.')
-            return redirect('asignar_encargado', id_departamento=id_departamento)
-
+            messages.info(request, 'Debe seleccionar un usuario.')
+            return redirect('asignar_encargado_depto', id_departamento=id_departamento)
         try:
             usuario = User.objects.get(pk=id_usuario)
         except User.DoesNotExist:
-            messages.add_message(request, messages.INFO, 'El usuario seleccionado no existe.')
-            return redirect('asignar_encargado', id_departamento=id_departamento)
-
+            messages.info(request, 'El usuario seleccionado no existe.')
+            return redirect('asignar_encargado_depto', id_departamento=id_departamento)
         if EncargadoDepartamento.objects.filter(departamento=departamento).exists():
-            messages.add_message(request, messages.INFO, f'El departamento "{departamento.nombre_dpto}" ya tiene un encargado asignado.')
+            messages.info(request, f'El departamento "{departamento.nombre_dpto}" ya tiene un encargado asignado.')
             return redirect('main_departamento')
-
         if EncargadoDepartamento.objects.filter(usuario=usuario).exists():
-            messages.add_message(request, messages.INFO, f'El usuario "{usuario.username}" ya está asignado a otro departamento.')
+            messages.info(request, f'El usuario "{usuario.username}" ya está asignado a otro departamento.')
             return redirect('main_departamento')
-
-        EncargadoDepartamento.objects.create(
-            departamento=departamento,
-            usuario=usuario
+        EncargadoDepartamento.objects.create(departamento=departamento, usuario=usuario)
+        messages.success(
+            request,
+            f'Se asignó correctamente a "{usuario.get_full_name() or usuario.username}" '
+            f'como encargado del departamento "{departamento.nombre_dpto}".'
         )
-        messages.add_message(request, messages.SUCCESS, f'Se asignó correctamente a "{usuario.username}" como encargado del departamento "{departamento.nombre_dpto}".')
         return redirect('main_departamento')
-
     template_name = 'departamento/asignar_encargado.html'
     context = {
         'departamento': departamento,

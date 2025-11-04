@@ -7,7 +7,7 @@
     {% endfor %}
   {% endif %}
 
-  <form method="post" action="{% url 'editar_departamento' departamento.id %}">
+  <form method="post" action="{% url 'editar_departamento' departamento.id %}" autocomplete="off">
     {% csrf_token %}
     <div class="mb-3">
       <label for="nombre_dpto" class="form-label">Nombre</label>
@@ -15,10 +15,17 @@
     </div>
 
     <div class="mb-3">
-      <label for="direccion" class="form-label">Dirección</label>
-      <input type="text" class="form-control" id="direccion" name="direccion" value="{{ departamento.direccion }}" required>
+      <label for="direccion_id" class="form-label">Dirección</label>
+      <select class="form-select" id="direccion_id" name="direccion" required> <option value="">Seleccione una dirección</option>
+        
+        {% for dir in direcciones %}
+            <option value="{{ dir.id_direccion }}" 
+                {% if departamento.direccion.id_direccion == dir.id_direccion %}selected{% endif %}>
+                {{ dir.nombre_direccion }}
+            </option>
+        {% endfor %}
+      </select>
     </div>
-
     <button type="submit" class="btn btn-primary">Guardar cambios</button>
     <a href="{% url 'main_departamento' %}" class="btn btn-secondary ms-2">Cancelar</a>
   </form>

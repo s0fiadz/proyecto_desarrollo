@@ -31,7 +31,7 @@ def crear_cuadrilla(request):
         return redirect('check_profile')
 
     if profile.group_id == 1:
-        operarios_disponibles = User.objects.filter(groups__id=6).exclude(
+        operarios_disponibles = User.objects.filter(groups__id=5).exclude(
             id__in=Miembro_cuadrilla.objects.values_list('usuario_id', flat=True)
         ).order_by('first_name')
 
@@ -228,7 +228,7 @@ def editar_cuadrillas(request, id_cuadrilla=None):
 
     # GET request - mostrar formulario
     template_name = 'cuadrillas/editar_cuadrillas.html'
-    todos_usuarios = User.objects.all()
+    todos_usuarios = User.objects.filter(groups__id=5, is_active=True).order_by('first_name', 'last_name')
     
     return render(request, template_name, {
         'cuadrilla_data': cuadrilla,
@@ -287,7 +287,7 @@ def main_operario(request):
         return redirect('login')
 
     if profile.group_id == 1:
-        operario_listado = Miembro_cuadrilla.objects.select_related('usuario', 'cuadrilla').filter(state= True, cuadrilla__state=True, usuario__groups__id=6).order_by('usuario__first_name', 'usuario__last_name')
+        operario_listado = Miembro_cuadrilla.objects.select_related('usuario', 'cuadrilla').filter(state= True, cuadrilla__state=True, usuario__groups__id=5).order_by('usuario__first_name', 'usuario__last_name')
 #agregue en el filter el state=true que hace referencia a los operarios.        
         template_name = 'cuadrillas/main_operario.html'
         context = {

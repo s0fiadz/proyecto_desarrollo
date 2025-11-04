@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 class Incidencia(models.Model):
     ESTADOS = [('abierta', 'Abierta'), ('derivada', 'Derivada'), ('rechazada', 'Rechazada'), 
-               ('proceso', 'En Proceso'), ('finalizada', 'Finalizada'), ('cerrada', 'Cerrada')]
+                ('proceso', 'En Proceso'), ('finalizada', 'Finalizada'), ('cerrada', 'Cerrada')]
     
     PRIORIDADES = [('baja', 'Baja'), ('media', 'Media'), ('alta', 'Alta'), ('urgente', 'Urgente')]
     

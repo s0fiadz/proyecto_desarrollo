@@ -4,7 +4,7 @@
 <p style="color: red;"><strong>Error:</strong> {{ error }}</p>
 {% endif %}
 
-<form method="post" action="{% url 'incidencia_create' %}" enctype="multipart/form-data">
+<form method="post" action="{% url 'incidencia:incidencia_create' %}" enctype="multipart/form-data">
     {% csrf_token %}
     
     <p><strong>Datos de la Incidencia:</strong></p>
@@ -79,7 +79,7 @@ function cargarPreguntas() {
         return;
     }
     
-    fetch(`{% url 'get_preguntas' %}?id_encuesta=${encuestaId}`)
+    fetch(`{% url 'incidencia:get_preguntas' %}?id_encuesta=${encuestaId}`)
         .then(response => response.json())
         .then(data => {
             if (data.length > 0) {
@@ -103,4 +103,4 @@ function cargarPreguntas() {
 }
 </script>
 
-<a href="{% url 'incidencia_list' %}">Volver a Incidencias</a>
+<a href="{% url 'incidencia:incidencia_list' %}">Volver a Incidencias</a>

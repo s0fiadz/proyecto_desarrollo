@@ -3,7 +3,7 @@
 <p><strong>Incidencia:</strong> {{ incidencia.id_incidencia }} - {{ incidencia.direccion }}</p>
 <p><strong>Estado actual:</strong> {{ incidencia.get_estado_display }}</p>
 
-<form method="post" action="{% url 'cambiar_estado' incidencia.id_incidencia %}">
+<form method="post" action="{% url 'incidencia:cambiar_estado' incidencia.id_incidencia %}">
     {% csrf_token %}
     
     <p>
@@ -20,5 +20,5 @@
     <p><input type="submit" value="Cambiar Estado"/></p>
 </form>
 
-<a href="{% url 'incidencia_view' incidencia.id_incidencia %}">Volver a Incidencia</a>
-<a href="{% url 'incidencia_list' %}">Volver a Lista</a>
+<a href="{% url 'incidencia:incidencia_view' incidencia.id_incidencia %}">Volver a Incidencia</a>
+<a href="{% url 'incidencia:incidencia_list' %}">Volver a Lista</a>
