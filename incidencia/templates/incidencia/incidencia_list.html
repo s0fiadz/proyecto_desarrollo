@@ -86,6 +86,7 @@
                 <tr>
                     <th>ID</th>
                     <th>Dirección</th>
+                    <th>Departamento</th>
                     <th>Prioridad</th>
                     <th>Estado</th>
                     <th>Fecha</th>
@@ -97,6 +98,7 @@
                 <tr>
                     <td>{{ incidencia.id_incidencia }}</td>
                     <td>{{ incidencia.direccion }}</td>
+                    <td>{{ incidencia.departamento.nombre_dpto }}</td>
                     <td>
                         <span class="badge 
                             {% if incidencia.prioridad == 'baja' %}bg-success
