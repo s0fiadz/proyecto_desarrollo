@@ -12,6 +12,12 @@ Antes de comenzar, asegúrate de:
 ```
 pip install -r requirements.txt
 ```
+
+# 🌱 Clonar el repositorio
+```
+cd (ingresa la dirección donde dejarás el proyecto)
+git clone https://github.com/s0fiadz/proyecto_desarrollo.git
+```
 # 👤 Configurar identidad local en Git
 Antes de hacer tu primer commit, configura tu nombre y correo para que Git registre correctamente tus contribuciones :
 ```
@@ -20,16 +26,11 @@ git config user.email "tu_correo_vinculado_en_GitHub@ejemplo.com"
 ```
 (recuerda usar tus mismas credenciales que tienes en tu cuenta de GitHub)
 
-# 🌱 Clonar el repositorio
-```
-cd (ingresa la dirección donde dejarás el proyecto)
-git clone https://github.com/s0fiadz/proyecto_desarrollo.git
-```
-
 # 🗂️ Base de datos
-1. Primero eliminar la base de datos que ya tenían y crean una nueva con el mismo nombre: 'proyectoweb'
-2. Luego se van a la consola y hacen 'python manage.py makemigrations' y luego 'python manage.py migrate'
-3. Luego insertan estos datos en la base de datos:
+1. Primero, deben meterse a la carpeta de donde tienen clonado el git, meterse a cada una de las aplicaciones, y borrar las migraciones (ej: core -> migrations -> borrar todo menos __pycache__ y __init__). Deben hacer en cada una de las aplicaciones creadas.
+2. Deben eliminar la base de datos que ya tenían y crean una nueva con el mismo nombre: 'proyectoweb'
+3. Luego se van a la consola y hacen 'python manage.py makemigrations' y luego 'python manage.py migrate'
+4. Luego insertan estos datos en la base de datos:
 ```
 insert into auth_group VALUES(1, 'Admin')
 insert into auth_group VALUES(2, 'Direccion')
@@ -37,8 +38,8 @@ insert into auth_group VALUES(3, 'Departamento')
 insert into auth_group VALUES(4, 'Territorial')
 insert into auth_group VALUES(5, 'Cuadrilla')
 ```
-4. Luego creen el super usuario con 'python manage.py createsuperuser'
-5. Una vez creado, ingresan esto en la base de datos:
+5. Luego creen el super usuario con 'python manage.py createsuperuser'
+6. Una vez creado, ingresan esto en la base de datos:
 ```
 insert into registration_profile VALUES(0, 'Default','Default', 88738473, 1,1)
 ```
