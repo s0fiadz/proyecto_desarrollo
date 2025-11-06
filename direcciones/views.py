@@ -44,10 +44,16 @@ def dashboard_direccion(request):
             'estados': Incidencia.ESTADOS
         })
 
-    incidencias_listado = Incidencia.objects.filter(id_direuntamiento=id_direccion)
+    # 🔹 Buscar incidencias que pertenecen a departamentos de esta dirección
+    incidencias_listado = Incidencia.objects.filter(
+        departamento__direccion_id=id_direccion
+    ).select_related('departamento')
+
+    # 🔹 Aplicar filtros y ordenamientos
     incidencias_listado = filtrar_incidencias_por_estado(request, incidencias_listado)
     incidencias_listado = ordenar_incidencias(request, incidencias_listado)
 
+    # 🔹 Paginación
     paginator = Paginator(incidencias_listado, 8)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -66,7 +72,6 @@ def dashboard_direccion(request):
         'direccion_usuario': direccion_usuario
     }
     return render(request, 'direcciones/dashboard_direccion.html', context)
-
 @login_required
 @user_passes_test(es_encargado_direccion, login_url='/accounts/login/')
 def ver_incidencia_direccion(request, id):
@@ -80,7 +85,7 @@ def ver_incidencia_direccion(request, id):
     incidencia = get_object_or_404(
         Incidencia,
         id_incidencia=id,
-        id_direuntamiento=id_direccion
+        departamento__direccion_id=id_direccion
     )
 
     datos_vecino = get_object_or_404(DatosVecino, id_incidencia=incidencia)

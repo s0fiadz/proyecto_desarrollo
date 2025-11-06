@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from departamento.models import Departamento
-
+from cuadrillas.models import Cuadrilla
 class Incidencia(models.Model):
     ESTADOS = [('abierta', 'Abierta'), ('derivada', 'Derivada'), ('rechazada', 'Rechazada'), 
                 ('proceso', 'En Proceso'), ('finalizada', 'Finalizada'), ('cerrada', 'Cerrada')]
@@ -11,10 +11,10 @@ class Incidencia(models.Model):
     id_incidencia = models.AutoField(primary_key=True)
     id_encuesta = models.ForeignKey('encuesta.Encuesta', on_delete=models.CASCADE, db_column='ID_encuesta')
     id_territorial = models.ForeignKey(User, on_delete=models.CASCADE, db_column='ID_territorial')
-    id_direuntamiento = models.IntegerField(blank=True, null=True)
-    id_caudrilla = models.IntegerField(blank=True, null=True)
+    id_cuadrilla = models.ForeignKey(Cuadrilla, on_delete=models.CASCADE,null=True, blank=True)
     descripcion = models.TextField()
     departamento = models.ForeignKey(Departamento, on_delete=models.SET_NULL, null=True, blank=True) #NUEVO ATRIBUTO
+    direccion_incidente = models.CharField(max_length=100,blank=True,null=True)
     lateral = models.CharField(max_length=100, blank=True, null=True)
     longitud = models.CharField(max_length=100, blank=True, null=True)
     prioridad = models.CharField(max_length=20, choices=PRIORIDADES, default='media')

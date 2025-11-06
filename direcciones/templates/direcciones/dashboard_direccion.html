@@ -19,12 +19,14 @@
         </div>
     {% else %}
 
-        <h2 class="mb-3">Panel de Dirección</h2>
-        <h5 class="text-muted">Dirección: {{ direccion_usuario.nombre_direccion }}</h5>
+        <h2 class="mb-3 text-center">Panel de Dirección</h2>
+        <h5 class="text-muted text-center">Dirección: {{ direccion_usuario.nombre_direccion }}</h5>
         <hr>
-        <a href="{% url 'login' %}" class="btn btn-secondary mb-3">Cerrar Sesión</a>
+        <div class="d-flex justify-content-center mb-3">
+            <a href="{% url 'login' %}" class="btn btn-secondary">Cerrar Sesión</a>
+        </div>
 
-        <div class="dropdown mb-3">
+        <div class="dropdown mb-3 text-center">
             <button class="btn btn-primary dropdown-toggle" type="button" id="filtroDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                 Filtrar y Ordenar
             </button>
@@ -33,10 +35,10 @@
                 {% for valor, texto in estados %}
                     <li>
                         <a class="dropdown-item {% if valor == estado_seleccionado %}active{% endif %}" 
-                            href="?estado={{ valor }}&ordenar={{ orden_seleccionado|default:'recientes' }}">
+                           href="?estado={{ valor }}&ordenar={{ orden_seleccionado|default:'recientes' }}">
                             {{ texto }}
                         </a>
-                        </li>
+                    </li>
                 {% endfor %}
                 <li><hr class="dropdown-divider"></li>
                 <li><h6 class="dropdown-header">Ordenar Por</h6></li>
@@ -45,19 +47,19 @@
                        href="?ordenar=recientes&estado={{ estado_seleccionado|default:'' }}">
                         Más Recientes
                     </a>
-                    </li>
+                </li>
                 <li>
                     <a class="dropdown-item {% if orden_seleccionado == 'antiguas' %}active{% endif %}" 
                        href="?ordenar=antiguas&estado={{ estado_seleccionado|default:'' }}">
                         Más Antiguas
                     </a>
-                    </li>
-                 <li>
+                </li>
+                <li>
                     <a class="dropdown-item {% if orden_seleccionado == 'prioridad' %}active{% endif %}" 
                        href="?ordenar=prioridad&estado={{ estado_seleccionado|default:'' }}">
                         Prioridad
                     </a>
-                    </li>
+                </li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="{% url 'dashboard_direccion' %}">Limpiar Filtros</a></li>
             </ul>
@@ -69,12 +71,12 @@
             {% endfor %}
         {% endif %}
         
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped align-middle">
+        <div class="table-responsive mt-3">
+            <table class="table table-bordered table-striped align-middle text-center">
                 <thead class="table-dark">
                     <tr>
                         <th>ID</th>
-                        <th>Lugar de Incidencia</th>
+                        <th>Departamento</th>
                         <th>Prioridad</th>
                         <th>Estado</th>
                         <th>Fecha Creación</th>
@@ -85,7 +87,13 @@
                     {% for incidencia in page_obj %}
                     <tr>
                         <td>{{ incidencia.id_incidencia }}</td>
-                        <td>{{ incidencia.direccion }}</td>
+                        <td>
+                            {% if incidencia.departamento %}
+                                {{ incidencia.departamento.nombre_dpto }}
+                            {% else %}
+                                <span class="text-muted">Sin departamento</span>
+                            {% endif %}
+                        </td>
                         <td>{{ incidencia.get_prioridad_display }}</td>
                         <td>
                             <span class="badge 

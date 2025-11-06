@@ -14,7 +14,10 @@
 
     <p><strong>ID:</strong> {{ incidencia.id_incidencia }}</p>
     <p><strong>Descripción:</strong> {{ incidencia.descripcion }}</p>
-    <p><strong>Dirección:</strong> {{ incidencia.direccion }}</p>
+
+    <!-- ✅ Nueva línea: dirección física del incidente -->
+    <p><strong>Dirección del incidente:</strong> {{ incidencia.direccion_incidente|default:"No especificada" }}</p>
+
     <p><strong>Lateral:</strong> {{ incidencia.lateral|default:"No especificado" }}</p>
     <p><strong>Longitud:</strong> {{ incidencia.longitud|default:"No especificado" }}</p>
     <p><strong>Prioridad:</strong> {{ incidencia.get_prioridad_display }}</p>

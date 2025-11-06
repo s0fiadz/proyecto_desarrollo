@@ -90,6 +90,7 @@ def incidencia_create(request):
                 id_territorial=request.user,
                 descripcion=request.POST['descripcion'],
                 departamento_id=request.POST['departamento'],
+                direccion_incidente=request.POST.get('direccion_incidente', ''),
                 lateral=request.POST.get('lateral', ''),
                 longitud=request.POST.get('longitud', ''),
                 prioridad=request.POST['prioridad'],
@@ -257,62 +258,66 @@ def incidencia_list_secpla(request):
         messages.error(request, 'Tu perfil de usuario no fue encontrado.')
         return redirect('login')
 
-    if profile.group_id == 1:
-        incidencias_listado = Incidencia.objects.all()
-        total_incidencias = incidencias_listado.count()
-        total_abiertas = incidencias_listado.filter(estado='abierta').count()
-        total_proceso = incidencias_listado.filter(estado='proceso').count()
-        total_finalizadas = incidencias_listado.filter(estado='finalizada').count()
-        total_cerradas = incidencias_listado.filter(estado='cerrada').count()
-        total_rechazadas = incidencias_listado.filter(estado='rechazada').count()
-        total_derivadas = incidencias_listado.filter(estado='derivada').count()
-
-        search_query = request.GET.get('search', '')
-        estado = request.GET.get('estado', '')
-        prioridad = request.GET.get('prioridad', '')
-        ordenar = request.GET.get('ordenar', 'id_asc')
-
-        if search_query:
-            incidencias_listado = incidencias_listado.filter(
-                direccion__icontains=search_query
-            )
-        if estado:
-            incidencias_listado = incidencias_listado.filter(estado=estado)
-        if prioridad:
-            incidencias_listado = incidencias_listado.filter(prioridad=prioridad)
-
-        if ordenar == 'id_desc':
-            incidencias_listado = incidencias_listado.order_by('-id_incidencia')
-        elif ordenar == 'direccion_asc':
-            incidencias_listado = incidencias_listado.order_by('direccion')
-        elif ordenar == 'direccion_desc':
-            incidencias_listado = incidencias_listado.order_by('-direccion')
-        else:
-            incidencias_listado = incidencias_listado.order_by('id_incidencia')
-
-        paginator = Paginator(incidencias_listado, 10)
-        page_number = request.GET.get('page')
-        page_obj = paginator.get_page(page_number)
-
-        context = {
-            'incidencias_listado': page_obj,
-            'page_obj': page_obj,
-            'search_query': search_query,
-            'estado': estado,
-            'prioridad': prioridad,
-            'ordenar': ordenar,
-            'total_incidencias': total_incidencias,
-            'total_abiertas': total_abiertas,
-            'total_proceso': total_proceso,
-            'total_finalizadas': total_finalizadas,
-            'total_cerradas': total_cerradas,
-            'total_rechazadas':total_rechazadas,
-            'total_derivadas':total_derivadas,
-        }
-
-        return render(request, 'incidencia/incidencia_list_secpla.html', context)
-    else:
+    if profile.group_id != 1:
         return redirect('logout')
+
+    incidencias_listado = Incidencia.objects.select_related(
+        'departamento__direccion'
+    ).all()
+
+    total_incidencias = incidencias_listado.count()
+    total_abiertas = incidencias_listado.filter(estado='abierta').count()
+    total_proceso = incidencias_listado.filter(estado='proceso').count()
+    total_finalizadas = incidencias_listado.filter(estado='finalizada').count()
+    total_cerradas = incidencias_listado.filter(estado='cerrada').count()
+    total_rechazadas = incidencias_listado.filter(estado='rechazada').count()
+    total_derivadas = incidencias_listado.filter(estado='derivada').count()
+
+    search_query = request.GET.get('search', '')
+    estado = request.GET.get('estado', '')
+    prioridad = request.GET.get('prioridad', '')
+    ordenar = request.GET.get('ordenar', 'id_asc')
+
+    if search_query:
+        incidencias_listado = incidencias_listado.filter(
+            direccion_incidente__icontains=search_query
+        )
+
+    if estado:
+        incidencias_listado = incidencias_listado.filter(estado=estado)
+
+    if prioridad:
+        incidencias_listado = incidencias_listado.filter(prioridad=prioridad)
+
+    if ordenar == 'id_desc':
+        incidencias_listado = incidencias_listado.order_by('-id_incidencia')
+    elif ordenar == 'direccion_asc':
+        incidencias_listado = incidencias_listado.order_by('departamento__direccion__nombre')
+    elif ordenar == 'direccion_desc':
+        incidencias_listado = incidencias_listado.order_by('-departamento__direccion__nombre')
+    else:
+        incidencias_listado = incidencias_listado.order_by('id_incidencia')
+
+    paginator = Paginator(incidencias_listado, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    context = {
+        'incidencias_listado': page_obj,
+        'page_obj': page_obj,
+        'search_query': search_query,
+        'estado': estado,
+        'prioridad': prioridad,
+        'ordenar': ordenar,
+        'total_incidencias': total_incidencias,
+        'total_abiertas': total_abiertas,
+        'total_proceso': total_proceso,
+        'total_finalizadas': total_finalizadas,
+        'total_cerradas': total_cerradas,
+        'total_rechazadas': total_rechazadas,
+        'total_derivadas': total_derivadas,
+    }
+
+    return render(request, 'incidencia/incidencia_list_secpla.html', context)
 
 @login_required
 def incidencia_view_secpla(request, id_incidencia):
