@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from departamento.models import Departamento
 
 class Incidencia(models.Model):
     ESTADOS = [('abierta', 'Abierta'), ('derivada', 'Derivada'), ('rechazada', 'Rechazada'), 
@@ -13,7 +14,7 @@ class Incidencia(models.Model):
     id_direuntamiento = models.IntegerField(blank=True, null=True)
     id_caudrilla = models.IntegerField(blank=True, null=True)
     descripcion = models.TextField()
-    direccion = models.CharField(max_length=255)
+    departamento = models.ForeignKey(Departamento, on_delete=models.SET_NULL, null=True, blank=True) #NUEVO ATRIBUTO
     lateral = models.CharField(max_length=100, blank=True, null=True)
     longitud = models.CharField(max_length=100, blank=True, null=True)
     prioridad = models.CharField(max_length=20, choices=PRIORIDADES, default='media')
@@ -45,7 +46,7 @@ class DatosVecino(models.Model):
 
 class ArchivosMultimedia(models.Model):
     TIPOS_ARCHIVO = [('imagen', 'Imagen'), ('video', 'Video'), ('audio', 'Audio'), 
-                     ('documento', 'Documento'), ('otro', 'Otro')]
+                    ('documento', 'Documento'), ('otro', 'Otro')]
     
     id_multimedia = models.AutoField(primary_key=True)
     id_incidencia = models.ForeignKey('incidencia.Incidencia', on_delete=models.CASCADE, db_column='ID_incidencia')

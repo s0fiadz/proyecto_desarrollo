@@ -11,6 +11,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.db.models import Q
 from registration.models import Profile
+from departamento.models import Departamento
 
 def es_territorial(user):
     return user.groups.filter(name='Territorial').exists() or user.groups.filter(id=4).exists()
@@ -80,15 +81,15 @@ def incidencia_list(request):
 @user_passes_test(es_territorial, login_url='/accounts/login/')
 def incidencia_create(request):
     encuestas = Encuesta.objects.filter(activo=True)
-    
+    departamentos = Departamento.objects.filter(state='Activo')
+
     if request.method == 'POST':
         try:
-            # 1. Crear la incidencia
             incidencia = Incidencia(
                 id_encuesta_id=request.POST['id_encuesta'],
                 id_territorial=request.user,
                 descripcion=request.POST['descripcion'],
-                direccion=request.POST['direccion'],
+                departamento_id=request.POST['departamento'],
                 lateral=request.POST.get('lateral', ''),
                 longitud=request.POST.get('longitud', ''),
                 prioridad=request.POST['prioridad'],
@@ -96,7 +97,6 @@ def incidencia_create(request):
             )
             incidencia.save()
             
-            # 2. Guardar datos del vecino
             datos_vecino = DatosVecino(
                 id_incidencia=incidencia,
                 id_encuesta_id=request.POST['id_encuesta'],
@@ -108,7 +108,6 @@ def incidencia_create(request):
             )
             datos_vecino.save()
             
-            # 3. Guardar respuestas a las preguntas
             encuesta_seleccionada = Encuesta.objects.get(id_encuesta=request.POST['id_encuesta'])
             preguntas = Preguntas.objects.filter(id_encuesta=encuesta_seleccionada)
             
@@ -120,8 +119,7 @@ def incidencia_create(request):
                         id_incidencia=incidencia,
                         respuesta=request.POST[respuesta_key]
                     )
-            
-            # 4. Guardar archivos multimedia
+
             archivos = request.FILES.getlist('archivos_multimedia')
             for archivo in archivos:
                 tipo = determinar_tipo_archivo(archivo.name)
@@ -137,11 +135,12 @@ def incidencia_create(request):
         except Exception as e:
             return render(request, 'incidencia/incidencia_create.html', {
                 'encuestas': encuestas,
+                'departamentos':departamentos,
                 'error': f'Error al crear incidencia: {str(e)}'
             })
     
     return render(request, 'incidencia/incidencia_create.html', {
-        'encuestas': encuestas
+        'encuestas': encuestas, 'departamentos':departamentos
     })
 
 def determinar_tipo_archivo(nombre_archivo):
@@ -191,8 +190,6 @@ def derivar_cuadrilla(request, id):
         'cuadrillas': cuadrillas
     })
 
-
-
 @login_required
 @user_passes_test(es_territorial, login_url='/accounts/login/')
 def cambiar_estado_incidencia(request, id):
@@ -235,12 +232,9 @@ def tipo_incidencia_create(request):
             else:
                 error = "Debe ingresar un nombre para el tipo de incidencia"
                 return render(request, 'incidencia/tipo_incidencia_create.html', {'error': error})
-
-        # ✅ Agregamos este bloque para manejar el método GET
         return render(request, 'incidencia/tipo_incidencia_create.html')
     else:
         return redirect('logout')
-
 
 @login_required
 def tipo_incidencia_list(request):
@@ -263,12 +257,8 @@ def incidencia_list_secpla(request):
         messages.error(request, 'Tu perfil de usuario no fue encontrado.')
         return redirect('login')
 
-    # 🔹 Solo si el usuario pertenece al grupo 1
     if profile.group_id == 1:
-        # ✅ Traer todas las incidencias primero
         incidencias_listado = Incidencia.objects.all()
-
-        # 🔹 Calcular totales generales
         total_incidencias = incidencias_listado.count()
         total_abiertas = incidencias_listado.filter(estado='abierta').count()
         total_proceso = incidencias_listado.filter(estado='proceso').count()
@@ -277,7 +267,6 @@ def incidencia_list_secpla(request):
         total_rechazadas = incidencias_listado.filter(estado='rechazada').count()
         total_derivadas = incidencias_listado.filter(estado='derivada').count()
 
-        # ✅ Aplicar filtros
         search_query = request.GET.get('search', '')
         estado = request.GET.get('estado', '')
         prioridad = request.GET.get('prioridad', '')
@@ -292,7 +281,6 @@ def incidencia_list_secpla(request):
         if prioridad:
             incidencias_listado = incidencias_listado.filter(prioridad=prioridad)
 
-        # ✅ Ordenar resultados
         if ordenar == 'id_desc':
             incidencias_listado = incidencias_listado.order_by('-id_incidencia')
         elif ordenar == 'direccion_asc':
@@ -302,12 +290,10 @@ def incidencia_list_secpla(request):
         else:
             incidencias_listado = incidencias_listado.order_by('id_incidencia')
 
-        # ✅ Paginación
         paginator = Paginator(incidencias_listado, 10)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
 
-        # ✅ Contexto
         context = {
             'incidencias_listado': page_obj,
             'page_obj': page_obj,
