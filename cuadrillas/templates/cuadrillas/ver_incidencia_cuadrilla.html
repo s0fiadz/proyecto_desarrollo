@@ -1,0 +1,64 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ver Incidencia</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container mt-4">
+    <h4>Ver Incidencia</h4>
+
+    <p><strong>ID:</strong> {{ incidencia.id_incidencia }}</p>
+    <p><strong>Descripción:</strong> {{ incidencia.descripcion }}</p>
+    <p><strong>Dirección:</strong> {{ incidencia.direccion_incidente }}</p>
+    <p><strong>Lateral:</strong> {{ incidencia.lateral|default:"No especificado" }}</p>
+    <p><strong>Longitud:</strong> {{ incidencia.longitud|default:"No especificado" }}</p>
+    <p><strong>Prioridad:</strong> {{ incidencia.get_prioridad_display }}</p>
+    <p><strong>Estado:</strong> {{ incidencia.get_estado_display }}</p>
+    <p><strong>Fecha de creación:</strong> {{ incidencia.fecha_creacion }}</p>
+
+    <hr>
+    <p><strong>Datos del Vecino:</strong></p>
+    <p><strong>Nombre:</strong> {{ datos_vecino.nombre }} {{ datos_vecino.apellido }}</p>
+    <p><strong>Correo:</strong> {{ datos_vecino.correo|default:"No especificado" }}</p>
+    <p><strong>Dirección:</strong> {{ datos_vecino.direccion_vicina }}</p>
+    <p><strong>RAT:</strong> {{ datos_vecino.rat|default:"No especificado" }}</p>
+
+    <hr>
+    <p><strong>Respuestas a la Encuesta:</strong></p>
+    {% if respuestas %}
+        {% for respuesta in respuestas %}
+        <p>
+            <strong>{{ respuesta.id_preguntas.pregunta }}</strong><br>
+            {{ respuesta.respuesta }}
+        </p>
+        {% endfor %}
+    {% else %}
+        <p>No hay respuestas registradas</p>
+    {% endif %}
+
+    <hr>
+    <p><strong>Archivos Multimedia:</strong></p>
+    {% if archivos %}
+        {% for archivo in archivos %}
+        <p>
+            <strong>{{ archivo.get_tipo_archivo_display }}:</strong> 
+            <a href="{{ archivo.archivo.url }}" target="_blank">{{ archivo.archivo.name }}</a>
+            {% if archivo.descripcion %}<br>{{ archivo.descripcion }}{% endif %}
+        </p>
+        {% endfor %}
+    {% else %}
+        <p>No hay archivos multimedia</p>
+    {% endif %}
+
+    <br>
+    <a href="{% url 'dashboard_cuadrilla' %}" class="btn btn-secondary">Volver al Dashboard</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

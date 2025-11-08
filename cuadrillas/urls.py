@@ -14,6 +14,8 @@ cuadrillas_urlpatterns = [
     path('bloquear_cuadrilla/<id_cuadrilla>', views.bloquear_cuadrilla, name='bloquear_cuadrilla'),
     path('listar_cuadrillas_bloqueadas/', views.listar_cuadrillas_bloqueadas, name='listar_cuadrillas_bloqueadas'),
     path('desbloquear_cuadrilla/<int:id_cuadrilla>/', views.desbloquear_cuadrilla, name='desbloquear_cuadrilla'),
+    path('dashboard/', views.dashboard_cuadrilla, name='dashboard_cuadrilla'),
+    path('dashboard/incidencia/<int:id>/', views.ver_incidencia_cuadrilla, name='ver_incidencia_cuadrilla'),
     
     #OPERARIOS
     path('main_operario/', views.main_operario, name='main_operario'),
@@ -22,6 +24,4 @@ cuadrillas_urlpatterns = [
     path('bloquear_operario/<usuario_id>/', views.bloquear_operario, name='bloquear_operario'),
     path('listar_operarios_bloqueados/', views.listar_operarios_bloqueados, name='listar_operarios_bloqueados'),
     path('desbloquear_operario/<int:usuario_id>/', views.desbloquear_operario, name='desbloquear_operario'),
-  
-
 ]
