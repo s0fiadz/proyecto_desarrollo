@@ -32,7 +32,7 @@ def check_profile(request):
     elif request.user.groups.filter(id=4).exists():
         return redirect('/incidencia/')
     elif request.user.groups.filter(id=3).exists():
-        return redirect('home')
+        return redirect('incidencia_list_derivar')
     elif request.user.groups.filter(id=5).exists():
         return redirect('main_cuadrilla') 
 
