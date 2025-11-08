@@ -1,13 +1,15 @@
 from django.shortcuts import redirect, render, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from registration.models import Profile, User
 from cuadrillas.models import Cuadrilla, Miembro_cuadrilla
 from departamento.models import Departamento
-from django.contrib.auth.decorators import user_passes_test
 from django.core.paginator import Paginator
 from django.db.models.query import QuerySet
 from incidencia.models import Incidencia, DatosVecino, ArchivosMultimedia, RegistrosRespuestas
+from .models import Registro_cierre
+from .forms import RegistroCierreForm
+from datetime import date
 # Create your views here.
 # TODO LO DE CUADRILLA
 @login_required
@@ -515,3 +517,44 @@ def ver_incidencia_cuadrilla(request, id):
         'archivos': archivos,
         'respuestas': respuestas
     })
+
+@login_required
+@user_passes_test(es_miembro_cuadrilla, login_url='/accounts/login/')
+def subir_evidencia_cierre(request, id_incidencia):
+    try:
+        miembro = Miembro_cuadrilla.objects.get(usuario=request.user)
+    except Miembro_cuadrilla.DoesNotExist:
+        messages.error(request, 'No tiene cuadrilla asignada.')
+        return redirect('dashboard_cuadrilla')
+    incidencia = get_object_or_404(
+        Incidencia,
+        id_incidencia=id_incidencia,
+        id_cuadrilla=miembro.cuadrilla
+    )
+    if incidencia.estado == 'finalizada':
+        messages.warning(request, 'Esta incidencia ya se encuentra finalizada.')
+        return redirect('dashboard_cuadrilla')
+
+    if request.method == 'POST':
+        form = RegistroCierreForm(request.POST, request.FILES)
+        if form.is_valid():
+            registro = form.save(commit=False)
+            registro.incidencia = incidencia
+            registro.cuadrilla = miembro.cuadrilla
+            registro.save()
+            incidencia.estado = 'finalizada'
+            incidencia.save()
+            
+            messages.success(request, f'¡Evidencia subida! La incidencia {incidencia.id_incidencia} ha sido marcada como FINALIZADA.')
+            return redirect('dashboard_cuadrilla')
+        else:
+            messages.error(request, 'Error al subir la evidencia. Revise el formulario.')
+            
+    else:
+        form = RegistroCierreForm()
+
+    context = {
+        'form': form,
+        'incidencia': incidencia
+    }
+    return render(request, 'cuadrillas/subir_evidencia.html', context)

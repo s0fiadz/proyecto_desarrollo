@@ -91,6 +91,8 @@
                         <th>Prioridad</th>
                         <th>Estado</th>
                         <th>Fecha Creación</th>
+                        <!-- ¡COLUMNA NUEVA AÑADIDA AQUÍ! -->
+                        <th>Fecha Término</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -122,12 +124,31 @@
                         </td>
                         <td>{{ incidencia.fecha_creacion|date:"d/m/Y H:i" }}</td>
                         <td>
+                            {% comment %}
+                                Buscamos el primer (y único) registro de cierre asociado
+                                a esta incidencia. Si existe y el estado es 'finalizada',
+                                mostramos su fecha de cierre.
+                            {% endcomment %}
+                            {% if incidencia.estado == 'finalizada' and incidencia.registros_cierre.first %}
+                                {{ incidencia.registros_cierre.first.fecha_cierre|date:"d/m/Y" }}
+                            {% else %}
+                                <span class="text-muted">---</span>
+                            {% endif %}
+                        </td>
+                        
+                        <td>
                             <a href="{% url 'ver_incidencia_cuadrilla' incidencia.id_incidencia %}" class="btn btn-info btn-sm">Ver</a>
-                            </td>
+                            {% if incidencia.estado != 'finalizada' and incidencia.estado != 'rechazada' and incidencia.estado != 'cerrada' %}
+                                <a href="{% url 'subir_evidencia_cierre' incidencia.id_incidencia %}" class="btn btn-success btn-sm mt-1 mt-md-0" title="Finalizar Incidencia">
+                                    Finalizar
+                                </a>
+                            {% endif %}
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="6" class="text-center">
+                        <!-- ¡COLSPAN ACTUALIZADO A 7! -->
+                        <td colspan="7" class="text-center">
                             No hay incidencias asignadas a esta cuadrilla.
                         </td>
                     </tr>
