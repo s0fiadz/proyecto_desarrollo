@@ -172,42 +172,7 @@ def incidencia_view(request, id):
         'respuestas': respuestas
     })
 
-@login_required
-@user_passes_test(es_territorial, login_url='/accounts/login/')
-def derivar_cuadrilla(request, id):
-    incidencia = get_object_or_404(Incidencia, id_incidencia=id, id_territorial=request.user)
-    cuadrillas = Cuadrilla.objects.filter(state=True).order_by('nombre_cuadrilla')
 
-    if request.method == 'POST':
-        id_cuadrilla = request.POST.get('cuadrilla')
-        if id_cuadrilla:
-            incidencia.cuadrilla_id = id_cuadrilla
-            incidencia.estado = 'derivada'
-            incidencia.save()
-        return redirect('incidencia:incidencia_list')
-
-    return render(request, 'incidencia/derivar_cuadrilla.html', {
-        'incidencia': incidencia,
-        'cuadrillas': cuadrillas
-    })
-
-@login_required
-@user_passes_test(es_territorial, login_url='/accounts/login/')
-def cambiar_estado_incidencia(request, id):
-    incidencia = get_object_or_404(Incidencia, id_incidencia=id, id_territorial=request.user)
-    
-    if request.method == 'POST':
-        nuevo_estado = request.POST.get('estado')
-        if nuevo_estado in dict(Incidencia.ESTADOS):
-            incidencia.estado = nuevo_estado
-            incidencia.save()
-        
-        return redirect('incidencia:incidencia_list')
-    
-    return render(request, 'incidencia/cambiar_estado.html', {
-        'incidencia': incidencia,
-        'estados': Incidencia.ESTADOS
-    })
 
 def get_preguntas_encuesta(request):
     id_encuesta = request.GET.get('id_encuesta')

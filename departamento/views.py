@@ -10,6 +10,10 @@ from direcciones.models import Direccion
 from django.contrib.auth.models import User
 from .models import EncargadoDepartamento
 from django.db.models.query import QuerySet
+from incidencia.models import Incidencia
+from cuadrillas.models import Cuadrilla
+from django.contrib.auth.decorators import login_required, user_passes_test
+from departamento.models import EncargadoDepartamento
 
 def filtrar_departamentos_por_direccion(request, departamentos: QuerySet) -> QuerySet:
     """Filtra el QuerySet de departamentos por la Dirección ID pasada en la URL (GET)."""
@@ -227,6 +231,7 @@ def editar_departamento(request, id=None):
         return render(request, template_name, {'departamento': departamento, 'direcciones': direcciones})
     else:
         return redirect('logout')
+
 #Funcion ver_departamento
 @login_required
 def ver_departamento(request, id=None):
@@ -354,3 +359,130 @@ def asignar_encargado_depto(request, id_departamento):
         'usuarios': usuarios
     }
     return render(request, template_name, context)
+
+
+def es_departamento(user):
+    return user.groups.filter(name='Departamento').exists() or user.groups.filter(id=3).exists()
+
+@login_required
+@user_passes_test(es_departamento, login_url='/accounts/login/')
+def incidencia_list_derivar(request):
+    # Obtener el departamento del usuario actual
+    try:
+        profile = Profile.objects.get(user=request.user)
+        # Si el usuario es del grupo Departamento (id=3), buscar su departamento
+        if profile.group_id == 3:
+            # Buscar si el usuario es encargado de algún departamento
+            try:
+                encargado_depto = EncargadoDepartamento.objects.get(usuario=request.user)
+                departamento_usuario = encargado_depto.departamento
+                # Filtrar incidencias por el departamento del usuario
+                incidencias = Incidencia.objects.filter(departamento=departamento_usuario)
+                
+            except EncargadoDepartamento.DoesNotExist:
+                # Si no es encargado de ningún departamento, no mostrar incidencias
+                incidencias = Incidencia.objects.none()
+        
+        # Si el usuario es de otro grupo (territorial, admin, etc.)
+        else:
+            # Mostrar todas las incidencias o filtrar según el grupo
+            incidencias = Incidencia.objects.all()
+
+    except Profile.DoesNotExist:
+        incidencias = Incidencia.objects.none()
+
+    # Aplicar filtros de búsqueda
+    search_query = request.GET.get('search', '')
+    estado = request.GET.get('estado', '')
+    prioridad = request.GET.get('prioridad', '')
+    ordenar = request.GET.get('ordenar', 'id_asc')
+
+    if search_query:
+        incidencias = incidencias.filter(direccion_incidente__icontains=search_query)
+    
+    if estado:
+        incidencias = incidencias.filter(estado=estado)
+    
+    if prioridad:
+        incidencias = incidencias.filter(prioridad=prioridad)
+
+    # Ordenamiento
+    if ordenar == 'id_desc':
+        incidencias = incidencias.order_by('-id_incidencia')
+    elif ordenar == 'direccion_asc':
+        incidencias = incidencias.order_by('direccion_incidente')
+    elif ordenar == 'direccion_desc':
+        incidencias = incidencias.order_by('-direccion_incidente')
+    else:
+        incidencias = incidencias.order_by('id_incidencia')
+
+    # Paginación
+    paginator = Paginator(incidencias, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'incidencias_listado': page_obj,
+        'page_obj': page_obj,
+        'search_query': search_query,
+        'estado': estado,
+        'prioridad': prioridad,
+        'ordenar': ordenar,
+    }
+
+    return render(request, 'departamento/incidencia_list_derivar.html', context)
+
+@login_required
+def cambiar_estado_incidencia(request, id):
+    incidencia = get_object_or_404(Incidencia, pk=id)
+    if request.method == 'POST':
+        nuevo_estado = request.POST.get('estado')
+        if nuevo_estado in dict(Incidencia.ESTADOS):
+            incidencia.estado = nuevo_estado
+            incidencia.save()
+            messages.success(request, f'Estado actualizado a "{nuevo_estado}".')
+            return redirect('incidencia_list_derivar')
+        else:
+            messages.error(request, 'Estado no válido.')
+    return render(request, 'departamento/cambiar_estado.html', {'incidencia': incidencia})
+
+@login_required
+def derivar_cuadrilla(request, id):
+    incidencia = get_object_or_404(Incidencia, pk=id)
+    cuadrillas = Cuadrilla.objects.all()
+    
+    if request.method == 'POST':
+        cuadrilla_id = request.POST.get('cuadrilla')
+        
+        if cuadrilla_id:
+            try:
+                cuadrilla = Cuadrilla.objects.get(id_cuadrilla=cuadrilla_id)
+                
+                cuadrilla_anterior = incidencia.id_cuadrilla
+                
+                # Siempre permitir asignar/re-asignar cuadrilla
+                incidencia.id_cuadrilla = cuadrilla
+                incidencia.estado = 'derivada'
+                incidencia.save()
+                
+                # Verificar que se guardó
+                incidencia.refresh_from_db()
+                
+                if cuadrilla_anterior:
+                    messages.success(request, f'✅ Incidencia #{incidencia.id_incidencia} re-derivada de {cuadrilla_anterior.nombre_cuadrilla} a {cuadrilla.nombre_cuadrilla}')
+                else:
+                    messages.success(request, f'✅ Incidencia #{incidencia.id_incidencia} derivada a {cuadrilla.nombre_cuadrilla}')
+                    
+                return redirect('incidencia_list_derivar')
+                
+            except Cuadrilla.DoesNotExist:
+                messages.error(request, '❌ La cuadrilla seleccionada no existe')
+            except Exception as e:
+                messages.error(request, f'❌ Error al derivar: {str(e)}')
+        else:
+            messages.error(request, '⚠️ Debes seleccionar una cuadrilla')
+    
+    return render(request, 'departamento/derivar_cuadrilla.html', {
+        'incidencia': incidencia,
+        'cuadrillas': cuadrillas
+    })
