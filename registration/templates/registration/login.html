@@ -1,42 +1,36 @@
 <!DOCTYPE html>
 <html lang="es">
-{% block content %}
+{% extends "core/base_login.html" %}
 {% load static %}
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>Proyecto Base</title>
-</head>
-<body>
-  <div>
-    <div>
-      <div>
+{% block content %}
+  <div class="row">
+    <form class="login-form" action="" method="post">
+      <div class="col-12 mt-n12 text-center mb-4">
+        <a>
+          <img alt="Logo" src="{% static 'core/images/LOGO_MUNICIPALIDAD.png' %}" style = "width:70%;height: 50%;">
+        </a>
         <h4>Ingrese sus datos</h4>
-        {% if form.non_field_errors %}
-          <p style="color:red">Credenciales erroneas</p>
-        {% endif %}
-        <form class="login-form" action="" method="post">
-          {% csrf_token %}
-          <div>
-            <label>Usuario:</label>
-            <input type="text" name="username"/>
-          </div>
-          <div>
-            <label>Contraseña:</label>
-            <input type="password" name="password"/>
-          </div>         
-          <div>
-            <button type="submit">
-              <span>Iniciar Sesión</span>
-            </button>
-          </div>
-          <div>
-            <a href="{% url 'password_reset' %}">Olvidé mi contraseña</a>
-          </div>
-        </form>
       </div>
-    </div>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="col-12 mt-2">
+          <p style="color:red">Credenciales erroneas</p>
+        </div>
+      {% endif %}
+      <div class="col-12 mt-2">
+        <input type="text" class="form-control" name="username" placeholder="Ingrese el nombre de usuario" required/>
+      </div>
+      <div class="col-12 mt-2">
+        <input type="password" class="form-control" name="password" placeholder="Ingrese la contraseña" required />
+      </div>
+      <div class="col-12 mt-2">
+        <button type="submit" class="btn btn-primary form-control">
+          <span>Iniciar Sesión</span>
+        </button>
+      </div>
+      <div class="col-12 mt-2 text-end">
+        <a href="{% url 'password_reset' %}">¿Olvidaste tu contraseña?</a>
+      </div>
+    </form>
   </div>
-</body>
-</html>
 {% endblock %}
