@@ -41,18 +41,62 @@
         <p>No hay respuestas registradas</p>
     {% endif %}
 
-    <hr>
-    <p><strong>Archivos Multimedia:</strong></p>
-    {% if archivos %}
+<hr>
+<h5>Evidencias subidas por el Territorial</h5>
+{% if archivos %}
+    <div class="row">
         {% for archivo in archivos %}
-        <p>
-            <strong>{{ archivo.get_tipo_archivo_display }}:</strong> 
-            <a href="{{ archivo.archivo.url }}" target="_blank">{{ archivo.archivo.name }}</a>
-            {% if archivo.descripcion %}<br>{{ archivo.descripcion }}{% endif %}
-        </p>
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm">
+                    {% with archivo.archivo.name|lower as name %}
+                        {% if ".jpg" in name or ".jpeg" in name or ".png" in name or ".gif" in name or ".webp" in name %}
+                            <img src="{{ archivo.archivo.url }}" class="card-img-top" alt="Evidencia territorial">
+                        {% else %}
+                            <div class="p-3">
+                                <a href="{{ archivo.archivo.url }}" target="_blank">Ver archivo adjunto</a>
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+                    <div class="card-body">
+                        <p><strong>Descripción:</strong> {{ archivo.descripcion|default:"Sin descripción" }}</p>
+                        <p><small class="text-muted">Subido el {{ archivo.fecha_subida|date:"d/m/Y" }}</small></p>
+                    </div>
+                </div>
+            </div>
         {% endfor %}
+    </div>
+{% else %}
+    <p class="text-muted">No hay evidencia subida por el territorial.</p>
+{% endif %}
+
+    <hr>
+    <h5>Evidencias subidas por la Cuadrilla</h5>
+    {% if evidencias %}
+        <div class="row">
+            {% for reg in evidencias %}
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm">
+                        {% if reg.evidencia %}
+                            {% with reg.evidencia.name|lower as name %}
+                                {% if ".jpg" in name or ".jpeg" in name or ".png" in name or ".gif" in name or ".webp" in name %}
+                                    <img src="{{ reg.evidencia.url }}" class="card-img-top" alt="Evidencia">
+                                {% else %}
+                                    <div class="p-3">
+                                        <a href="{{ reg.evidencia.url }}" target="_blank">Ver archivo adjunto</a>
+                                    </div>
+                                {% endif %}
+                            {% endwith %}
+                        {% endif %}
+                        <div class="card-body">
+                            <p><strong>Descripción:</strong> {{ reg.descripcion|default:"Sin descripción" }}</p>
+                            <p><small class="text-muted">Subido el {{ reg.fecha_cierre|date:"d/m/Y" }}</small></p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     {% else %}
-        <p>No hay archivos multimedia</p>
+        <p class="text-muted">No hay evidencia registrada para esta incidencia.</p>
     {% endif %}
 
     <br>

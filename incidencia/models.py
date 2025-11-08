@@ -26,7 +26,7 @@ class Incidencia(models.Model):
         db_table = 'incidencia'
     
     def __str__(self):
-        return f"Incidencia {self.id_incidencia} - {self.direccion}"
+        return f"Incidencia {self.id_incidencia} - {self.direccion_incidente or 'Sin dirección'}"
 
 class DatosVecino(models.Model):
     id_vicino = models.AutoField(primary_key=True)
