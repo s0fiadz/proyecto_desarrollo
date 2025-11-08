@@ -10,6 +10,10 @@ from incidencia.models import Incidencia, DatosVecino, ArchivosMultimedia, Regis
 from .models import Registro_cierre
 from .forms import RegistroCierreForm
 from datetime import date
+from django.db.models import Q
+from django.core.paginator import Paginator
+
+
 # Create your views here.
 # TODO LO DE CUADRILLA
 @login_required
@@ -22,10 +26,42 @@ def main_cuadrilla(request):
 
     if profile.group_id == 1:
         cuadrilla_listado = Cuadrilla.objects.filter(state=True).order_by('nombre_cuadrilla').prefetch_related('usuarios')
+        
+        #Búsqueda por nombre
+        busqueda = request.GET.get('busqueda', '')
+        if busqueda:
+            cuadrilla_listado = cuadrilla_listado.filter(
+                Q(nombre_cuadrilla__icontains=busqueda) |
+                Q(jefe_cuadrilla__usuario__first_name__icontains=busqueda) |
+                Q(jefe_cuadrilla__usuario__last_name__icontains=busqueda)
+            )
+        #Filtro por departamento
+        departamento_id = request.GET.get('departamento', '')
+        if departamento_id:
+            cuadrilla_listado = cuadrilla_listado.filter(departamento_id=departamento_id)
+        #Orden alfabético
+        orden = request.GET.get('orden', 'asc')
+        if orden == 'desc':
+            cuadrilla_listado = cuadrilla_listado.order_by('-nombre_cuadrilla')
+        else:  # asc
+            cuadrilla_listado = cuadrilla_listado.order_by('nombre_cuadrilla')
+        #Paginación 
+        paginator = Paginator(cuadrilla_listado, 10)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        departamentos = Departamento.objects.all()
         template_name = 'cuadrillas/main_cuadrilla.html'
-        return render(request, template_name,{'cuadrilla_listado': cuadrilla_listado})
+        context = {
+            'page_obj': page_obj,
+            'departamentos': departamentos, 
+            'busqueda': busqueda,  
+            'departamento_seleccionado': departamento_id, 
+            'orden_seleccionado': orden, 
+        }
+        return render(request, template_name, context)
     else:
         return redirect('logout')
+    
 
 @login_required
 def crear_cuadrilla(request):
