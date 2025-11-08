@@ -16,6 +16,7 @@ cuadrillas_urlpatterns = [
     path('desbloquear_cuadrilla/<int:id_cuadrilla>/', views.desbloquear_cuadrilla, name='desbloquear_cuadrilla'),
     path('dashboard/', views.dashboard_cuadrilla, name='dashboard_cuadrilla'),
     path('dashboard/incidencia/<int:id>/', views.ver_incidencia_cuadrilla, name='ver_incidencia_cuadrilla'),
+    path('incidencia/<int:id_incidencia>/finalizar/', views.subir_evidencia_cierre, name='subir_evidencia_cierre'),
     
     #OPERARIOS
     path('main_operario/', views.main_operario, name='main_operario'),

@@ -11,7 +11,7 @@ class Incidencia(models.Model):
     id_incidencia = models.AutoField(primary_key=True)
     id_encuesta = models.ForeignKey('encuesta.Encuesta', on_delete=models.CASCADE, db_column='ID_encuesta')
     id_territorial = models.ForeignKey(User, on_delete=models.CASCADE, db_column='ID_territorial')
-    id_cuadrilla = models.ForeignKey(Cuadrilla, on_delete=models.CASCADE,null=True, blank=True)
+    id_cuadrilla = models.ForeignKey('cuadrillas.Cuadrilla', on_delete=models.CASCADE, null=True, blank=True)
     descripcion = models.TextField()
     departamento = models.ForeignKey(Departamento, on_delete=models.SET_NULL, null=True, blank=True) #NUEVO ATRIBUTO
     direccion_incidente = models.CharField(max_length=100,blank=True,null=True)
