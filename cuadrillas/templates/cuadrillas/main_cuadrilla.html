@@ -1,54 +1,184 @@
-<h2>Gestión de Cuadrillas</h2>
-</hr>
-<a href="{% url 'crear_cuadrilla' %}">Nueva Cuadrilla</a>
-<br>
-<a href="{% url  'listar_cuadrillas_bloqueadas' %}" class="btn btn-warning">Ver cuadrillas bloqueadas</a>
-<br>
-<a href = "{% url 'main_operario' %}">Gestión de Operarios</a>
-<br>
-<a href = "{% url 'main_admin' %}">Volver al menú principal</a>
-<br/><br/>
-{% if messages %}
-    {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}" style="margin-top:10px;">
-            {{ message }}
+    {% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Cuadrillas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container mt-4">
+    <h2 class="mb-3">Gestión de Cuadrillas</h2>
+    <hr>
+    
+    
+    <div class="d-flex justify-content-between mb-4">
+        <div>
+            <a href="{% url 'crear_cuadrilla' %}" class="btn btn-success me-2">Nueva Cuadrilla</a>
+            <a href="{% url 'listar_cuadrillas_bloqueadas' %}" class="btn btn-warning me-2">Ver cuadrillas bloqueadas</a> 
+            <a href="{% url 'main_operario' %}" class="btn btn-info me-2">Gestión de Operarios</a>
+            <a href="{% url 'main_admin' %}" class="btn btn-secondary">Volver al menú principal</a>
         </div>
-    {% endfor %}
-{% endif %}
-<hr/>
-<table border="1">
-    <thead>
-            <th>Nombre de Cuadrilla</th>
-            <th>Jefe de Cuadrilla</th>
-            <th>Departamento</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-    </thead>
-    {% for cuadrilla in cuadrilla_listado %}
-        <tr>
-            <td>{{ cuadrilla.nombre_cuadrilla }}</td>
-            <td>
-                {% if cuadrilla.jefe_cuadrilla %}
-                    {{ cuadrilla.jefe_cuadrilla.usuario.first_name }} {{ cuadrilla.jefe_cuadrilla.usuario.last_name }}
-                {% else %}
-                    -
+        
+        <!-- Búsqueda -->
+        <form method="GET" class="d-flex" action="{% url 'main_cuadrilla' %}">
+            <input type="search" name="busqueda" class="form-control me-2"
+                   placeholder="Buscar cuadrilla..." value="{{ busqueda|default:'' }}">
+            <button class="btn btn-outline-primary" type="submit">Buscar</button>
+            {% if busqueda %}
+                <a href="{% url 'main_cuadrilla' %}" class="btn btn-outline-danger ms-2">Limpiar</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Filtros -->
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <form method="GET" class="d-flex">
+                
+                <select class="form-select me-2" name="departamento" onchange="this.form.submit()">
+                    <option value="">Todos los departamentos</option>
+                    {% for depto in departamentos %}
+                        <option value="{{ depto.id }}" 
+                                {% if depto.id|stringformat:"s" == departamento_seleccionado %}selected{% endif %}>
+                            {{ depto.nombre_dpto }}
+                        </option>
+                    {% endfor %}
+                </select>
+                
+                
+                <select class="form-select" name="orden" onchange="this.form.submit()">
+                    <option value="asc" {% if orden_seleccionado == 'asc' %}selected{% endif %}>
+                        Nombre (A → Z)
+                    </option>
+                    <option value="desc" {% if orden_seleccionado == 'desc' %}selected{% endif %}>
+                        Nombre (Z → A)
+                    </option>
+                </select>
+                
+                
+                {% if busqueda %}
+                    <input type="hidden" name="busqueda" value="{{ busqueda }}">
                 {% endif %}
-            </td>
-            <td>
-                {% if cuadrilla.departamento %}
-                    {{ cuadrilla.departamento.nombre_dpto }}
+            </form>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Tabla de cuadrillas -->
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Nombre de Cuadrilla</th>
+                    <th>Jefe de Cuadrilla</th>
+                    <th>Departamento</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cuadrilla in page_obj %}
+                <tr>
+                    <td>{{ cuadrilla.nombre_cuadrilla }}</td>
+                    <td>
+                        {% if cuadrilla.jefe_cuadrilla %}
+                            {{ cuadrilla.jefe_cuadrilla.usuario.first_name }} {{ cuadrilla.jefe_cuadrilla.usuario.last_name }}
+                        {% else %}
+                            <span class="text-muted">Sin asignar</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if cuadrilla.departamento %}
+                            {{ cuadrilla.departamento.nombre_dpto }}
+                        {% else %}
+                            <span class="text-muted">Sin asignar</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge bg-{% if cuadrilla.state %}success{% else %}danger{% endif %}">
+                            {% if cuadrilla.state %}Activa{% else %}Inactiva{% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            <a href="{% url 'ver_cuadrillas' cuadrilla.id_cuadrilla %}" class="btn btn-sm btn-info">Ver</a>
+                            <a href="{% url 'editar_cuadrillas' cuadrilla.id_cuadrilla %}" class="btn btn-sm btn-primary">Editar</a>
+                            {% if cuadrilla.state %}
+                                <a href="{% url 'bloquear_cuadrilla' cuadrilla.id_cuadrilla %}" class="btn btn-sm btn-danger">Bloquear</a>
+                            {% else %}
+                                <a href="{% url 'desbloquear_cuadrilla' cuadrilla.id_cuadrilla %}" class="btn btn-sm btn-success">Activar</a>
+                            {% endif %}
+                            <a href="{% url 'asignar_jefe_cuadrilla' cuadrilla.id_cuadrilla %}" class="btn btn-sm btn-warning">Asignar Jefe</a>
+                            <a href="{% url 'asignar_departamento_cuadrilla' cuadrilla.id_cuadrilla %}" class="btn btn-sm btn-secondary">Asignar Depto</a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No hay cuadrillas registradas.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Paginación -->
+    {% if page_obj.paginator.num_pages > 1 %}
+    <nav aria-label="Paginación de Cuadrillas">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link"
+                       href="?page={{ page_obj.previous_page_number }}&busqueda={{ busqueda }}&departamento={{ departamento_seleccionado }}&orden={{ orden_seleccionado }}">
+                        Anterior
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+            {% endif %}
+
+            {% for i in page_obj.paginator.page_range %}
+                {% if page_obj.number == i %}
+                    <li class="page-item active"><span class="page-link">{{ i }}</span></li>
                 {% else %}
-                    -
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="?page={{ i }}&busqueda={{ busqueda }}&departamento={{ departamento_seleccionado }}&orden={{ orden_seleccionado }}">
+                            {{ i }}
+                        </a>
+                    </li>
                 {% endif %}
-            </td>
-            <td>{{ cuadrilla.state }}</td>
-            <td>
-                <a href="{% url 'ver_cuadrillas' cuadrilla.id_cuadrilla %}" class="btn btn-info btn-sm">Ver</a>
-                <a href="{% url 'editar_cuadrillas' cuadrilla.id_cuadrilla %}">Editar</a>
-                <a href="{% url 'bloquear_cuadrilla' cuadrilla.id_cuadrilla %}">Bloquear</a>
-                <a href="{% url 'asignar_jefe_cuadrilla' cuadrilla.id_cuadrilla %}" class="btn btn-primary">Asignar jefe</a>
-                <a href="{% url 'asignar_departamento_cuadrilla' cuadrilla.id_cuadrilla %}"class="btn btn-primary">Asignar Departamento</a>
-            </td>
-        </tr>
-    {% endfor %}
-</table>
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link"
+                       href="?page={{ page_obj.next_page_number }}&busqueda={{ busqueda }}&departamento={{ departamento_seleccionado }}&orden={{ orden_seleccionado }}">
+                        Siguiente
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+            {% endif %}
+        </ul>
+    </nav>
+    <div class="text-center mb-4">
+        <p class="text-muted">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</p>
+    </div>
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
