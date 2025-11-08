@@ -4,7 +4,10 @@ from django.contrib import messages
 from registration.models import Profile, User
 from cuadrillas.models import Cuadrilla, Miembro_cuadrilla
 from departamento.models import Departamento
-
+from django.contrib.auth.decorators import user_passes_test
+from django.core.paginator import Paginator
+from django.db.models.query import QuerySet
+from incidencia.models import Incidencia, DatosVecino, ArchivosMultimedia, RegistrosRespuestas
 # Create your views here.
 # TODO LO DE CUADRILLA
 @login_required
@@ -421,3 +424,94 @@ def desbloquear_operario(request, usuario_id):
     else:
         messages.add_message(request, messages.INFO, 'No tienes permisos')
         return redirect('logout')
+
+#PERFIL CUADRILLA
+
+def es_miembro_cuadrilla(user):
+    return user.groups.filter(id=5).exists()
+
+def filtrar_incidencias_cuadrilla(request, incidencias: QuerySet) -> QuerySet:
+    estado_filtro = request.GET.get('estado', None)
+    prioridad_filtro = request.GET.get('prioridad', None)
+
+    if estado_filtro and estado_filtro in [e[0] for e in Incidencia.ESTADOS]:
+        incidencias = incidencias.filter(estado=estado_filtro)
+
+    if prioridad_filtro and prioridad_filtro in [p[0] for p in Incidencia.PRIORIDADES]:
+        incidencias = incidencias.filter(prioridad=prioridad_filtro)
+
+    return incidencias
+
+def ordenar_incidencias_cuadrilla(request, incidencias: QuerySet) -> QuerySet:
+    orden = request.GET.get('ordenar', 'prioridad')
+    if orden == 'antiguas':
+        return incidencias.order_by('fecha_creacion')
+    if orden == 'recientes':
+        return incidencias.order_by('-fecha_creacion')
+    return incidencias.order_by('prioridad')
+
+@login_required
+@user_passes_test(es_miembro_cuadrilla, login_url='/accounts/login/')
+def dashboard_cuadrilla(request):
+    try:
+        miembro = Miembro_cuadrilla.objects.get(usuario=request.user)
+        cuadrilla_usuario = miembro.cuadrilla
+    except Miembro_cuadrilla.DoesNotExist:
+        messages.error(request, 'Usted no está asignado a ninguna cuadrilla.')
+        return render(request, 'cuadrillas/dashboard_cuadrilla.html', {
+            'error': True,
+            'estados': Incidencia.ESTADOS,
+            'prioridades': Incidencia.PRIORIDADES
+        })
+
+    incidencias_listado = Incidencia.objects.filter(id_cuadrilla=cuadrilla_usuario)
+    incidencias_listado = filtrar_incidencias_cuadrilla(request, incidencias_listado)
+    incidencias_listado = ordenar_incidencias_cuadrilla(request, incidencias_listado)
+
+    paginator = Paginator(incidencias_listado, 8)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    query_params = request.GET.copy()
+    if 'page' in query_params:
+        del query_params['page']
+    query_params = query_params.urlencode()
+
+    context = {
+        'page_obj': page_obj,
+        'query_params': query_params,
+        'estados': Incidencia.ESTADOS,
+        'prioridades': Incidencia.PRIORIDADES,
+        'estado_seleccionado': request.GET.get('estado', ''),
+        'prioridad_seleccionada': request.GET.get('prioridad', ''),
+        'orden_seleccionado': request.GET.get('ordenar', 'prioridad'),
+        'cuadrilla_usuario': cuadrilla_usuario
+    }
+    return render(request, 'cuadrillas/dashboard_cuadrilla.html', context)
+
+@login_required
+@user_passes_test(es_miembro_cuadrilla, login_url='/accounts/login/')
+def ver_incidencia_cuadrilla(request, id):
+    try:
+        miembro = Miembro_cuadrilla.objects.get(usuario=request.user)
+        id_cuadrilla_usuario = miembro.cuadrilla.id_cuadrilla
+    except Miembro_cuadrilla.DoesNotExist:
+        messages.error(request, 'No tiene cuadrilla asignada.')
+        return redirect('dashboard_cuadrilla')
+
+    incidencia = get_object_or_404(
+        Incidencia,
+        id_incidencia=id,
+        id_cuadrilla_id=id_cuadrilla_usuario
+    )
+
+    datos_vecino = get_object_or_404(DatosVecino, id_incidencia=incidencia)
+    archivos = ArchivosMultimedia.objects.filter(id_incidencia=incidencia)
+    respuestas = RegistrosRespuestas.objects.filter(id_incidencia=incidencia)
+
+    return render(request, 'cuadrillas/ver_incidencia_cuadrilla.html', {
+        'incidencia': incidencia,
+        'datos_vecino': datos_vecino,
+        'archivos': archivos,
+        'respuestas': respuestas
+    })

@@ -1,0 +1,180 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Cuadrilla</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container mt-4">
+    
+    {% if error %}
+        <div class="alert alert-danger">
+            <h4>Error</h4>
+            <p>No se ha podido cargar el dashboard. Es posible que no esté asignado a ninguna cuadrilla.</p>
+            <a href="{% url 'login' %}" class="btn btn-secondary">Cerrar Sesión</a>
+        </div>
+    {% else %}
+
+        <h2 class="mb-3">Dashboard de Incidencias</h2>
+        <h5 class="text-muted">Cuadrilla: {{ cuadrilla_usuario.nombre_cuadrilla }}</h5>
+        <hr>
+        <a href="{% url 'login' %}" class="btn btn-secondary">Cerrar Sesión</a>
+
+        <div class="dropdown mb-3">
+            <button class="btn btn-primary dropdown-toggle" type="button" id="filtroDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                Filtrar y Ordenar
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="filtroDropdown">
+                <li><h6 class="dropdown-header">Filtrar por Estado</h6></li>
+                {% for valor, texto in estados %}
+                    <li>
+                        <a class="dropdown-item {% if valor == estado_seleccionado %}active{% endif %}" 
+                           href="?estado={{ valor }}&prioridad={{ prioridad_seleccionada|default:'' }}&ordenar={{ orden_seleccionado|default:'prioridad' }}">
+                            {{ texto }}
+                        </a>
+                    </li>
+                {% endfor %}
+
+                <li><hr class="dropdown-divider"></li>
+                <li><h6 class="dropdown-header">Filtrar por Prioridad</h6></li>
+                {% for valor, texto in prioridades %}
+                    <li>
+                        <a class="dropdown-item {% if valor == prioridad_seleccionada %}active{% endif %}" 
+                           href="?prioridad={{ valor }}&estado={{ estado_seleccionado|default:'' }}&ordenar={{ orden_seleccionado|default:'prioridad' }}">
+                            {{ texto }}
+                        </a>
+                    </li>
+                {% endfor %}
+
+                <li><hr class="dropdown-divider"></li>
+                <li><h6 class="dropdown-header">Ordenar Por</h6></li>
+                <li>
+                    <a class="dropdown-item {% if orden_seleccionado == 'prioridad' %}active{% endif %}" 
+                       href="?ordenar=prioridad&estado={{ estado_seleccionado|default:'' }}&prioridad={{ prioridad_seleccionada|default:'' }}">
+                        Prioridad
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item {% if orden_seleccionado == 'recientes' %}active{% endif %}" 
+                       href="?ordenar=recientes&estado={{ estado_seleccionado|default:'' }}&prioridad={{ prioridad_seleccionada|default:'' }}">
+                        Más Recientes
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item {% if orden_seleccionado == 'antiguas' %}active{% endif %}" 
+                       href="?ordenar=antiguas&estado={{ estado_seleccionado|default:'' }}&prioridad={{ prioridad_seleccionada|default:'' }}">
+                        Más Antiguas
+                    </a>
+                </li>
+                
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{% url 'dashboard_cuadrilla' %}">Limpiar Filtros</a></li>
+            </ul>
+        </div>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} mt-2">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Lugar de Incidencia</th>
+                        <th>Prioridad</th>
+                        <th>Estado</th>
+                        <th>Fecha Creación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for incidencia in page_obj %}
+                    <tr>
+                        <td>{{ incidencia.id_incidencia }}</td>
+                        <td>{{ incidencia.direccion_incidente }}</td> <td>
+                            <span class="badge 
+                                {% if incidencia.prioridad == 'urgente' %}bg-danger
+                                {% elif incidencia.prioridad == 'alta' %}bg-warning text-dark
+                                {% elif incidencia.prioridad == 'media' %}bg-info text-dark
+                                {% else %}bg-secondary
+                                {% endif %}">
+                                {{ incidencia.get_prioridad_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge 
+                                {% if incidencia.estado == 'abierta' %}bg-primary
+                                {% elif incidencia.estado == 'derivada' %}bg-info text-dark
+                                {% elif incidencia.estado == 'proceso' %}bg-warning text-dark
+                                {% elif incidencia.estado == 'finalizada' %}bg-success
+                                {% elif incidencia.estado == 'rechazada' %}bg-danger
+                                {% elif incidencia.estado == 'cerrada' %}bg-dark
+                                {% endif %}">
+                                {{ incidencia.get_estado_display }}
+                            </span>
+                        </td>
+                        <td>{{ incidencia.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            <a href="{% url 'ver_incidencia_cuadrilla' incidencia.id_incidencia %}" class="btn btn-info btn-sm">Ver</a>
+                            </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center">
+                            No hay incidencias asignadas a esta cuadrilla.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if page_obj.has_other_pages %}
+        <nav aria-label="Navegación de páginas">
+            <ul class="pagination justify-content-center">
+
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?{{ query_params }}&page={{ page_obj.previous_page_number }}">&laquo;</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                {% endif %}
+
+                {% for i in page_obj.paginator.page_range %}
+                    {% if page_obj.number == i %}
+                        <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                    {% else %}
+                        <li class="page-item"><a class="page-link" href="?{{ query_params }}&page={{ i }}">{{ i }}</a></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?{{ query_params }}&page={{ page_obj.next_page_number }}">&raquo;</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+                {% endif %}
+            </ul>
+        </nav>
+        <div class="text-center">
+            <p class="text-muted">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</p>
+        </div>
+        {% endif %}
+    
+    {% endif %} {# Fin del 'if error' #}
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
