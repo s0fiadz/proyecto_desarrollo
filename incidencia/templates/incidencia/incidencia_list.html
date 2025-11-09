@@ -124,13 +124,15 @@
                     </td>
                     <td>{{ incidencia.fecha_creacion|date:"d/m/Y" }}</td>
                     <td>
-                        <a href="{% url 'incidencia:incidencia_view' incidencia.id_incidencia %}" class="btn btn-sm btn-info me-1">Ver</a>
-                        <!-- Solo mostrar botones si las URLs existen -->
-                        {% comment %}
-                        Si quieres mantener la funcionalidad y las funciones están en la app departamento, usa:
-                        <a href="{% url 'cambiar_estado_incidencia' incidencia.id_incidencia %}" class="btn btn-sm btn-warning me-1">Cambiar Estado</a>
-                        <a href="{% url 'derivar_cuadrilla' incidencia.id_incidencia %}" class="btn btn-sm btn-primary">Derivar</a>
-                        {% endcomment %}
+                        <a href="{% url 'incidencia:incidencia_view' incidencia.id_incidencia %}" 
+                            class="btn btn-sm btn-info me-1">Ver</a>
+
+                        {% if incidencia.estado == 'finalizada' %}
+                            <a href="{% url 'incidencia:ver_evidencia_territorial' incidencia.id_incidencia %}" 
+                                class="btn btn-sm btn-success">
+                                Ver Evidencia
+                            </a>
+                        {% endif %}
                     </td>
                 </tr>
                 {% empty %}

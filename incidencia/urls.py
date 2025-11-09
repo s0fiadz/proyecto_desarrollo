@@ -16,4 +16,6 @@ incidencia_urlpatterns = [
     path('main-tipo-incidencia/', views.main_tipo_incidencia, name='main_tipo_incidencia'),
     path('incidencia_list_secpla', views.incidencia_list_secpla, name='incidencia_list_secpla'),
     path('ver-secpla/<int:id_incidencia>/', views.incidencia_view_secpla, name='incidencia_view_secpla'),
+    path('ver_evidencia/<int:id_incidencia>/', views.ver_evidencia_territorial, name='ver_evidencia_territorial'),
+    path('evaluar_evidencia/<int:id_incidencia>/<str:accion>/', views.evaluar_evidencia, name='evaluar_evidencia'),
 ]

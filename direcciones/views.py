@@ -8,6 +8,7 @@ from django.core.paginator import Paginator
 from django.db.models.query import QuerySet
 from incidencia.models import Incidencia, DatosVecino, ArchivosMultimedia, RegistrosRespuestas
 from django.contrib.auth.decorators import user_passes_test
+from cuadrillas.models import Registro_cierre
 
 
 # Create your views here.
@@ -72,6 +73,7 @@ def dashboard_direccion(request):
         'direccion_usuario': direccion_usuario
     }
     return render(request, 'direcciones/dashboard_direccion.html', context)
+
 @login_required
 @user_passes_test(es_encargado_direccion, login_url='/accounts/login/')
 def ver_incidencia_direccion(request, id):
@@ -91,12 +93,14 @@ def ver_incidencia_direccion(request, id):
     datos_vecino = get_object_or_404(DatosVecino, id_incidencia=incidencia)
     archivos = ArchivosMultimedia.objects.filter(id_incidencia=incidencia)
     respuestas = RegistrosRespuestas.objects.filter(id_incidencia=incidencia)
+    evidencias = Registro_cierre.objects.filter(incidencia=incidencia)  # 👈 AÑADIDO
 
     return render(request, 'direcciones/ver_incidencia_direccion.html', {
         'incidencia': incidencia,
         'datos_vecino': datos_vecino,
         'archivos': archivos,
-        'respuestas': respuestas
+        'respuestas': respuestas,
+        'evidencias': evidencias,  # 👈 AÑADIDO
     })
 #----------------------------------------------------------------------------------------------------------------------------------
 

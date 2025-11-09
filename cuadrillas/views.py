@@ -546,12 +546,14 @@ def ver_incidencia_cuadrilla(request, id):
     datos_vecino = get_object_or_404(DatosVecino, id_incidencia=incidencia)
     archivos = ArchivosMultimedia.objects.filter(id_incidencia=incidencia)
     respuestas = RegistrosRespuestas.objects.filter(id_incidencia=incidencia)
+    evidencias = Registro_cierre.objects.filter(incidencia=incidencia)  # 👈 AÑADIDO
 
     return render(request, 'cuadrillas/ver_incidencia_cuadrilla.html', {
         'incidencia': incidencia,
         'datos_vecino': datos_vecino,
         'archivos': archivos,
-        'respuestas': respuestas
+        'respuestas': respuestas,
+        'evidencias': evidencias,  # 👈 AÑADIDO
     })
 
 @login_required

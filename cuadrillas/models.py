@@ -40,14 +40,15 @@ class Miembro_cuadrilla(models.Model):
 
 class Registro_cierre(models.Model):
     id_registro = models.AutoField(primary_key=True)
-    fecha_cierre = models.DateField(auto_now_add=True) 
+    fecha_cierre = models.DateTimeField(auto_now_add=True)
     descripcion = models.TextField(blank=True, null=True)
     evidencia = models.FileField(upload_to='cuadrillas/')
     cuadrilla = models.ForeignKey(Cuadrilla, on_delete=models.CASCADE, db_column='id_cuadrilla', related_name='registros_de_cierre')
     incidencia = models.ForeignKey('incidencia.Incidencia', on_delete=models.CASCADE, db_column='id_incidencia', related_name='registros_cierre', null=True, blank=True)
+    comentario_territorial = models.TextField(blank=True, null=True)
     state = models.BooleanField(default=False)
-    created=models.DateTimeField(auto_now_add=True)
-    updated=models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = "Registro de Cierre"

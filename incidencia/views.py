@@ -6,12 +6,13 @@ from django.http import JsonResponse
 from .models import Incidencia, DatosVecino, ArchivosMultimedia, RegistrosRespuestas
 from encuesta.models import Encuesta, Preguntas, TipoIncidencia
 from django.core.paginator import Paginator
-from cuadrillas.models import Cuadrilla
+from cuadrillas.models import Cuadrilla, Registro_cierre
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.db.models import Q
 from registration.models import Profile
 from departamento.models import Departamento
+from django.contrib import messages
 
 def es_territorial(user):
     return user.groups.filter(name='Territorial').exists() or user.groups.filter(id=4).exists()
@@ -164,12 +165,15 @@ def incidencia_view(request, id):
     datos_vecino = get_object_or_404(DatosVecino, id_incidencia=incidencia)
     archivos = ArchivosMultimedia.objects.filter(id_incidencia=incidencia)
     respuestas = RegistrosRespuestas.objects.filter(id_incidencia=incidencia)
-    
+
+    evidencia = Registro_cierre.objects.filter(incidencia=incidencia)
+
     return render(request, 'incidencia/incidencia_view.html', {
         'incidencia': incidencia,
         'datos_vecino': datos_vecino,
         'archivos': archivos,
-        'respuestas': respuestas
+        'respuestas': respuestas,
+        'evidencia': evidencia,
     })
 
 
@@ -297,12 +301,71 @@ def incidencia_view_secpla(request, id_incidencia):
         datos_vecino = get_object_or_404(DatosVecino, id_incidencia=incidencia)
         archivos = ArchivosMultimedia.objects.filter(id_incidencia=incidencia)
         respuestas = RegistrosRespuestas.objects.filter(id_incidencia=incidencia)
-    
+        evidencias = Registro_cierre.objects.filter(incidencia=incidencia) 
+
         return render(request, 'incidencia/incidencia_view_secpla.html', {
             'incidencia': incidencia,
             'datos_vecino': datos_vecino,
             'archivos': archivos,
-            'respuestas': respuestas
+            'respuestas': respuestas,
+            'evidencias': evidencias 
         })
     else:
         return redirect('logout')
+
+@login_required
+@user_passes_test(es_territorial_o_admin, login_url='/accounts/login/')
+def ver_evidencia_territorial(request, id_incidencia):
+    """
+    Permite al territorial visualizar la evidencia subida por la cuadrilla 
+    una vez que la incidencia fue finalizada.
+    """
+    incidencia = get_object_or_404(
+        Incidencia,
+        id_incidencia=id_incidencia,
+        id_territorial=request.user
+    )
+
+    # Importamos el modelo de registros de cierre
+    from cuadrillas.models import Registro_cierre  # o el nombre exacto que uses
+
+    evidencia = Registro_cierre.objects.filter(incidencia=incidencia)
+
+    context = {
+        'incidencia': incidencia,
+        'evidencia': evidencia,
+    }
+    return render(request, 'incidencia/ver_evidencia_territorial.html', context)
+
+@login_required
+@user_passes_test(es_territorial, login_url='/accounts/login/')
+def evaluar_evidencia(request, id_incidencia, accion):
+    incidencia = get_object_or_404(Incidencia, id_incidencia=id_incidencia)
+    registro = incidencia.registros_cierre.first()  # último registro de evidencia
+
+    if request.method == 'POST':
+        comentario = request.POST.get('comentario')
+        if registro:
+            registro.comentario_territorial = comentario
+            registro.save()
+
+        if accion == 'cerrar':
+            incidencia.estado = 'cerrada'
+            messages.success(request, f"La incidencia #{incidencia.id_incidencia} ha sido marcada como CERRADA.")
+        elif accion == 'proceso':
+            incidencia.estado = 'proceso'
+            messages.warning(request, f"La incidencia #{incidencia.id_incidencia} ha sido devuelta a 'En Proceso'.")
+        else:
+            messages.error(request, "Acción no válida.")
+            return redirect('incidencia:ver_evidencia_territorial', id_incidencia=incidencia.id_incidencia)
+
+        incidencia.save()
+        return redirect('incidencia:ver_evidencia_territorial', id_incidencia=incidencia.id_incidencia)
+
+    # GET request: mostrar formulario
+    context = {
+        'incidencia': incidencia,
+        'registro': registro,
+        'accion': accion,
+    }
+    return render(request, 'incidencia/evaluar_evidencia.html', context)
