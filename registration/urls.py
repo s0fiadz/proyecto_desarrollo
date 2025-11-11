@@ -2,6 +2,7 @@ from django.urls import path
 from .views import SignUpView, ProfileUpdate, EmailUpdate
 from django.contrib import admin
 from registration import views
+from django.contrib.auth.views import LogoutView
 ''' Acá deben agregar las rutas para las funciones que creen en views.py '''
 urlpatterns = [
     path('signup/', SignUpView.as_view(), name="signup"),

@@ -60,6 +60,7 @@ class EmailUpdate(UpdateView):
         #modificamos en tiempo real
         form.fields['email'].widget = forms.EmailInput(attrs={'class':'form-control mb-2','placeholder':'Dirección de correo'})
         return form
+
 @login_required
 def profile_edit(request):
     if request.method == 'POST':
