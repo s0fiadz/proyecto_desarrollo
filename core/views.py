@@ -10,7 +10,7 @@ from django.http import (HttpResponse, HttpResponseBadRequest,
 from django.shortcuts import redirect, render #permite renderizar vistas basadas en funciones o redireccionar a otras funciones
 from django.template import RequestContext # contexto del sistema
 from django.views.decorators.csrf import csrf_exempt #decorador que nos permitira realizar conexiones csrf
-
+from incidencia.models import Incidencia
 from registration.models import Profile #importa el modelo profile, el que usaremos para los perfiles de usuarios
 
 # Create your views here.
@@ -47,9 +47,28 @@ def main_admin(request):
     except:
         messages.add_message(request, messages.INFO, 'Hubo un error con su usuario, por favor contactese con los administradores')              
         return redirect('login')
-    if profile.group_id == 1:        
+    if profile.group_id == 1:    
+        incidencias_listado = Incidencia.objects.select_related('departamento__direccion').all()
+        cantidad_activos=User.objects.filter(is_active=True).count()
+        total_incidencias = incidencias_listado.count()
+        total_abiertas = incidencias_listado.filter(estado='abierta').count()
+        total_proceso = incidencias_listado.filter(estado='proceso').count()
+        total_finalizadas = incidencias_listado.filter(estado='finalizada').count()
+        total_cerradas = incidencias_listado.filter(estado='cerrada').count()
+        total_rechazadas = incidencias_listado.filter(estado='rechazada').count()
+        total_derivadas = incidencias_listado.filter(estado='derivada').count()
+        contexto = {
+            'cantidad_activos': cantidad_activos,
+            'total_incidencias': total_incidencias,
+            'total_abiertas': total_abiertas,
+            'total_proceso': total_proceso,
+            'total_finalizadas': total_finalizadas,
+            'total_cerradas': total_cerradas,
+            'total_rechazadas': total_rechazadas,
+            'total_derivadas': total_derivadas,
+        }
         template_name = 'core/main_admin.html'
-        return render(request,template_name)
+        return render(request,template_name, contexto)
     else:
         messages.add_message(request, messages.INFO, 'No tiene permisos para ver esta página')              
         return redirect('logout')

@@ -1,31 +1,24 @@
-    {% load static %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Cuadrillas</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
+{% extends 'core/base.html' %}
+{% load static %}
 
+{% block title %}Gestión de Cuadrillas{% endblock %}
+
+{% block content %}
 <div class="container mt-4">
     <h2 class="mb-3">Gestión de Cuadrillas</h2>
     <hr>
-    
-    
+
     <div class="d-flex justify-content-between mb-4">
         <div>
             <a href="{% url 'crear_cuadrilla' %}" class="btn btn-success me-2">Nueva Cuadrilla</a>
             <a href="{% url 'listar_cuadrillas_bloqueadas' %}" class="btn btn-warning me-2">Ver cuadrillas bloqueadas</a> 
             <a href="{% url 'main_operario' %}" class="btn btn-info me-2">Gestión de Operarios</a>
-            <a href="{% url 'main_admin' %}" class="btn btn-secondary">Volver al menú principal</a>
         </div>
         
         <!-- Búsqueda -->
         <form method="GET" class="d-flex" action="{% url 'main_cuadrilla' %}">
             <input type="search" name="busqueda" class="form-control me-2"
-                   placeholder="Buscar cuadrilla..." value="{{ busqueda|default:'' }}">
+                    placeholder="Buscar cuadrilla..." value="{{ busqueda|default:'' }}">
             <button class="btn btn-outline-primary" type="submit">Buscar</button>
             {% if busqueda %}
                 <a href="{% url 'main_cuadrilla' %}" class="btn btn-outline-danger ms-2">Limpiar</a>
@@ -37,7 +30,6 @@
     <div class="row mb-3">
         <div class="col-md-6">
             <form method="GET" class="d-flex">
-                
                 <select class="form-select me-2" name="departamento" onchange="this.form.submit()">
                     <option value="">Todos los departamentos</option>
                     {% for depto in departamentos %}
@@ -48,7 +40,6 @@
                     {% endfor %}
                 </select>
                 
-                
                 <select class="form-select" name="orden" onchange="this.form.submit()">
                     <option value="asc" {% if orden_seleccionado == 'asc' %}selected{% endif %}>
                         Nombre (A → Z)
@@ -57,7 +48,6 @@
                         Nombre (Z → A)
                     </option>
                 </select>
-                
                 
                 {% if busqueda %}
                     <input type="hidden" name="busqueda" value="{{ busqueda }}">
@@ -178,7 +168,4 @@
     </div>
     {% endif %}
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{% endblock %}

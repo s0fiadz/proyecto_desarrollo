@@ -1,0 +1,143 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Panel SECPLA{% endblock %}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: #0a99c4;
+            color: white;
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+        }
+        .sidebar a {
+            color: #f8f9fa;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .sidebar a:hover {
+            background-color: #343a40;
+            color: #fff;
+        }
+        .sidebar a.active {
+            background-color: #0d6efd;
+            color: #fff;
+        }
+        .sidebar h4 {
+            color: #fff;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        /* Contenido + Footer */
+        .main-wrapper {
+            margin-left: 250px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        .content {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        footer {
+            background-color: #0b1221;
+            color: white;
+            text-align: center;
+            padding: 1rem 0;
+            border-top: 1px solid #1e2a3a;
+            width: 100%;
+        }
+
+        footer a {
+            color: #0dcaf0;
+            text-decoration: none;
+            margin: 0 5px;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h4><i class="bi bi-speedometer2 me-2"></i>Panel SECPLA</h4>
+        <a href="{% url 'main_admin' %}">
+            <i class="bi bi-house"></i> Menú Principal
+        </a>
+        <a href="{% url 'main_usuario' %}">
+            <i class="bi bi-people"></i> Gestión de Usuarios
+        </a>
+        <a href="{% url 'main_direccion' %}">
+            <i class="bi bi-geo-alt"></i> Gestión de Direcciones
+        </a>
+        <a href="{% url 'main_departamento' %}">
+            <i class="bi bi-building"></i> Gestión de Departamentos
+        </a>
+        <a href="{% url 'main_cuadrilla' %}">
+            <i class="bi bi-person-badge"></i> Gestión de Cuadrillas
+        </a>
+        <a href="{% url 'encuesta_list' %}">
+            <i class="bi bi-list-check"></i> Gestión de Encuestas
+        </a>
+        <a href="{% url 'incidencia:main_tipo_incidencia' %}">
+            <i class="bi bi-exclamation-triangle"></i> Gestión de Tipos de Incidencia
+        </a>
+        <a href="{% url 'incidencia:incidencia_list_secpla' %}">
+            <i class="bi bi-folder2"></i> Gestión de Incidencias
+        </a>
+
+        <hr class="text-secondary mt-4">
+
+        <a href="{% url 'home' %}">
+            <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+        </a>
+    </div>
+
+    <div class="main-wrapper">
+        <div class="content">
+            {% block content %}
+            {% endblock %}
+        </div>
+        <footer>
+            <div>&copy; 2025 Municipalidades. Todos los derechos reservados.</div>
+            <div>
+                <a href="#">Política de Privacidad</a> |
+                <a href="#">Términos de Servicio</a>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
