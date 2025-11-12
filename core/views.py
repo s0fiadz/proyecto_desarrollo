@@ -12,6 +12,8 @@ from django.template import RequestContext # contexto del sistema
 from django.views.decorators.csrf import csrf_exempt #decorador que nos permitira realizar conexiones csrf
 from incidencia.models import Incidencia
 from registration.models import Profile #importa el modelo profile, el que usaremos para los perfiles de usuarios
+from django.contrib.auth.views import LogoutView
+from django.urls import reverse_lazy
 
 # Create your views here.
 def home(request):
@@ -21,7 +23,6 @@ def home(request):
 def pre_check_profile(request):
     #por ahora solo esta creada pero aún no la implementaremos
     pass
-
 
 @login_required
 def check_profile(request):

@@ -494,17 +494,23 @@ def dashboard_cuadrilla(request):
     try:
         miembro = Miembro_cuadrilla.objects.get(usuario=request.user)
         cuadrilla_usuario = miembro.cuadrilla
+
+        if miembro.cargo != "Jefe de Cuadrilla" or cuadrilla_usuario.jefe_cuadrilla != miembro:
+            return redirect('logout')
+
     except Miembro_cuadrilla.DoesNotExist:
         messages.error(request, 'Usted no está asignado a ninguna cuadrilla.')
-        return render(request, 'cuadrillas/dashboard_cuadrilla.html', {
-            'error': True,
-            'estados': Incidencia.ESTADOS,
-            'prioridades': Incidencia.PRIORIDADES
-        })
+        return redirect('main_usuario')
 
     incidencias_listado = Incidencia.objects.filter(id_cuadrilla=cuadrilla_usuario)
     incidencias_listado = filtrar_incidencias_cuadrilla(request, incidencias_listado)
     incidencias_listado = ordenar_incidencias_cuadrilla(request, incidencias_listado)
+
+    # 🔹 Bloqueo de iniciar proceso si hay incidencias activas o finalizadas sin cerrar
+    hay_activa = Incidencia.objects.filter(
+        id_cuadrilla=cuadrilla_usuario,
+        estado__in=['proceso', 'finalizada']
+    ).exists()
 
     paginator = Paginator(incidencias_listado, 8)
     page_number = request.GET.get('page')
@@ -523,7 +529,8 @@ def dashboard_cuadrilla(request):
         'estado_seleccionado': request.GET.get('estado', ''),
         'prioridad_seleccionada': request.GET.get('prioridad', ''),
         'orden_seleccionado': request.GET.get('ordenar', 'prioridad'),
-        'cuadrilla_usuario': cuadrilla_usuario
+        'cuadrilla_usuario': cuadrilla_usuario,
+        'hay_activa': hay_activa,
     }
     return render(request, 'cuadrillas/dashboard_cuadrilla.html', context)
 
@@ -564,11 +571,19 @@ def subir_evidencia_cierre(request, id_incidencia):
     except Miembro_cuadrilla.DoesNotExist:
         messages.error(request, 'No tiene cuadrilla asignada.')
         return redirect('dashboard_cuadrilla')
+
     incidencia = get_object_or_404(
         Incidencia,
         id_incidencia=id_incidencia,
         id_cuadrilla=miembro.cuadrilla
     )
+
+    # 🔹 Aquí agregamos la validación nueva:
+    if incidencia.estado != 'proceso':
+        messages.warning(request, 'Solo puede subir evidencia cuando la incidencia está en proceso.')
+        return redirect('dashboard_cuadrilla')
+
+    # 🔹 Mantén esta parte igual:
     if incidencia.estado == 'finalizada':
         messages.warning(request, 'Esta incidencia ya se encuentra finalizada.')
         return redirect('dashboard_cuadrilla')
@@ -587,7 +602,6 @@ def subir_evidencia_cierre(request, id_incidencia):
             return redirect('dashboard_cuadrilla')
         else:
             messages.error(request, 'Error al subir la evidencia. Revise el formulario.')
-            
     else:
         form = RegistroCierreForm()
 
@@ -596,3 +610,29 @@ def subir_evidencia_cierre(request, id_incidencia):
         'incidencia': incidencia
     }
     return render(request, 'cuadrillas/subir_evidencia.html', context)
+
+@login_required
+def activar_proceso_incidencia(request, id_incidencia):
+
+    incidencia = get_object_or_404(Incidencia, id_incidencia=id_incidencia)
+
+    cuadrilla = incidencia.id_cuadrilla
+    if not cuadrilla:
+        messages.error(request, "Esta incidencia no tiene cuadrilla asignada.")
+        return redirect('dashboard_cuadrilla')
+
+    en_proceso = Incidencia.objects.filter(id_cuadrilla=cuadrilla, estado='proceso').exists()
+    if en_proceso:
+        messages.warning(request, "Ya hay una incidencia en proceso. Debe cerrarla antes de iniciar otra.")
+        return redirect('dashboard_cuadrilla')
+
+
+    if incidencia.estado != 'derivada':
+        messages.error(request, "Solo las incidencias derivadas pueden iniciarse.")
+        return redirect('dashboard_cuadrilla')
+
+    incidencia.estado = 'proceso'
+    incidencia.save()
+
+    messages.success(request, f"La incidencia #{incidencia.id_incidencia} ha sido marcada como 'En proceso'.")
+    return redirect('dashboard_cuadrilla')
