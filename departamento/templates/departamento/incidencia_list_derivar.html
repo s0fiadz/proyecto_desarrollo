@@ -6,6 +6,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Incidencias para Derivar - Departamento</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Botón color celeste personalizado */
+        .btn-celeste {
+            background-color: #5bc0de; /* celeste claro */
+            color: #ffffff;
+            border: 1px solid rgba(0,0,0,0.08);
+        }
+        .btn-celeste:hover, .btn-celeste:focus {
+            background-color: #31a7c6; /* tono ligeramente más oscuro al pasar */
+            color: #ffffff;
+        }
+        /* Asegurar separación consistente entre botones */
+        .acciones-incidencia .btn {
+            margin-right: .5rem;
+        }
+        .acciones-incidencia .btn:last-child {
+            margin-right: 0;
+        }
+    </style>
 </head>
 <body>
 
@@ -161,17 +180,21 @@
                     </td>
                     <td>{{ incidencia.fecha_creacion|date:"d/m/Y H:i" }}</td>
                     <td>
-                        <div class="btn-group" role="group">
-                            <a href="{% url 'cambiar_estado_incidencia' incidencia.id_incidencia %}" 
-                               class="btn btn-warning btn-sm" 
+                        <div class="acciones-incidencia d-flex align-items-center">
+                            <a href="{% url 'cambiar_estado_incidencia' incidencia.id_incidencia %}"
+                               class="btn btn-celeste btn-sm"
                                title="Cambiar Estado">
-                                📝 Estado
+                                Estado
                             </a>
                             <!-- SIEMPRE permitir derivar/cambiar cuadrilla -->
-                            <a href="{% url 'derivar_cuadrilla' incidencia.id_incidencia %}" 
-                               class="btn {% if incidencia.id_cuadrilla %}btn-info{% else %}btn-primary{% endif %} btn-sm" 
+                            <a href="{% url 'derivar_cuadrilla' incidencia.id_incidencia %}"
+                               class="btn btn-celeste btn-sm"
                                title="{% if incidencia.id_cuadrilla %}Cambiar Cuadrilla - Actual: {{ incidencia.id_cuadrilla.nombre_cuadrilla }}{% else %}Derivar a Cuadrilla{% endif %}">
-                                {% if incidencia.id_cuadrilla %}🔄 Cambiar{% else %}🔄 Derivar{% endif %}
+                                {% if incidencia.id_cuadrilla %} Cambiar{% else %} Derivar{% endif %}
+                            </a>
+                            <a href="{% url 'ver_incidencia_departamento' incidencia.id_incidencia %}"
+                               class="btn btn-celeste btn-sm">
+                                Ver
                             </a>
                         </div>
                     </td>

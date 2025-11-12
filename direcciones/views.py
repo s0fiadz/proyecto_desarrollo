@@ -10,8 +10,6 @@ from incidencia.models import Incidencia, DatosVecino, ArchivosMultimedia, Regis
 from django.contrib.auth.decorators import user_passes_test
 from cuadrillas.models import Registro_cierre
 
-
-# Create your views here.
 #----------------------------------------------------DASHBOARD DIRECCIÓN------------------------------------------------------------------------------
 def es_encargado_direccion(user):
     return user.groups.filter(id=2).exists()

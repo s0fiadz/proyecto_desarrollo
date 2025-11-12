@@ -1,0 +1,108 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ver Incidencia</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container mt-4">
+    <h4>Ver Incidencia</h4>
+
+    <p><strong>ID:</strong> {{ incidencia.id_incidencia }}</p>
+    <p><strong>Descripción:</strong> {{ incidencia.descripcion }}</p>
+    <p><strong>Dirección del incidente:</strong> {{ incidencia.direccion_incidente|default:"No especificada" }}</p>
+    <p><strong>Lateral:</strong> {{ incidencia.lateral|default:"No especificado" }}</p>
+    <p><strong>Longitud:</strong> {{ incidencia.longitud|default:"No especificado" }}</p>
+    <p><strong>Prioridad:</strong> {{ incidencia.get_prioridad_display }}</p>
+    <p><strong>Estado:</strong> {{ incidencia.get_estado_display }}</p>
+    <p><strong>Fecha de creación:</strong> {{ incidencia.fecha_creacion }}</p>
+
+    <hr>
+    <p><strong>Datos del Vecino:</strong></p>
+    <p><strong>Nombre:</strong> {{ datos_vecino.nombre }} {{ datos_vecino.apellido }}</p>
+    <p><strong>Correo:</strong> {{ datos_vecino.correo|default:"No especificado" }}</p>
+    <p><strong>Dirección:</strong> {{ datos_vecino.direccion_vicina }}</p>
+    <p><strong>RAT:</strong> {{ datos_vecino.rat|default:"No especificado" }}</p>
+
+    <hr>
+    <p><strong>Respuestas a la Encuesta:</strong></p>
+    {% if respuestas %}
+        {% for respuesta in respuestas %}
+        <p>
+            <strong>{{ respuesta.id_preguntas.pregunta }}</strong><br>
+            {{ respuesta.respuesta }}
+        </p>
+        {% endfor %}
+    {% else %}
+        <p>No hay respuestas registradas</p>
+    {% endif %}
+
+<hr>
+<h5>Evidencias subidas por el Territorial</h5>
+{% if archivos %}
+    <div class="row">
+        {% for archivo in archivos %}
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm">
+                    {% with archivo.archivo.name|lower as name %}
+                        {% if ".jpg" in name or ".jpeg" in name or ".png" in name or ".gif" in name or ".webp" in name %}
+                            <img src="{{ archivo.archivo.url }}" class="card-img-top" alt="Evidencia territorial">
+                        {% else %}
+                            <div class="p-3">
+                                <a href="{{ archivo.archivo.url }}" target="_blank">Ver archivo adjunto</a>
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+                    <div class="card-body">
+                        <p><strong>Descripción:</strong> {{ archivo.descripcion|default:"Sin descripción" }}</p>
+                        <p><small class="text-muted">Subido el {{ archivo.fecha_subida|date:"d/m/Y" }}</small></p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p class="text-muted">No hay evidencia subida por el territorial.</p>
+{% endif %}
+
+    <hr>
+    <h5>Evidencias subidas por la Cuadrilla</h5>
+    {% if evidencias %}
+        <div class="row">
+            {% for reg in evidencias %}
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm">
+                        {% if reg.evidencia %}
+                            {% with reg.evidencia.name|lower as name %}
+                                {% if ".jpg" in name or ".jpeg" in name or ".png" in name or ".gif" in name or ".webp" in name %}
+                                    <img src="{{ reg.evidencia.url }}" class="card-img-top" alt="Evidencia">
+                                {% else %}
+                                    <div class="p-3">
+                                        <a href="{{ reg.evidencia.url }}" target="_blank">Ver archivo adjunto</a>
+                                    </div>
+                                {% endif %}
+                            {% endwith %}
+                        {% endif %}
+                        <div class="card-body">
+                            <p><strong>Descripción:</strong> {{ reg.descripcion|default:"Sin descripción" }}</p>
+                            <p><small class="text-muted">Subido el {{ reg.fecha_cierre|date:"d/m/Y" }}</small></p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-muted">No hay evidencia registrada para esta incidencia.</p>
+    {% endif %}
+
+    <br>
+    <a href="{% url 'incidencia_list_derivar' %}" class="btn btn-secondary">Volver a las Incidencias</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

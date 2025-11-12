@@ -19,4 +19,5 @@ departamento_urlpatterns = [
 
     #  Derivar incidencia a cuadrilla (CORREGIDO)
     path('departamento/<int:id>/derivar/', views.derivar_cuadrilla, name='derivar_cuadrilla'),
+    path('departamento/incidencia/<int:id>/', views.ver_incidencia_departamento, name='ver_incidencia_departamento'),
 ]
