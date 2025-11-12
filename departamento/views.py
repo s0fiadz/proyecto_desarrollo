@@ -8,12 +8,11 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from direcciones.models import Direccion
 from django.contrib.auth.models import User
-from .models import EncargadoDepartamento
 from django.db.models.query import QuerySet
-from incidencia.models import Incidencia
+from incidencia.models import Incidencia, DatosVecino, ArchivosMultimedia, RegistrosRespuestas
 from cuadrillas.models import Cuadrilla
 from django.contrib.auth.decorators import login_required, user_passes_test
-from departamento.models import EncargadoDepartamento
+from cuadrillas.models import Registro_cierre
 
 def filtrar_departamentos_por_direccion(request, departamentos: QuerySet) -> QuerySet:
     """Filtra el QuerySet de departamentos por la Dirección ID pasada en la URL (GET)."""
@@ -485,4 +484,33 @@ def derivar_cuadrilla(request, id):
     return render(request, 'departamento/derivar_cuadrilla.html', {
         'incidencia': incidencia,
         'cuadrillas': cuadrillas
+    })
+
+@login_required
+@user_passes_test(es_departamento, login_url='/accounts/login/')
+def ver_incidencia_departamento(request, id):
+    try:
+        encargado = EncargadoDepartamento.objects.get(usuario=request.user)
+        departamento_id = encargado.departamento_id
+    except EncargadoDepartamento.DoesNotExist:
+        messages.error(request, 'No tiene dirección asignada.')
+        return redirect('incidencia_list_derivar')
+
+    incidencia = get_object_or_404(
+        Incidencia,
+        id_incidencia=id,
+        departamento_id=departamento_id
+    )
+
+    datos_vecino = get_object_or_404(DatosVecino, id_incidencia=incidencia)
+    archivos = ArchivosMultimedia.objects.filter(id_incidencia=incidencia)
+    respuestas = RegistrosRespuestas.objects.filter(id_incidencia=incidencia)
+    evidencias = Registro_cierre.objects.filter(incidencia=incidencia)  # 👈 AÑADIDO
+
+    return render(request, 'departamento/ver_incidencia_departamento.html', {
+        'incidencia': incidencia,
+        'datos_vecino': datos_vecino,
+        'archivos': archivos,
+        'respuestas': respuestas,
+        'evidencias': evidencias,  # 👈 AÑADIDO
     })
