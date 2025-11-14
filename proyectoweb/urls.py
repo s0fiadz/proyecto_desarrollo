@@ -24,10 +24,16 @@ from django.conf import settings
 from encuesta import urls as encuesta_urls
 from incidencia import urls as incidencia_urls
 from cuadrillas import urls as cuadrillas_urls
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('', include(core_urlpatterns)),
     path('admin/', admin.site.urls),
+    path('accounts/password_reset/', 
+        auth_views.PasswordResetView.as_view(
+            html_email_template_name='registration/password_reset_email.html'
+        ), 
+        name='password_reset'),
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/', include('registration.urls')),
     path('departamento/', include(departamento_urls.departamento_urlpatterns)),
