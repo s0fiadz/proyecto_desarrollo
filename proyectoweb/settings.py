@@ -140,3 +140,16 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Solo para desarrollo (sirve los archivos estáticos y de usuario)
 DEBUG = True
+
+LOGOUT_ON_GET = True
+
+# recuperar contraseña
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 465        
+EMAIL_USE_SSL = True     
+EMAIL_USE_TLS = False
+EMAIL_HOST_USER = 'proyectowebtest@gmail.com' 
+EMAIL_HOST_PASSWORD = 'ovvx ygch uswc zymz' 
+DEFAULT_FROM_EMAIL = 'proyectowebtest@gmail.com'
