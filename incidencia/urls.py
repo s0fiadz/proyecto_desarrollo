@@ -5,7 +5,6 @@ app_name = 'incidencia'
 
 incidencia_urlpatterns = [
     path('', views.main_territorial, name='main_territorial'),
-    path('lista/', views.incidencia_list, name='incidencia_list'),
     path('crear/', views.incidencia_create, name='incidencia_create'),
     path('ver/<int:id>/', views.incidencia_view, name='incidencia_view'),
     
