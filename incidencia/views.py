@@ -35,11 +35,7 @@ def main_tipo_incidencia(request):
 @login_required
 @user_passes_test(es_territorial, login_url='/accounts/login/')
 def main_territorial(request):
-    return render(request, 'incidencia/main_territorial.html')
 
-@login_required
-@user_passes_test(es_territorial_o_admin, login_url='/accounts/login/')
-def incidencia_list(request):
     incidencias = Incidencia.objects.filter(id_territorial=request.user)
 
     search_query = request.GET.get('search', '')
@@ -48,7 +44,7 @@ def incidencia_list(request):
     ordenar = request.GET.get('ordenar', 'id_asc')
 
     if search_query:
-        incidencias = incidencias.filter(direccion__icontains=search_query)
+        incidencias = incidencias.filter(departamento__direccion__nombre_direccion__icontains=search_query)
     if estado:
         incidencias = incidencias.filter(estado=estado)
     if prioridad:
@@ -76,7 +72,7 @@ def incidencia_list(request):
         'ordenar': ordenar,
     }
 
-    return render(request, 'incidencia/incidencia_list.html', context)
+    return render(request, 'incidencia/main_territorial.html', context)
 
 @login_required
 @user_passes_test(es_territorial, login_url='/accounts/login/')
@@ -132,7 +128,7 @@ def incidencia_create(request):
                     descripcion=request.POST.get('descripcion_archivo', '')
                 )
             
-            return redirect('incidencia:incidencia_list')
+            return redirect('incidencia:main_territorial')
             
         except Exception as e:
             return render(request, 'incidencia/incidencia_create.html', {
