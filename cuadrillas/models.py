@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 class  Cuadrilla(models.Model):
     id_cuadrilla = models.AutoField(primary_key=True)
     nombre_cuadrilla = models.CharField(max_length=100)
-    jefe_cuadrilla = models.ForeignKey( 'Miembro_cuadrilla', on_delete=models.SET_NULL, null=True, blank=True, related_name='cuadrillas_dirigidas', limit_choices_to={'cargo': 'Jefe de Cuadrilla'}, unique=True)
+    jefe_cuadrilla = models.ForeignKey( 'Miembro_cuadrilla', on_delete=models.SET_NULL, null=True, blank=True, related_name='cuadrillas_dirigidas', limit_choices_to={'cargo': 'Jefe de Cuadrilla'})
     state = models.BooleanField(default=True)
     created=models.DateTimeField(auto_now_add=True)
     updated=models.DateTimeField(auto_now=True)
