@@ -9,6 +9,8 @@ from django.db.models.query import QuerySet
 from incidencia.models import Incidencia, DatosVecino, ArchivosMultimedia, RegistrosRespuestas
 from django.contrib.auth.decorators import user_passes_test
 from cuadrillas.models import Registro_cierre
+from departamento.models import Departamento 
+
 
 #----------------------------------------------------DASHBOARD DIRECCIÓN------------------------------------------------------------------------------
 def es_encargado_direccion(user):
@@ -29,30 +31,31 @@ def ordenar_incidencias(request, incidencias: QuerySet) -> QuerySet:
         return incidencias.order_by('-prioridad')
     return incidencias.order_by('-fecha_creacion')
 
+# TABLA  DE INCIDENCIAS
 @login_required
 @user_passes_test(es_encargado_direccion, login_url='/accounts/login/')
-def dashboard_direccion(request):
+def lista_incidencias_direccion(request):
     try:
         encargado = encargado_direccion.objects.get(usuario=request.user)
         direccion_usuario = encargado.direccion
         id_direccion = direccion_usuario.id_direccion
     except encargado_direccion.DoesNotExist:
         messages.error(request, 'Usted no está asignado a ninguna dirección.')
-        return render(request, 'direcciones/dashboard_direccion.html', {
+        return render(request, 'direcciones/lista_incidencias.html', {
             'error': True,
             'estados': Incidencia.ESTADOS
         })
 
-    # 🔹 Buscar incidencias que pertenecen a departamentos de esta dirección
+    # Buscar incidencias que pertenecen a departamentos de esta dirección
     incidencias_listado = Incidencia.objects.filter(
         departamento__direccion_id=id_direccion
     ).select_related('departamento')
 
-    # 🔹 Aplicar filtros y ordenamientos
+    # filtros y ordenamientos
     incidencias_listado = filtrar_incidencias_por_estado(request, incidencias_listado)
     incidencias_listado = ordenar_incidencias(request, incidencias_listado)
 
-    # 🔹 Paginación
+    # Paginación
     paginator = Paginator(incidencias_listado, 8)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -70,7 +73,68 @@ def dashboard_direccion(request):
         'orden_seleccionado': request.GET.get('ordenar', 'recientes'),
         'direccion_usuario': direccion_usuario
     }
-    return render(request, 'direcciones/dashboard_direccion.html', context)
+   
+    return render(request, 'direcciones/lista_incidencias.html', context)
+
+#  MÉTRICAS (PÁGINA PRINCIPAL)
+@login_required
+@user_passes_test(es_encargado_direccion, login_url='/accounts/login/')
+def dashboard_direccion(request):
+    try:
+        encargado = encargado_direccion.objects.get(usuario=request.user)
+        direccion_usuario = encargado.direccion
+        id_direccion = direccion_usuario.id_direccion
+    except encargado_direccion.DoesNotExist:
+        messages.error(request, 'Usted no está asignado a ninguna dirección.')
+        return render(request, 'direcciones/masterpage.html', {'error': True})
+
+
+    total_incidencias = Incidencia.objects.filter(
+        departamento__direccion_id=id_direccion
+    ).count()
+    
+    incidencias_abiertas = Incidencia.objects.filter(
+        departamento__direccion_id=id_direccion,
+        estado='abierta'
+    ).count()
+    
+    incidencias_proceso = Incidencia.objects.filter(
+        departamento__direccion_id=id_direccion,
+        estado='proceso'
+    ).count()
+    
+    incidencias_finalizadas = Incidencia.objects.filter(
+        departamento__direccion_id=id_direccion,
+        estado='finalizada'
+    ).count()
+    
+    incidencias_derivadas = Incidencia.objects.filter(
+        departamento__direccion_id=id_direccion,
+        estado='derivada'
+    ).count()
+    
+    incidencias_rechazadas = Incidencia.objects.filter(
+        departamento__direccion_id=id_direccion,
+        estado='rechazada'
+    ).count()
+    
+    incidencias_cerradas = Incidencia.objects.filter(
+        departamento__direccion_id=id_direccion,
+        estado='cerrada'
+    ).count()
+
+    context = {
+        'direccion_usuario': direccion_usuario,
+        'total_incidencias': total_incidencias,
+        'incidencias_abiertas': incidencias_abiertas,
+        'incidencias_proceso': incidencias_proceso,
+        'incidencias_finalizadas': incidencias_finalizadas,
+        'incidencias_derivadas': incidencias_derivadas,
+        'incidencias_rechazadas': incidencias_rechazadas,
+        'incidencias_cerradas': incidencias_cerradas,
+    }
+
+    return render(request, 'direcciones/masterpage.html', context)
 
 @login_required
 @user_passes_test(es_encargado_direccion, login_url='/accounts/login/')
@@ -91,15 +155,36 @@ def ver_incidencia_direccion(request, id):
     datos_vecino = get_object_or_404(DatosVecino, id_incidencia=incidencia)
     archivos = ArchivosMultimedia.objects.filter(id_incidencia=incidencia)
     respuestas = RegistrosRespuestas.objects.filter(id_incidencia=incidencia)
-    evidencias = Registro_cierre.objects.filter(incidencia=incidencia)  # 👈 AÑADIDO
+    evidencias = Registro_cierre.objects.filter(incidencia=incidencia)
 
     return render(request, 'direcciones/ver_incidencia_direccion.html', {
         'incidencia': incidencia,
         'datos_vecino': datos_vecino,
         'archivos': archivos,
         'respuestas': respuestas,
-        'evidencias': evidencias,  # 👈 AÑADIDO
+        'evidencias': evidencias,
     })
+
+# DEPARTAMENTOS ASIGNADOS
+@login_required
+@user_passes_test(es_encargado_direccion, login_url='/accounts/login/')
+def departamentos_direccion(request):
+    try:
+        encargado = encargado_direccion.objects.get(usuario=request.user)
+        direccion_usuario = encargado.direccion
+    except encargado_direccion.DoesNotExist:
+        messages.error(request, 'Usted no está asignado a ninguna dirección.')
+        return render(request, 'direcciones/departamentos_direccion.html', {'error': True})
+
+
+    departamentos = Departamento.objects.filter(direccion=direccion_usuario)
+    
+    context = {
+        'direccion_usuario': direccion_usuario,
+        'departamentos': departamentos,
+    }
+    return render(request, 'direcciones/departamentos_direccion.html', context)
+
 #----------------------------------------------------------------------------------------------------------------------------------
 
 @login_required
@@ -322,4 +407,3 @@ def asignar_encargado(request, id_direccion):
 
     else:
         return redirect('check_profile')
-    
