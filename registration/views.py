@@ -114,37 +114,107 @@ def generar_password(longitud=10):
 @login_required
 def crear_usuario(request):
     try:
-        profile = Profile.objects.filter(user_id = request.user.id).get()
+        profile = Profile.objects.get(user_id=request.user.id)
     except:
         messages.add_message(request, messages.INFO, 'Hubo un error')
         return redirect('check_profile')
-    if profile.group_id == 1:
-        if request.method == 'POST':
-            user_form = CustomUserCreationForm(request.POST)
-            profile_form = ProfileForm(request.POST)
 
-            if user_form.is_valid() and profile_form.is_valid():
-                user = user_form.save(commit=False)
-                user.is_active = True
-                user.save()
-                user_profile = profile_form.save(commit=False)
-                user_profile.user = user
-                user_profile.save()
-                user.groups.clear()
-                user.groups.add(user_profile.group)
-
-                messages.success(request, f'Usuario "{user.username}" creado correctamente.')
-                return redirect('main_usuario')
-        else:
-            user_form = CustomUserCreationForm()
-            profile_form = ProfileForm()
-
-        return render(request, 'registration/crear_usuario.html', {
-            'user_form': user_form,
-            'profile_form': profile_form
-        })
-    else:
+    if profile.group_id != 1:
         return redirect('logout')
+
+    # =====================================================
+    # ===========   CREACIÓN MASIVA DE USUARIOS   =========
+    # =====================================================
+    if request.method == 'POST' and 'crear_multiples' in request.POST:
+        bulk_data = request.POST.get("bulk_users", "").strip()
+        lines = bulk_data.split("\n")
+
+        creados = 0
+        errores = []
+
+        for linea in lines:
+            try:
+                nombre, apellido, correo, cargo = [x.strip() for x in linea.split(",")]
+
+                # Generar username automáticamente
+                username = (
+                    nombre.lower().replace(" ", "") +
+                    apellido.lower().replace(" ", "") +
+                    correo[:3].lower()
+                )
+
+                # Password automática: primeros 4 caracteres del correo
+                password = correo[:4]
+
+                # Evitar duplicados
+                if User.objects.filter(username=username).exists():
+                    errores.append(f"Username repetido: {username}")
+                    continue
+
+                if User.objects.filter(email=correo).exists():
+                    errores.append(f"Email ya existe: {correo}")
+                    continue
+
+                # Crear usuario auth_user
+                user = User.objects.create_user(
+                    username=username,
+                    password=password,
+                    first_name=nombre,
+                    last_name=apellido,
+                    email=correo,
+                    is_active=True
+                )
+
+                # Crear perfil asociado
+                user_profile = Profile.objects.create(
+                    user=user,
+                    group_id=cargo
+                )
+
+                # Asignar grupo de Django
+                user.groups.add(cargo)
+
+                creados += 1
+
+            except Exception as e:
+                errores.append(f"Error en línea '{linea}': {e}")
+
+        messages.success(request, f"Usuarios creados correctamente: {creados}")
+        for err in errores:
+            messages.error(request, err)
+
+        return redirect('main_usuario')
+
+    # =====================================================
+    # ========  CREACIÓN INDIVIDUAL (NORMAL)  =============
+    # =====================================================
+    if request.method == 'POST':
+        user_form = CustomUserCreationForm(request.POST)
+        profile_form = ProfileForm(request.POST)
+
+        if user_form.is_valid() and profile_form.is_valid():
+            user = user_form.save(commit=False)
+            user.is_active = True
+            user.save()
+
+            user_profile = profile_form.save(commit=False)
+            user_profile.user = user
+            user_profile.save()
+
+            user.groups.clear()
+            user.groups.add(user_profile.group)
+
+            messages.success(request, f'Usuario "{user.username}" creado correctamente.')
+            return redirect('main_usuario')
+    else:
+        user_form = CustomUserCreationForm()
+        profile_form = ProfileForm()
+
+    return render(request, 'registration/crear_usuario.html', {
+        'user_form': user_form,
+        'profile_form': profile_form
+    })
+
 
 @login_required
 def ver_usuario(request, user_id):
@@ -313,3 +383,4 @@ def ordenar_usuarios(request, usuarios: QuerySet) -> QuerySet:
     else:
         return redirect('check_profile')
 '''
+

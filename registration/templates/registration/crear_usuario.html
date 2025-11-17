@@ -1,4 +1,12 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Crear Usuario{% endblock %}
+
+{% block content %}
+
 <h2>Crear nuevo usuario</h2>
+
 {% if messages %}
     {% for message in messages %}
         <div class="alert alert-{{ message.tags }}" style="margin-top:10px;">
@@ -7,11 +15,13 @@
     {% endfor %}
 {% endif %}
 
+<!-- FORMULARIO INDIVIDUAL -->
 <form method="POST">
     {% csrf_token %}
 
     <fieldset>
         <legend>Datos de usuario</legend>
+
         {{ user_form.as_p }}
     </fieldset>
 
@@ -20,6 +30,41 @@
         {{ profile_form.as_p }}
     </fieldset>
 
-    <button type="submit">Crear usuario</button>
-    <a href="{% url 'main_usuario' %}">Cancelar</a>
+    <button type="submit" class="btn btn-success">Crear usuario</button>
+    <a href="{% url 'main_usuario' %}" class="btn btn-secondary">Cancelar</a>
 </form>
+
+<hr class="mt-5">
+
+<!-- FORMULARIO DE CARGA MASIVA -->
+<h3>Crear múltiples usuarios</h3>
+<p>Pega aquí varias líneas con el formato:</p>
+
+<pre>
+Nombre,Apellido,correo@dominio.com,cargoID
+</pre>
+
+
+<div class="alert alert-info">
+    <strong>Información importante:</strong><br>
+    Los usuarios creados mediante carga masiva tendrán su 
+    <strong>nombre de usuario</strong> y <strong>contraseña</strong> generados automáticamente 
+    por el sistema, siguiendo las reglas internas definidas por la aplicación.
+    <br>No es necesario ingresarlos manualmente.
+</div>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <textarea name="bulk_users" class="form-control" rows="10"
+        placeholder="Ejemplo:
+Juan,Perez,juanperez@gmail.com,1
+Maria,Gonzalez,marig@gmail.com,2
+Pedro,Ruiz,pedro.ruiz@empresa.cl,3"></textarea>
+
+    <button type="submit" name="crear_multiples" class="btn btn-primary mt-3">
+        Crear usuarios masivamente
+    </button>
+</form>
+
+{% endblock %}
