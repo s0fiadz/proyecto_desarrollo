@@ -1,4 +1,8 @@
-<h2>Crear nuevo Departamento</h2>
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<h2 class="mb-4">Crear nuevo Departamento</h2>
 
 {% if messages %}
     {% for message in messages %}
@@ -8,19 +12,26 @@
     {% endfor %}
 {% endif %}
 
-<form method="post" action="{% url 'guardar_departamento' %}">
+<form method="post" action="{% url 'guardar_departamento' %}" class="mb-3">
     {% csrf_token %}
-    <label for="nombre_dpto">Nombre:</label>
-    <input type="text" name="nombre_dpto" id="nombre_dpto"><br><br>
 
-    <label for="direccion">Dirección:</label>
-    <select name="direccion" id="direccion" required>
-        <option value="">Seleccione una dirección</option>
-        {% for direccion in direcciones %}
-            <option value="{{ direccion.id_direccion }}">{{ direccion.nombre_direccion }}</option>
-        {% endfor %}
-    </select><br><br>
+    <div class="mb-3">
+        <label for="nombre_dpto" class="form-label">Nombre:</label>
+        <input type="text" name="nombre_dpto" id="nombre_dpto" class="form-control" required>
+    </div>
 
-    <button type="submit">Guardar</button>
-    <a href="{% url 'main_departamento' %}">Cancelar</a>
+    <div class="mb-3">
+        <label for="direccion" class="form-label">Dirección:</label>
+        <select name="direccion" id="direccion" class="form-select" required>
+            <option value="">Seleccione una dirección</option>
+            {% for direccion in direcciones %}
+                <option value="{{ direccion.id_direccion }}">{{ direccion.nombre_direccion }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a href="{% url 'main_departamento' %}" class="btn btn-secondary ms-2">Cancelar</a>
 </form>
+
+{% endblock %}

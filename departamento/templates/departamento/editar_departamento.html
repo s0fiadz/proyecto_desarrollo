@@ -1,3 +1,7 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
 <div class="container mt-4">
   <h2>Editar Departamento</h2>
 
@@ -9,6 +13,7 @@
 
   <form method="post" action="{% url 'editar_departamento' departamento.id %}" autocomplete="off">
     {% csrf_token %}
+
     <div class="mb-3">
       <label for="nombre_dpto" class="form-label">Nombre</label>
       <input type="text" class="form-control" id="nombre_dpto" name="nombre_dpto" value="{{ departamento.nombre_dpto }}" required>
@@ -16,17 +21,21 @@
 
     <div class="mb-3">
       <label for="direccion_id" class="form-label">Dirección</label>
-      <select class="form-select" id="direccion_id" name="direccion" required> <option value="">Seleccione una dirección</option>
-        
+      <select class="form-select" id="direccion_id" name="direccion" required>
+        <option value="">Seleccione una dirección</option>
+
         {% for dir in direcciones %}
-            <option value="{{ dir.id_direccion }}" 
-                {% if departamento.direccion.id_direccion == dir.id_direccion %}selected{% endif %}>
-                {{ dir.nombre_direccion }}
-            </option>
+          <option value="{{ dir.id_direccion }}"
+            {% if departamento.direccion.id_direccion == dir.id_direccion %}selected{% endif %}>
+            {{ dir.nombre_direccion }}
+          </option>
         {% endfor %}
       </select>
     </div>
+
     <button type="submit" class="btn btn-primary">Guardar cambios</button>
     <a href="{% url 'main_departamento' %}" class="btn btn-secondary ms-2">Cancelar</a>
   </form>
 </div>
+
+{% endblock %}

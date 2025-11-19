@@ -14,6 +14,7 @@ from incidencia.models import Incidencia
 from registration.models import Profile #importa el modelo profile, el que usaremos para los perfiles de usuarios
 from django.contrib.auth.views import LogoutView
 from django.urls import reverse_lazy
+from django.contrib.auth import logout
 
 # Create your views here.
 def home(request):
@@ -72,4 +73,5 @@ def main_admin(request):
         return render(request,template_name, contexto)
     else:
         messages.add_message(request, messages.INFO, 'No tiene permisos para ver esta página')              
-        return redirect('logout')
+        logout(request)
+        return redirect('login')

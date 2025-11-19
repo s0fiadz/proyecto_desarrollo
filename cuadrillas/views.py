@@ -12,6 +12,8 @@ from .forms import RegistroCierreForm
 from datetime import date
 from django.db.models import Q
 from django.core.paginator import Paginator
+from django.contrib.auth import logout
+
 
 
 # Create your views here.
@@ -60,7 +62,8 @@ def main_cuadrilla(request):
         }
         return render(request, template_name, context)
     else:
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
     
 
 @login_required
@@ -84,7 +87,8 @@ def crear_cuadrilla(request):
         return render(request, 'cuadrillas/crear_cuadrilla.html', context)
 
     else:
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
 
 
 @login_required
@@ -139,7 +143,8 @@ def guardar_cuadrilla(request):
             return redirect('main_cuadrilla')
 
     else:
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
 
 
 @login_required
@@ -216,7 +221,8 @@ def ver_cuadrillas(request, id_cuadrilla):
         template_name = 'cuadrillas/ver_cuadrillas.html'
         return render(request,template_name,{'cuadrilla_data':cuadrilla_data})
     else:
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
 
 @login_required
 def editar_cuadrillas(request, id_cuadrilla=None):
@@ -227,7 +233,8 @@ def editar_cuadrillas(request, id_cuadrilla=None):
         return redirect('check_profile')
     
     if profile.group_id != 1: 
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
     
     try:
         cuadrilla = Cuadrilla.objects.get(pk=id_cuadrilla)
@@ -294,7 +301,8 @@ def bloquear_cuadrilla(request, id_cuadrilla):
             return redirect('main_cuadrilla')
     else: 
         messages.add_message(request,messages.INFO, 'Hubo un error')
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
 
 @login_required
 def listar_cuadrillas_bloqueadas(request):
@@ -310,7 +318,8 @@ def listar_cuadrillas_bloqueadas(request):
         return render(request,template_name, {'cuadrillas_bloqueadas': cuadrillas_bloqueadas})
     else:
         messages.add_message(request, messages.INFO, 'No tienes permisos')
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
 
 @login_required
 def desbloquear_cuadrilla(request, id_cuadrilla):
@@ -336,7 +345,8 @@ def main_operario(request):
         }
         return render(request, template_name, context)
     else:
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
 
 @login_required
 def cambiar_cargo(request, miembro_id):
@@ -344,11 +354,13 @@ def cambiar_cargo(request, miembro_id):
         profile = Profile.objects.get(user_id=request.user.id)
     except Profile.DoesNotExist:
         messages.error(request, 'Error al obtener el perfil del usuario.')
+        logout(request)
         return redirect('login')
 
     # Solo administradores pueden hacer esto (ajusta según tus permisos)
     if profile.group_id != 1:
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
 
     try:
         miembro = Miembro_cuadrilla.objects.select_related('usuario').get(id=miembro_id)
@@ -402,7 +414,8 @@ def ver_operario(request, usuario_id):
         template_name = 'cuadrillas/ver_operario.html'
         return render(request,template_name,{'operario_data':operario_data})
     else:
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
     
 @login_required
 def bloquear_operario(request, usuario_id):
@@ -422,7 +435,8 @@ def bloquear_operario(request, usuario_id):
             return redirect('main_operario')  # ← CAMBIADO
     else: 
         messages.add_message(request,messages.INFO, 'Hubo un error')
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
 
 @login_required
 def listar_operarios_bloqueados(request):
@@ -439,7 +453,8 @@ def listar_operarios_bloqueados(request):
         return render(request,template_name, {'operarios_bloqueados': operarios_bloqueados})
     else:
         messages.add_message(request, messages.INFO, 'No tienes permisos')
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
     
 @login_required
 def desbloquear_operario(request, usuario_id):
@@ -461,7 +476,8 @@ def desbloquear_operario(request, usuario_id):
             return redirect('listar_operarios_bloqueados')
     else:
         messages.add_message(request, messages.INFO, 'No tienes permisos')
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
 
 #PERFIL CUADRILLA
 
@@ -496,7 +512,9 @@ def dashboard_cuadrilla(request):
         cuadrilla_usuario = miembro.cuadrilla
 
         if miembro.cargo != "Jefe de Cuadrilla" or cuadrilla_usuario.jefe_cuadrilla != miembro:
-            return redirect('logout')
+            messages.error(request, 'Solo el jefe de cuadrilla puede acceder.')
+            logout(request)
+            return redirect('login')
 
     except Miembro_cuadrilla.DoesNotExist:
         messages.error(request, 'Usted no está asignado a ninguna cuadrilla.')
@@ -553,14 +571,14 @@ def ver_incidencia_cuadrilla(request, id):
     datos_vecino = get_object_or_404(DatosVecino, id_incidencia=incidencia)
     archivos = ArchivosMultimedia.objects.filter(id_incidencia=incidencia)
     respuestas = RegistrosRespuestas.objects.filter(id_incidencia=incidencia)
-    evidencias = Registro_cierre.objects.filter(incidencia=incidencia)  # 👈 AÑADIDO
+    evidencias = Registro_cierre.objects.filter(incidencia=incidencia)  
 
     return render(request, 'cuadrillas/ver_incidencia_cuadrilla.html', {
         'incidencia': incidencia,
         'datos_vecino': datos_vecino,
         'archivos': archivos,
         'respuestas': respuestas,
-        'evidencias': evidencias,  # 👈 AÑADIDO
+        'evidencias': evidencias,  
     })
 
 @login_required

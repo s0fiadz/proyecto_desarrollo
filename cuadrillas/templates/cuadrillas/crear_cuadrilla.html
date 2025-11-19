@@ -1,32 +1,78 @@
-<h2>Crear nueva cuadrilla</h2>
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Crear Nueva Cuadrilla{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold"><i class="bi bi-people-fill me-2"></i>Crear Nueva Cuadrilla</h2>
+
+    <a href="{% url 'main_cuadrilla' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Volver al listado
+    </a>
+</div>
 
 {% if messages %}
     {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}" style="margin-top:10px;">
+        <div class="alert alert-{{ message.tags }} mt-2">
             {{ message }}
         </div>
     {% endfor %}
 {% endif %}
 
-<form method="post" action="{% url 'guardar_cuadrilla' %}">
-    {% csrf_token %}
-    
-    <p><input type="text" name="nombre_cuadrilla" placeholder="Nombre de la cuadrilla" required></p>
-    
-    <p>
-        <label>Operarios:</label>
-        <div style="border: 1px solid #ccc; padding: 10px;">
-            {% for operario in operarios_listado %}
-                <input type="checkbox" name="cuadrillas" value="{{ operario.id }}" id="operario_{{ operario.id }}">
-                <label for="operario_{{ operario.id }}">{{ operario.first_name }} {{ operario.last_name }}</label>
-                <br>
-            {% endfor %}
-        </div>
-    </p>
+<div class="card shadow-sm mt-3">
+    <div class="card-body">
 
-    <p><input type="checkbox" name="state" id="state" checked> Activa</p>
-    
-    <p><button type="submit">Crear cuadrilla</button></p>
-    
-    <a href="{% url 'main_cuadrilla' %}">Volver al listado de cuadrillas</a>
-</form>
+        <form method="post" action="{% url 'guardar_cuadrilla' %}">
+            {% csrf_token %}
+
+            <!-- Nombre -->
+            <div class="mb-3">
+                <label for="nombre_cuadrilla" class="form-label fw-semibold">Nombre de la cuadrilla</label>
+                <input type="text" name="nombre_cuadrilla" id="nombre_cuadrilla"
+                       class="form-control" placeholder="Ej: Cuadrilla Norte" required>
+            </div>
+
+            <!-- Operarios -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Operarios</label>
+
+                <div class="border rounded p-3" style="background:#fdfdfd;">
+                    <div class="row">
+                        {% for operario in operarios_listado %}
+                        <div class="col-md-4 col-sm-6 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox"
+                                       name="cuadrillas" value="{{ operario.id }}"
+                                       id="operario_{{ operario.id }}">
+
+                                <label class="form-check-label" for="operario_{{ operario.id }}">
+                                    {{ operario.first_name }} {{ operario.last_name }}
+                                </label>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estado -->
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" name="state" id="state" checked>
+                <label class="form-check-label fw-semibold" for="state">
+                    Cuadrilla activa
+                </label>
+            </div>
+
+            <!-- Botón crear -->
+            <button type="submit" class="btn btn-primary px-4">
+                <i class="bi bi-plus-circle"></i> Crear Cuadrilla
+            </button>
+
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

@@ -103,22 +103,27 @@ def encuesta_edit(request, id):
     encuesta = get_object_or_404(Encuesta, id_encuesta=id)
     tipos_incidencia = TipoIncidencia.objects.all()
     preguntas = Preguntas.objects.filter(id_encuesta=encuesta)
-    
+
+    if encuesta.activo:
+        return render(request, 'encuesta/encuesta_edit.html', {
+            'encuesta': encuesta,
+            'tipos_incidencia': tipos_incidencia,
+            'preguntas': preguntas
+        })
+
     if request.method == 'POST':
         try:
-            # Actualizar datos de la encuesta
             encuesta.titulo = request.POST.get('titulo')
             encuesta.descripcion = request.POST.get('descripcion')
             encuesta.id_tipo_incidencia_id = request.POST.get('tipo_incidencia')
             encuesta.activo = request.POST.get('activo') == 'on'
             encuesta.save()
             
-            # Actualizar preguntas existentes
             preguntas_existentes = request.POST.getlist('preguntas_existentes[]')
             ids_preguntas = request.POST.getlist('ids_preguntas[]')
             
             for i, id_pregunta in enumerate(ids_preguntas):
-                if id_pregunta:  # Pregunta existente
+                if id_pregunta:
                     try:
                         pregunta = Preguntas.objects.get(id_preguntas=id_pregunta, id_encuesta=encuesta)
                         if i < len(preguntas_existentes) and preguntas_existentes[i].strip():
@@ -127,7 +132,6 @@ def encuesta_edit(request, id):
                     except Preguntas.DoesNotExist:
                         pass
             
-            # Agregar nuevas preguntas
             nuevas_preguntas = request.POST.getlist('nuevas_preguntas[]')
             for texto_pregunta in nuevas_preguntas:
                 if texto_pregunta.strip():

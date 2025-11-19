@@ -1,14 +1,79 @@
-<h4>Detalles del Operario</h4>
+{% extends "core/base.html" %}
 
-<div class="card">
-    <div class="card-body">
-        <h5 class="card-title">{{ operario_data.first_name }} {{ operario_data.last_name }}</h5>
-        <p><strong>Username:</strong> {{ operario_data.username }}</p>
-        <p><strong>Email:</strong> {{ operario_data.email }}</p>
-        <p><strong>Estado:</strong> {% if operario_data.is_active %}Activo{% else %}Bloqueado{% endif %}</p>
-        
+{% block extra_styles %}
+<style>
+    .container {
+        max-width: 600px !important;
+        margin: 40px auto !important;
+        background: #fff !important;
+        padding: 25px !important;
+        border-radius: 10px !important;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.15) !important;
+    }
+
+    h4 {
+        margin-bottom: 25px !important;
+        font-size: 24px !important;
+        font-weight: bold !important;
+        text-align: center !important;
+    }
+
+    .card {
+        border: 1px solid #ddd !important;
+        border-radius: 10px !important;
+        padding: 20px !important;
+        margin-bottom: 25px !important;
+    }
+
+    .card-title {
+        font-size: 22px !important;
+        font-weight: bold !important;
+        margin-bottom: 15px !important;
+    }
+
+    p {
+        margin-bottom: 10px !important;
+        font-size: 15px !important;
+    }
+
+    .btn-back {
+        display: inline-block !important;
+        padding: 10px 18px !important;
+        background: #6c757d !important;
+        color: #fff !important;
+        border-radius: 6px !important;
+        text-decoration: none !important;
+    }
+
+    .btn-back:hover {
+        background: #5a6268 !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <h4>Detalles del Operario</h4>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{ operario_data.first_name }} {{ operario_data.last_name }}</h5>
+
+            <p><strong>Username:</strong> {{ operario_data.username }}</p>
+            <p><strong>Email:</strong> {{ operario_data.email }}</p>
+            <p>
+                <strong>Estado:</strong>
+                {% if operario_data.is_active %}
+                    Activo
+                {% else %}
+                    Bloqueado
+                {% endif %}
+            </p>
+        </div>
     </div>
+
+    <a href="{% url 'main_operario' %}" class="btn-back">Volver a la lista de operarios</a>
+
 </div>
-
-<a href="{% url 'main_cuadrilla' %}">Volver a la lista de cuadrillas</a>
-
+{% endblock %}

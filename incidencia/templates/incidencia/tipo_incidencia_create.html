@@ -1,19 +1,28 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+
 <h4>Crear Tipo de Incidencia</h4>
+<hr>
 
 {% if error %}
-<p style="color: red;"><strong>Error:</strong> {{ error }}</p>
+<div class="alert alert-danger">
+    <strong>Error:</strong> {{ error }}
+</div>
 {% endif %}
 
-<form method="post">
+<form method="post" class="mt-3">
     {% csrf_token %}
-    <p>
-        <input type="text" name="nombre" placeholder="Nombre del tipo de incidencia" required />
-    </p>
-    <p>
-        <input type="submit" value="Crear Tipo de Incidencia" />
-    </p>
+
+    <div class="mb-3">
+        <label class="form-label fw-bold">Nombre del Tipo de Incidencia</label>
+        <input type="text" name="nombre" class="form-control" placeholder="Ingrese el nombre" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Crear Tipo de Incidencia</button>
+    <a href="{% url 'incidencia:main_tipo_incidencia' %}" class="btn btn-outline-secondary ms-2">
+        Volver al menú
+    </a>
 </form>
 
-<p>
-    <a href="{% url 'incidencia:main_tipo_incidencia' %}">Volver al menú</a>
-</p>
+{% endblock %}

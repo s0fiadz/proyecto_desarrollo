@@ -13,6 +13,7 @@ from incidencia.models import Incidencia, DatosVecino, ArchivosMultimedia, Regis
 from cuadrillas.models import Cuadrilla
 from django.contrib.auth.decorators import login_required, user_passes_test
 from cuadrillas.models import Registro_cierre
+from django.contrib.auth import logout
 
 def filtrar_departamentos_por_direccion(request, departamentos: QuerySet) -> QuerySet:
     """Filtra el QuerySet de departamentos por la Dirección ID pasada en la URL (GET)."""
@@ -39,7 +40,8 @@ def main_departamento(request):
         return redirect('login')
 
     if profile.group_id != 1:
-        return redirect('logout') 
+        logout(request)
+        return redirect('login')
 
     departamentos_list = Departamento.objects.filter(state='Activo').select_related('direccion', 'encargado')
     departamentos_list = filtrar_departamentos_por_direccion(request, departamentos_list)
@@ -151,7 +153,8 @@ def bloquear_desbloquear_departamento(request, id):
             messages.add_message(request, messages.INFO, 'El departamento no existe.')
             return redirect('main_departamento')
     else:
-        return redirect('logout') 
+        logout(request)
+        return redirect('login')
     
 @login_required
 def main_departamento_bloqueado(request):
@@ -165,7 +168,8 @@ def main_departamento_bloqueado(request):
         template_name = 'departamento/main_departamento_bloqueado.html'
         return render(request, template_name, {'departamento_bloqueado_listado': departamento_bloqueado_listado})
     else:
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
 
 @login_required
 def editar_departamento(request, id=None):
@@ -224,12 +228,14 @@ def editar_departamento(request, id=None):
             direcciones = Direccion.objects.all()
         except Exception:
             messages.add_message(request, messages.INFO, 'Hubo un error')
-            return redirect('logout')
+            logout(request)
+            return redirect('login')
 
         template_name = 'departamento/editar_departamento.html'
         return render(request, template_name, {'departamento': departamento, 'direcciones': direcciones})
     else:
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
 
 #Funcion ver_departamento
 @login_required
@@ -238,7 +244,8 @@ def ver_departamento(request, id=None):
         profile = Profile.objects.filter(user_id=request.user.id).get()
     except:
         messages.add_message(request, messages.INFO, 'Hubo un error')
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
 
     if profile.group_id == 1:
         departamento = get_object_or_404(Departamento, pk=id)
@@ -246,7 +253,8 @@ def ver_departamento(request, id=None):
         template_name = 'departamento/ver_departamento.html'
         return render(request, template_name, {'departamento': departamento})
     else:
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
     
 @login_required
 def departamentos_json_list(request):
@@ -317,7 +325,8 @@ def asignar_encargado_depto(request, id_departamento):
 
     if profile.group_id != 1:
         messages.info(request, 'No tiene permisos para realizar esta acción.')
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
     try:
         departamento = Departamento.objects.get(pk=id_departamento)
     except Departamento.DoesNotExist:

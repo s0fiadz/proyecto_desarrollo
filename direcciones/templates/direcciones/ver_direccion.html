@@ -1,13 +1,29 @@
-<h4>Ver Dirección</h4>
-<a href="{% url 'main_direccion' %}">Volver al Listado</a>
-<hr>
-<p><strong>Nombre de Dirección:</strong> {{ direccion_data.nombre_direccion }}</p>
-<p><strong>Estado:</strong> 
-    {% if direccion_data.state %}
-        Activo
-    {% else %}
-        Inactivo
-    {% endif %}
-</p>
-<p><strong>Fecha de creación:</strong> {{ direccion_data.created|date:"d/m/Y H:i" }}</p>
-<p><strong>Última actualización:</strong> {{ direccion_data.updated|date:"d/m/Y H:i" }}</p>
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h4 class="mb-3">Ver Dirección</h4>
+
+    <div class="mb-3">
+        <a href="{% url 'main_direccion' %}" class="btn btn-secondary">Volver al Listado</a>
+    </div>
+
+    <div class="card p-4 shadow-sm">
+        <p><strong>Nombre de Dirección:</strong> {{ direccion_data.nombre_direccion }}</p>
+
+        <p><strong>Estado:</strong>
+            {% if direccion_data.state %}
+                <span class="badge bg-success">Activo</span>
+            {% else %}
+                <span class="badge bg-danger">Inactivo</span>
+            {% endif %}
+        </p>
+
+        <p><strong>Fecha de creación:</strong> {{ direccion_data.created|date:"d/m/Y H:i" }}</p>
+        <p><strong>Última actualización:</strong> {{ direccion_data.updated|date:"d/m/Y H:i" }}</p>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,8 +1,31 @@
-<h2>Ver Usuario</h2>
-<a href = "{% url 'main_usuario' %}">Volver a la lista de usuarios</a>
-</hr>
-<p><strong>Nombre Usuario:</strong> {{ usuario_data.username }}</p>
-<p><strong>Nombre:</strong> {{ usuario_data.first_name }}</p>
-<p><strong>Apellido:</strong> {{ usuario_data.last_name }}</p>
-<p><strong>Email:</strong> {{ usuario_data.email }}</p>
-<p><strong>Estado:</strong> {{ usuario_data.is_active }}</p>
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h2 class="mb-3">Ver Usuario</h2>
+
+    <div class="mb-3">
+        <a href="{% url 'main_usuario' %}" class="btn btn-secondary">Volver a la lista de usuarios</a>
+    </div>
+
+    <div class="card p-4 shadow-sm">
+
+        <p><strong>Nombre de Usuario:</strong> {{ usuario_data.username }}</p>
+        <p><strong>Nombre:</strong> {{ usuario_data.first_name }}</p>
+        <p><strong>Apellido:</strong> {{ usuario_data.last_name }}</p>
+        <p><strong>Email:</strong> {{ usuario_data.email }}</p>
+
+        <p><strong>Estado:</strong>
+            {% if usuario_data.is_active %}
+                <span class="badge bg-success">Activo</span>
+            {% else %}
+                <span class="badge bg-danger">Inactivo</span>
+            {% endif %}
+        </p>
+
+    </div>
+
+</div>
+{% endblock %}
