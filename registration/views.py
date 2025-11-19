@@ -18,6 +18,7 @@ from django.db.models.query import QuerySet
 from .forms import CustomUserCreationForm, ProfileForm
 from django.db.models import Q
 from incidencia.models import Incidencia
+from django.contrib.auth import logout
 
 class SignUpView(CreateView):
     form_class = UserCreationFormWithEmail
@@ -88,6 +89,7 @@ def main_usuario(request):
         profile = Profile.objects.get(user=request.user)
     except Profile.DoesNotExist:
         messages.error(request, 'Tu perfil de usuario no fue encontrado.')
+        logout(request)
         return redirect('login')
 
     if profile.group_id == 1:
@@ -105,7 +107,8 @@ def main_usuario(request):
         return render(request, 'registration/main_usuario.html', {'page_obj': page_obj, 'todos_los_roles': todos_los_roles,'query_params': query_params})
     else:
         messages.error(request, 'No tienes permisos para acceder a esta página.')
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
     
 def generar_password(longitud=10):
     caracteres = string.ascii_letters + string.digits + string.punctuation
@@ -120,7 +123,8 @@ def crear_usuario(request):
         return redirect('check_profile')
 
     if profile.group_id != 1:
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
 
     # =====================================================
     # ===========   CREACIÓN MASIVA DE USUARIOS   =========
@@ -222,7 +226,8 @@ def ver_usuario(request, user_id):
         profile = Profile.objects.filter(user_id = request.user.id).get()
     except:
         messages.add_message(request, messages.INFO, 'Hubo un error')
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
     if profile.group_id == 1:
         try:
             usuario_count = User.objects.filter(pk=user_id).count()
@@ -236,7 +241,8 @@ def ver_usuario(request, user_id):
         template_name = 'registration/ver_usuario.html'
         return render(request,template_name,{'usuario_data':usuario_data})
     else:
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
 
 @login_required
 def editar_usuario(request, user_id=None):
@@ -244,10 +250,12 @@ def editar_usuario(request, user_id=None):
         profile = Profile.objects.get(user_id=request.user.id)
     except Profile.DoesNotExist:
         messages.error(request, 'Hubo un error con el perfil.')
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
 
     if profile.group_id != 1:
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
 
     try:
         usuario_data = User.objects.get(pk=user_id)
@@ -294,7 +302,8 @@ def bloquear_desbloquear_usuario(request, user_id):
         profile = Profile.objects.filter(user_id=request.user.id).get()
     except:
         messages.add_message(request, messages.INFO, 'Hubo un error')
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
     if profile.group_id == 1:  #solo admins
         try:
             usuario = User.objects.get(pk=user_id)
@@ -313,7 +322,8 @@ def bloquear_desbloquear_usuario(request, user_id):
             messages.add_message(request, messages.INFO, 'El usuario no éxiste. ')
             return redirect('main_usuario')
     else:
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
 
 @login_required
 def main_usuario_bloqueados(request):
@@ -321,13 +331,15 @@ def main_usuario_bloqueados(request):
         profile=Profile.objects.filter(user_id=request.user.id).get()
     except:
         messages.add_message(request,messages.INFO,'Hubo un error')
+        logout(request)
         return redirect('login')
     if profile.group_id == 1:
         usuario_bloqueado_listado=User.objects.filter(is_active=False).order_by('username')
         template_name = 'registration/main_usuario_bloqueados.html'
         return render(request, template_name, {'usuario_bloqueado_listado': usuario_bloqueado_listado})
     else:
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
     
 @login_required
 def profile_elimina(request, profile_id):
@@ -335,7 +347,8 @@ def profile_elimina(request, profile_id):
         profile = Profile.objects.filter(user_id=request.user.id).get()
     except Profile.DoesNotExist:
         messages.add_message(request, messages.INFO, 'Hubo un error con el perfil')
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
 
     if profile.group_id == 1:
         profile_count = Profile.objects.filter(pk=profile_id).count()
@@ -348,7 +361,8 @@ def profile_elimina(request, profile_id):
         return redirect('main_profile')
     else:
         messages.add_message(request, messages.INFO, 'No autorizado')
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
 
 def filtrar_usuarios_por_rol(request, usuarios: QuerySet) -> QuerySet:
     rol_id_filtro = request.GET.get('rol_id')

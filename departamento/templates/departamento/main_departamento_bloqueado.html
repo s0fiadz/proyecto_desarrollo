@@ -1,43 +1,85 @@
-<h2>Departamentos bloqueados</h2>
-</hr>
-<a href = "{% url 'main_departamento' %}">Volver a la lista de departamentos</a>
-<br/><br/>
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Departamentos Bloqueados{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold"><i class="bi bi-lock-fill me-2"></i>Departamentos Bloqueados</h2>
+
+    <a href="{% url 'main_departamento' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Volver a la lista de departamentos
+    </a>
+</div>
+
 {% if messages %}
     {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}" style="margin-top:10px;">
+        <div class="alert alert-{{ message.tags }} mt-3">
             {{ message }}
         </div>
     {% endfor %}
 {% endif %}
-<hr/>
-<table border="1">
-    <thead>
-            <th>Nombre Departamento</th>
-            <th>Dirección</th>
-            <th>Encargado</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-    </thead>
-    {% for departamento in departamento_bloqueado_listado %}
-        <tr>
-            <td>{{ departamento.nombre_dpto }}</td>
-            <td>{{ departamento.direccion }}</td>
-            <td>{% with encargado=d.encargadodepartamento_set.first %}
-                            {% if encargado %}
-                                {{ encargado.usuario.username }}
+
+<div class="card shadow-sm mt-4">
+    <div class="card-body">
+        <div class="table-responsive">
+
+            <table class="table table-striped table-bordered align-middle">
+                <thead class="table-primary text-center">
+                    <tr>
+                        <th>Nombre Departamento</th>
+                        <th>Dirección</th>
+                        <th>Encargado</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for departamento in departamento_bloqueado_listado %}
+                    <tr>
+                        <td>{{ departamento.nombre_dpto }}</td>
+                        <td>{{ departamento.direccion }}</td>
+
+                        <td>
+                            {% with encargado=departamento.encargadodepartamento_set.first %}
+                                {% if encargado %}
+                                    {{ encargado.usuario.username }}
+                                {% else %}
+                                    <span class="text-muted">Sin asignar</span>
+                                {% endif %}
+                            {% endwith %}
+                        </td>
+
+                        <td class="text-center">
+                            {% if departamento.state %}
+                                <span class="badge bg-success">Activo</span>
                             {% else %}
-                                <span class="text-muted">Sin asignar</span>
+                                <span class="badge bg-danger">Bloqueado</span>
                             {% endif %}
-                        {% endwith %}
-            </td>
-            <td>{{ departamento.state }}</td>
-            <td>
-                <a href="{% url 'bloquear_desbloquear_departamento' departamento.id%}">Desbloquear</a>
-            </td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="5">No hay usuarios bloqueados</td>
-        </tr>
-    {% endfor %}
-</table>
+                        </td>
+
+                        <td class="text-center">
+                            <a href="{% url 'bloquear_desbloquear_departamento' departamento.id %}" 
+                               class="btn btn-sm btn-success">
+                                <i class="bi bi-unlock-fill"></i> Desbloquear
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">
+                            No hay departamentos bloqueados
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

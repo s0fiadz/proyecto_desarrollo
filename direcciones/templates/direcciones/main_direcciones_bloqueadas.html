@@ -1,34 +1,68 @@
-<h4>Direcciones bloqueadas</h4>
-</hr>
-<a href = "{% url 'main_direccion' %}">Volver a la lista de direcciones</a>
-<br/><br/>
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Direcciones Bloqueadas{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold"><i class="bi bi-lock-fill me-2"></i>Direcciones Bloqueadas</h2>
+
+    <a href="{% url 'main_direccion' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Volver a la lista de direcciones
+    </a>
+</div>
+
 {% if messages %}
     {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}" style="margin-top:10px;">
+        <div class="alert alert-{{ message.tags }} mt-3">
             {{ message }}
         </div>
     {% endfor %}
 {% endif %}
-<hr/>
-<table border="1">
-    <thead>
-            <th>Nombre de la Dirección</th>
-            <th>Encargado de Dirección</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-    </thead>
-    {% for direccion in direccion_bloqueada_listado %}
-        <tr>
-            <td>{{ direccion.nombre_direccion }}</td>
-            <td>{{ direccion.encargado }}</td>
-            <td>{{ direccion.state }}</td>
-            <td>
-                <a href="{% url 'bloquear_desbloquear_direccion' direccion.id_direccion %}">Desbloquear</a>
-            </td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="4">No hay direcciones bloqueadas</td>
-        </tr>
-    {% endfor %}
-</table>
+
+<div class="card shadow-sm mt-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered align-middle">
+                <thead class="table-primary text-center">
+                    <tr>
+                        <th>Nombre de la Dirección</th>
+                        <th>Encargado de Dirección</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for direccion in direccion_bloqueada_listado %}
+                    <tr>
+                        <td>{{ direccion.nombre_direccion }}</td>
+                        <td>{{ direccion.encargado }}</td>
+                        <td class="text-center">
+                            {% if direccion.state %}
+                                <span class="badge bg-success">Activa</span>
+                            {% else %}
+                                <span class="badge bg-danger">Bloqueada</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <a href="{% url 'bloquear_desbloquear_direccion' direccion.id_direccion %}"
+                               class="btn btn-sm btn-success">
+                                <i class="bi bi-unlock-fill"></i> Desbloquear
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">No hay direcciones bloqueadas</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

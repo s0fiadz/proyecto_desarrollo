@@ -10,7 +10,7 @@ from incidencia.models import Incidencia, DatosVecino, ArchivosMultimedia, Regis
 from django.contrib.auth.decorators import user_passes_test
 from cuadrillas.models import Registro_cierre
 from departamento.models import Departamento 
-
+from django.contrib.auth import logout
 
 #----------------------------------------------------DASHBOARD DIRECCIÓN------------------------------------------------------------------------------
 def es_encargado_direccion(user):
@@ -73,7 +73,7 @@ def lista_incidencias_direccion(request):
         'orden_seleccionado': request.GET.get('ordenar', 'recientes'),
         'direccion_usuario': direccion_usuario
     }
-   
+
     return render(request, 'direcciones/lista_incidencias.html', context)
 
 #  MÉTRICAS (PÁGINA PRINCIPAL)
@@ -219,7 +219,8 @@ def main_direccion(request):
         template_name = 'direcciones/main_direccion.html'
         return render(request, template_name,{'direccion_listado': page_object,'search_query': search_query, 'ordenar': ordenar})
     else:
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
 
 @login_required
 def crear_direccion(request):
@@ -232,7 +233,8 @@ def crear_direccion(request):
         template_name = 'direcciones/crear_direccion.html'
         return render(request,template_name)
     else:
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
 
 @login_required
 def guardar_direccion(request):
@@ -260,7 +262,8 @@ def guardar_direccion(request):
             messages.add_message(request, messages.INFO, 'Hubo un error')
             return redirect('check_group_main')
     else:
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
 
 @login_required
 def bloquear_desbloquear_direccion(request, id_direccion):
@@ -268,7 +271,8 @@ def bloquear_desbloquear_direccion(request, id_direccion):
         profile = Profile.objects.filter(user_id=request.user.id).get()
     except:
         messages.add_message(request, messages.INFO, 'Hubo un error')
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
     if profile.group_id == 1:
         try:
             direccion = Direccion.objects.get(pk=id_direccion)
@@ -283,7 +287,8 @@ def bloquear_desbloquear_direccion(request, id_direccion):
             messages.add_message(request, messages.INFO, 'La dirección no éxiste. ')
             return redirect('main_direccion')
     else:
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
 
 @login_required
 def main_direcciones_bloqueadas(request):
@@ -291,13 +296,15 @@ def main_direcciones_bloqueadas(request):
         profile=Profile.objects.filter(user_id=request.user.id).get()
     except:
         messages.add_message(request,messages.INFO,'Hubo un error')
+        logout(request)
         return redirect('login')
     if profile.group_id == 1:
         direccion_bloqueada_listado= Direccion.objects.filter(state=False).order_by('nombre_direccion')
         template_name = 'direcciones/main_direcciones_bloqueadas.html'
         return render(request, template_name, {'direccion_bloqueada_listado': direccion_bloqueada_listado})
     else:
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
     
 @login_required
 def ver_direccion(request, id_direccion):
@@ -319,7 +326,8 @@ def ver_direccion(request, id_direccion):
         template_name = 'direcciones/ver_direccion.html'
         return render(request,template_name,{'direccion_data':direccion_data})
     else:
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
     
 @login_required
 def editar_direccion(request,id_direccion=None):

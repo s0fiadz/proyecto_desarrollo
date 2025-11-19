@@ -1,4 +1,9 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
 <h2>Editar Usuario</h2>
+
 {% if messages %}
     {% for message in messages %}
         <div class="alert alert-{{ message.tags }}" style="margin-top:10px;">
@@ -6,13 +11,29 @@
         </div>
     {% endfor %}
 {% endif %}
+
 <form method="post" action="{% url 'editar_usuario' usuario_data.id %}">
     {% csrf_token %}
-    <p><input type="text" name="username" value="{{ usuario_data.username }}" placeholder="Nombre de usuario"></p>
-    <p><input type="text" name="first_name" value="{{ usuario_data.first_name }}" placeholder="Nombre"></p>
-    <p><input type="text" name="last_name" value="{{ usuario_data.last_name }}" placeholder="Apellido"></p>
-    <p><input type="email" name="email" value="{{ usuario_data.email }}" placeholder="Correo electrónico"></p>
-    <p><input type="text" name="telefono" value="{{ usuario_data.profile.telefono }}" placeholder="Teléfono"></p>
+
+    <p>
+        <input type="text" name="username" value="{{ usuario_data.username }}" placeholder="Nombre de usuario">
+    </p>
+
+    <p>
+        <input type="text" name="first_name" value="{{ usuario_data.first_name }}" placeholder="Nombre">
+    </p>
+
+    <p>
+        <input type="text" name="last_name" value="{{ usuario_data.last_name }}" placeholder="Apellido">
+    </p>
+
+    <p>
+        <input type="email" name="email" value="{{ usuario_data.email }}" placeholder="Correo electrónico">
+    </p>
+
+    <p>
+        <input type="text" name="telefono" value="{{ usuario_data.profile.telefono }}" placeholder="Teléfono">
+    </p>
 
     <p>
         <label for="group_id">Grupo:</label>
@@ -28,5 +49,10 @@
         </select>
     </p>
 
-    <p><input type="submit" value="Guardar cambios"></p>
+    <p>
+        <input type="submit" value="Guardar cambios">
+    </p>
+
 </form>
+
+{% endblock %}

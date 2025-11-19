@@ -1,20 +1,89 @@
-<h4>Ver Encuesta</h4>
+{% extends "core/base.html" %}
 
-<p><strong>ID:</strong> {{ encuesta.id_encuesta }}</p>
-<p><strong>Título:</strong> {{ encuesta.titulo }}</p>
-<p><strong>Tipo de Incidencia:</strong> {{ encuesta.id_tipo_incidencia.nombre }}</p>
-<p><strong>Descripción:</strong> {{ encuesta.descripcion }}</p>
-<p><strong>Estado:</strong> {% if encuesta.activo %}Activo{% else %}Bloqueado{% endif %}</p>
+{% block extra_styles %}
+<style>
+    .container {
+        max-width: 700px !important;
+        margin: 40px auto !important;
+        background: #fff !important;
+        padding: 25px !important;
+        border-radius: 10px !important;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.15) !important;
+    }
 
-<p><strong>Preguntas:</strong></p>
-{% if preguntas %}
-<ol>
-    {% for pregunta in preguntas %}
-    <li>{{ pregunta.pregunta }}</li>
-    {% endfor %}
-</ol>
-{% else %}
-<p>No hay preguntas definidas para esta encuesta.</p>
-{% endif %}
+    h4 {
+        margin-bottom: 25px !important;
+        font-size: 26px !important;
+        font-weight: bold !important;
+        text-align: center !important;
+    }
 
-<a href="{% url 'encuesta_list' %}">Volver a Encuestas</a>
+    .card {
+        border: 1px solid #ddd !important;
+        border-radius: 10px !important;
+        padding: 20px !important;
+        margin-bottom: 25px !important;
+    }
+
+    .card p {
+        margin-bottom: 8px !important;
+        font-size: 15px !important;
+    }
+
+    ol li {
+        margin-bottom: 6px !important;
+    }
+
+    .btn-back {
+        display: inline-block !important;
+        padding: 10px 18px !important;
+        background: #6c757d !important;
+        color: #fff !important;
+        border-radius: 6px !important;
+        text-decoration: none !important;
+    }
+
+    .btn-back:hover {
+        background: #5a6268 !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <h4>Detalles de la Encuesta</h4>
+
+    <div class="card">
+        <p><strong>ID:</strong> {{ encuesta.id_encuesta }}</p>
+        <p><strong>Título:</strong> {{ encuesta.titulo }}</p>
+        <p><strong>Tipo de Incidencia:</strong> {{ encuesta.id_tipo_incidencia.nombre }}</p>
+        <p><strong>Descripción:</strong> {{ encuesta.descripcion }}</p>
+        <p>
+            <strong>Estado:</strong>
+            {% if encuesta.activo %}
+                Activo
+            {% else %}
+                Bloqueado
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="card">
+        <h5 style="margin-bottom: 15px;">Preguntas</h5>
+
+        {% if preguntas %}
+            <ol>
+                {% for pregunta in preguntas %}
+                    <li>{{ pregunta.pregunta }}</li>
+                {% endfor %}
+            </ol>
+        {% else %}
+            <p class="text-muted">No hay preguntas definidas para esta encuesta.</p>
+        {% endif %}
+    </div>
+
+    <a href="{% url 'encuesta_list' %}" class="btn-back">Volver a Encuestas</a>
+
+</div>
+{% endblock %}

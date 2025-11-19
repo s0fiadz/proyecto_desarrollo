@@ -13,6 +13,7 @@ from django.db.models import Q
 from registration.models import Profile
 from departamento.models import Departamento
 from django.contrib import messages
+from django.contrib.auth import logout
 
 def es_territorial(user):
     return user.groups.filter(name='Territorial').exists() or user.groups.filter(id=4).exists()
@@ -26,11 +27,13 @@ def main_tipo_incidencia(request):
         profile = Profile.objects.get(user=request.user)
     except Profile.DoesNotExist:
         messages.error(request, 'Tu perfil de usuario no fue encontrado.')
+        logout(request)
         return redirect('login')
     if profile.group_id ==1:
         return render(request, 'incidencia/main_tipo_incidencia.html')
     else:
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
 
 @login_required
 @user_passes_test(es_territorial, login_url='/accounts/login/')
@@ -187,6 +190,7 @@ def tipo_incidencia_create(request):
         profile = Profile.objects.get(user=request.user)
     except Profile.DoesNotExist:
         messages.error(request, 'Tu perfil de usuario no fue encontrado.')
+        logout(request)
         return redirect('login')
 
     if profile.group_id == 1:
@@ -200,7 +204,8 @@ def tipo_incidencia_create(request):
                 return render(request, 'incidencia/tipo_incidencia_create.html', {'error': error})
         return render(request, 'incidencia/tipo_incidencia_create.html')
     else:
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
 
 @login_required
 def tipo_incidencia_list(request):
@@ -208,12 +213,14 @@ def tipo_incidencia_list(request):
         profile = Profile.objects.get(user=request.user)
     except Profile.DoesNotExist:
         messages.error(request, 'Tu perfil de usuario no fue encontrado.')
+        logout(request)
         return redirect('login')
     if profile.group_id ==1:
         tipos = TipoIncidencia.objects.all()
         return render(request, 'incidencia/tipo_incidencia_list.html', {'tipos': tipos})
     else:
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
 
 @login_required
 def incidencia_list_secpla(request):
@@ -221,22 +228,16 @@ def incidencia_list_secpla(request):
         profile = Profile.objects.get(user=request.user)
     except Profile.DoesNotExist:
         messages.error(request, 'Tu perfil de usuario no fue encontrado.')
+        logout(request)
         return redirect('login')
 
     if profile.group_id != 1:
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
 
     incidencias_listado = Incidencia.objects.select_related(
         'departamento__direccion'
     ).all()
-
-    total_incidencias = incidencias_listado.count()
-    total_abiertas = incidencias_listado.filter(estado='abierta').count()
-    total_proceso = incidencias_listado.filter(estado='proceso').count()
-    total_finalizadas = incidencias_listado.filter(estado='finalizada').count()
-    total_cerradas = incidencias_listado.filter(estado='cerrada').count()
-    total_rechazadas = incidencias_listado.filter(estado='rechazada').count()
-    total_derivadas = incidencias_listado.filter(estado='derivada').count()
 
     search_query = request.GET.get('search', '')
     estado = request.GET.get('estado', '')
@@ -257,9 +258,9 @@ def incidencia_list_secpla(request):
     if ordenar == 'id_desc':
         incidencias_listado = incidencias_listado.order_by('-id_incidencia')
     elif ordenar == 'direccion_asc':
-        incidencias_listado = incidencias_listado.order_by('departamento__direccion__nombre')
+        incidencias_listado = incidencias_listado.order_by('departamento__direccion__nombre_direccion')
     elif ordenar == 'direccion_desc':
-        incidencias_listado = incidencias_listado.order_by('-departamento__direccion__nombre')
+        incidencias_listado = incidencias_listado.order_by('-departamento__direccion__nombre_direccion')
     else:
         incidencias_listado = incidencias_listado.order_by('id_incidencia')
 
@@ -273,13 +274,6 @@ def incidencia_list_secpla(request):
         'estado': estado,
         'prioridad': prioridad,
         'ordenar': ordenar,
-        'total_incidencias': total_incidencias,
-        'total_abiertas': total_abiertas,
-        'total_proceso': total_proceso,
-        'total_finalizadas': total_finalizadas,
-        'total_cerradas': total_cerradas,
-        'total_rechazadas': total_rechazadas,
-        'total_derivadas': total_derivadas,
     }
 
     return render(request, 'incidencia/incidencia_list_secpla.html', context)
@@ -290,6 +284,7 @@ def incidencia_view_secpla(request, id_incidencia):
         profile = Profile.objects.get(user=request.user)
     except Profile.DoesNotExist:
         messages.error(request, 'Tu perfil de usuario no fue encontrado.')
+        logout(request)
         return redirect('login')
 
     if profile.group_id == 1:
@@ -307,7 +302,8 @@ def incidencia_view_secpla(request, id_incidencia):
             'evidencias': evidencias 
         })
     else:
-        return redirect('logout')
+        logout(request)
+        return redirect('login')
 
 @login_required
 @user_passes_test(es_territorial_o_admin, login_url='/accounts/login/')

@@ -72,9 +72,10 @@
                 <hr class="text-secondary mt-4">
 
 
-                <a href="{% url 'logout' %}" class="sidebar-link">
-                    <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
-                </a>
+                <form action="{% url 'logout' %}" method="post" style="display:inline;" class="mt-auto px-3">
+                    {% csrf_token %}
+                    <button type="submit" class="btn text-white p-0">Cerrar sesión</button>
+                </form>
 
             </div>
         </div>

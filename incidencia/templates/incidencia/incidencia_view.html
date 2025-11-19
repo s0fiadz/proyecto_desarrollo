@@ -1,91 +1,124 @@
-<h4>Ver Incidencia</h4>
+{% extends "incidencia/base_territorial.html" %}
+{% load static %}
 
-<p><strong>ID:</strong> {{ incidencia.id_incidencia }}</p>
-<p><strong>Descripción:</strong> {{ incidencia.descripcion }}</p>
-<p><strong>Dirección del incidente:</strong> {{ incidencia.direccion_incidente|default:"No especificada" }}</p>
-<p><strong>Lateral:</strong> {{ incidencia.lateral|default:"No especificado" }}</p>
-<p><strong>Longitud:</strong> {{ incidencia.longitud|default:"No especificado" }}</p>
-<p><strong>Prioridad:</strong> {{ incidencia.get_prioridad_display }}</p>
-<p><strong>Estado:</strong> {{ incidencia.get_estado_display }}</p>
-<p><strong>Fecha de creación:</strong> {{ incidencia.fecha_creacion }}</p>
+{% block content %}
 
-<hr>
-<p><strong>Datos del Vecino:</strong></p>
-<p><strong>Nombre:</strong> {{ datos_vecino.nombre }} {{ datos_vecino.apellido }}</p>
-<p><strong>Correo:</strong> {{ datos_vecino.correo|default:"No especificado" }}</p>
-<p><strong>Dirección:</strong> {{ datos_vecino.direccion_vicina }}</p>
-<p><strong>RAT:</strong> {{ datos_vecino.rat|default:"No especificado" }}</p>
+<div class="container mt-4">
 
-<hr>
-<p><strong>Respuestas a la Encuesta:</strong></p>
-{% if respuestas %}
-    {% for respuesta in respuestas %}
-    <p>
-        <strong>{{ respuesta.id_preguntas.pregunta }}</strong><br>
-        {{ respuesta.respuesta }}
-    </p>
-    {% endfor %}
-{% else %}
-    <p>No hay respuestas registradas</p>
-{% endif %}
+    <h4 class="mb-4">Ver Incidencia</h4>
 
-<hr>
-<h5>Evidencias subidas por el Territorial</h5>
-{% if archivos %}
-    <div class="row">
-        {% for archivo in archivos %}
-            <div class="col-md-4 mb-4">
-                <div class="card shadow-sm">
-                    {% with archivo.archivo.name|lower as name %}
-                        {% if ".jpg" in name or ".jpeg" in name or ".png" in name or ".gif" in name or ".webp" in name %}
-                            <img src="{{ archivo.archivo.url }}" class="card-img-top" alt="Evidencia territorial">
-                        {% else %}
-                            <div class="p-3">
-                                <a href="{{ archivo.archivo.url }}" target="_blank">Ver archivo adjunto</a>
-                            </div>
-                        {% endif %}
-                    {% endwith %}
-                    <div class="card-body">
-                        <p><strong>Descripción:</strong> {{ archivo.descripcion|default:"Sin descripción" }}</p>
-                        <p><small class="text-muted">Subido el {{ archivo.fecha_subida|date:"d/m/Y" }}</small></p>
-                    </div>
-                </div>
-            </div>
-        {% endfor %}
+    <!-- Datos de la incidencia -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Información de la Incidencia</h5>
+            <p><strong>ID:</strong> {{ incidencia.id_incidencia }}</p>
+            <p><strong>Descripción:</strong> {{ incidencia.descripcion }}</p>
+            <p><strong>Dirección del incidente:</strong> {{ incidencia.direccion_incidente|default:"No especificada" }}</p>
+            <p><strong>Lateral:</strong> {{ incidencia.lateral|default:"No especificado" }}</p>
+            <p><strong>Longitud:</strong> {{ incidencia.longitud|default:"No especificado" }}</p>
+            <p><strong>Prioridad:</strong> {{ incidencia.get_prioridad_display }}</p>
+            <p><strong>Estado:</strong> {{ incidencia.get_estado_display }}</p>
+            <p><strong>Fecha de creación:</strong> {{ incidencia.fecha_creacion }}</p>
+        </div>
     </div>
-{% else %}
-    <p class="text-muted">No hay evidencia subida por el territorial.</p>
-{% endif %}
 
-<hr>
-<h5>Evidencias Subidas por la Cuadrilla</h5>
+    <!-- Datos del vecino -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Datos del Vecino</h5>
+            <p><strong>Nombre:</strong> {{ datos_vecino.nombre }} {{ datos_vecino.apellido }}</p>
+            <p><strong>Correo:</strong> {{ datos_vecino.correo|default:"No especificado" }}</p>
+            <p><strong>Dirección:</strong> {{ datos_vecino.direccion_vicina }}</p>
+            <p><strong>RAT:</strong> {{ datos_vecino.rat|default:"No especificado" }}</p>
+        </div>
+    </div>
 
-{% if evidencia %}
-    <div class="row">
-        {% for reg in evidencia %}
-            <div class="col-md-4 mb-4">
-                <div class="card shadow-sm">
-                    {% if reg.evidencia %}
-                        {% with reg.evidencia.name|lower as name %}
+    <!-- Respuestas -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Respuestas a la Encuesta</h5>
+
+            {% if respuestas %}
+                {% for respuesta in respuestas %}
+                <div class="mb-3">
+                    <strong>{{ respuesta.id_preguntas.pregunta }}</strong><br>
+                    {{ respuesta.respuesta }}
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-muted">No hay respuestas registradas.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Evidencias territoriales -->
+    <h5 class="mb-3">Evidencias subidas por el Territorial</h5>
+
+    {% if archivos %}
+        <div class="row">
+            {% for archivo in archivos %}
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm h-100">
+                        {% with archivo.archivo.name|lower as name %}
                             {% if ".jpg" in name or ".jpeg" in name or ".png" in name or ".gif" in name or ".webp" in name %}
-                                <img src="{{ reg.evidencia.url }}" class="card-img-top" alt="Evidencia">
+                                <img src="{{ archivo.archivo.url }}" class="card-img-top" alt="Evidencia territorial">
                             {% else %}
                                 <div class="p-3">
-                                    <a href="{{ reg.evidencia.url }}" target="_blank">Ver archivo adjunto</a>
+                                    <a href="{{ archivo.archivo.url }}" target="_blank">Ver archivo adjunto</a>
                                 </div>
                             {% endif %}
                         {% endwith %}
-                    {% endif %}
-                    <div class="card-body">
-                        <p><strong>Descripción:</strong> {{ reg.descripcion|default:"Sin descripción" }}</p>
-                        <p><small class="text-muted">Subido el {{ reg.fecha_cierre|date:"d/m/Y H:i" }}</small></p>
+                        <div class="card-body">
+                            <p><strong>Descripción:</strong> {{ archivo.descripcion|default:"Sin descripción" }}</p>
+                            <p><small class="text-muted">Subido el {{ archivo.fecha_subida|date:"d/m/Y" }}</small></p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-muted">No hay evidencia subida por el territorial.</p>
+    {% endif %}
+
+    <hr class="my-4">
+
+    <!-- Evidencias cuadrilla -->
+    <h5 class="mb-3">Evidencias subidas por la Cuadrilla</h5>
+
+    {% if evidencia %}
+        <div class="row">
+            {% for reg in evidencia %}
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm h-100">
+                        {% if reg.evidencia %}
+                            {% with reg.evidencia.name|lower as name %}
+                                {% if ".jpg" in name or ".jpeg" in name or ".png" in name or ".gif" in name or ".webp" in name %}
+                                    <img src="{{ reg.evidencia.url }}" class="card-img-top" alt="Evidencia">
+                                {% else %}
+                                    <div class="p-3">
+                                        <a href="{{ reg.evidencia.url }}" target="_blank">Ver archivo adjunto</a>
+                                    </div>
+                                {% endif %}
+                            {% endwith %}
+                        {% endif %}
+                        <div class="card-body">
+                            <p><strong>Descripción:</strong> {{ reg.descripcion|default:"Sin descripción" }}</p>
+                            <p><small class="text-muted">Subido el {{ reg.fecha_cierre|date:"d/m/Y H:i" }}</small></p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-muted">No hay evidencia registrada para esta incidencia.</p>
+    {% endif %}
+
+    <div class="mt-4">
+        <a href="{% url 'incidencia:main_territorial' %}" class="btn btn-secondary">
+            Volver a Incidencias
+        </a>
     </div>
-{% else %}
-    <p class="text-muted">No hay evidencia registrada para esta incidencia.</p>
-{% endif %}
-<br>
-<a href="{% url 'incidencia:main_territorial' %}">Volver a Incidencias</a>
+
+</div>
+
+{% endblock %}
