@@ -9,10 +9,12 @@
     <div class="d-flex justify-content-between mb-4">
         <form method="GET" class="d-flex" action="{% url 'incidencia:incidencia_list_secpla' %}">
             <input type="search" name="search" class="form-control me-2"
-                    placeholder="Buscar incidencia..." value="{{ search_query|default:'' }}">
-            <button class="btn btn-outline-primary" type="submit">Buscar</button>
+                   placeholder="Buscar incidencia..." value="{{ search_query|default:'' }}">
+            
+            <button class="btn btn-info text-white" type="submit">Buscar</button>
+            
             {% if search_query %}
-                <a href="{% url 'incidencia:dashboard_direccion' %}" class="btn btn-outline-danger ms-2">Limpiar</a>
+                <a href="{% url 'incidencia:dashboard_direccion' %}" class="btn btn-secondary ms-2">Limpiar</a>
             {% endif %}
         </form>
     </div>
@@ -45,21 +47,21 @@
         <div class="col-md-3">
             <label class="form-label">Ordenar:</label>
             <div class="dropdown">
-                <button class="btn btn-primary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                <button class="btn btn-info text-white dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
                     Ordenar
                 </button>
                 <ul class="dropdown-menu">
                     <li><h6 class="dropdown-header">Por dirección</h6></li>
                     <li><a class="dropdown-item {% if ordenar == 'direccion_asc' %}active{% endif %}"
-                            href="?ordenar=direccion_asc&search={{ search_query }}&estado={{ estado }}&prioridad={{ prioridad }}">Dirección (A → Z)</a></li>
+                           href="?ordenar=direccion_asc&search={{ search_query }}&estado={{ estado }}&prioridad={{ prioridad }}">Dirección (A → Z)</a></li>
                     <li><a class="dropdown-item {% if ordenar == 'direccion_desc' %}active{% endif %}"
-                            href="?ordenar=direccion_desc&search={{ search_query }}&estado={{ estado }}&prioridad={{ prioridad }}">Dirección (Z → A)</a></li>
+                           href="?ordenar=direccion_desc&search={{ search_query }}&estado={{ estado }}&prioridad={{ prioridad }}">Dirección (Z → A)</a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li><h6 class="dropdown-header">Por ID</h6></li>
                     <li><a class="dropdown-item {% if ordenar == 'id_asc' %}active{% endif %}"
-                            href="?ordenar=id_asc&search={{ search_query }}&estado={{ estado }}&prioridad={{ prioridad }}">ID (menor → mayor)</a></li>
+                           href="?ordenar=id_asc&search={{ search_query }}&estado={{ estado }}&prioridad={{ prioridad }}">ID (menor → mayor)</a></li>
                     <li><a class="dropdown-item {% if ordenar == 'id_desc' %}active{% endif %}"
-                            href="?ordenar=id_desc&search={{ search_query }}&estado={{ estado }}&prioridad={{ prioridad }}">ID (mayor → menor)</a></li>
+                           href="?ordenar=id_desc&search={{ search_query }}&estado={{ estado }}&prioridad={{ prioridad }}">ID (mayor → menor)</a></li>
                 </ul>
             </div>
         </div>
@@ -114,7 +116,7 @@
                     <td>{{ incidencia.fecha_creacion|date:"d/m/Y" }}</td>
                     <td>
                         <a href="{% url 'incidencia:incidencia_view_secpla' incidencia.id_incidencia %}" 
-                           class="btn btn-sm btn-info me-1">Ver</a>
+                           class="btn btn-sm btn-info text-white me-1">Ver</a>
                     </td>
                 </tr>
                 {% empty %}
@@ -131,8 +133,8 @@
         <ul class="pagination justify-content-center">
             {% if incidencias_listado.has_previous %}
                 <li class="page-item">
-                    <a class="page-link"
-                        href="?page={{ incidencias_listado.previous_page_number }}&search={{ search_query }}&estado={{ estado }}&prioridad={{ prioridad }}&ordenar={{ ordenar }}">
+                    <a class="page-link text-info"
+                       href="?page={{ incidencias_listado.previous_page_number }}&search={{ search_query }}&estado={{ estado }}&prioridad={{ prioridad }}&ordenar={{ ordenar }}">
                         Anterior
                     </a>
                 </li>
@@ -142,17 +144,17 @@
 
             {% for i in incidencias_listado.paginator.page_range %}
                 {% if incidencias_listado.number == i %}
-                    <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                    <li class="page-item active"><span class="page-link bg-info border-info text-white">{{ i }}</span></li>
                 {% else %}
-                    <li class="page-item"><a class="page-link"
+                    <li class="page-item"><a class="page-link text-info"
                         href="?page={{ i }}&search={{ search_query }}&estado={{ estado }}&prioridad={{ prioridad }}&ordenar={{ ordenar }}">{{ i }}</a></li>
                 {% endif %}
             {% endfor %}
 
             {% if incidencias_listado.has_next %}
                 <li class="page-item">
-                    <a class="page-link"
-                        href="?page={{ incidencias_listado.next_page_number }}&search={{ search_query }}&estado={{ estado }}&prioridad={{ prioridad }}&ordenar={{ ordenar }}">
+                    <a class="page-link text-info"
+                       href="?page={{ incidencias_listado.next_page_number }}&search={{ search_query }}&estado={{ estado }}&prioridad={{ prioridad }}&ordenar={{ ordenar }}">
                         Siguiente
                     </a>
                 </li>

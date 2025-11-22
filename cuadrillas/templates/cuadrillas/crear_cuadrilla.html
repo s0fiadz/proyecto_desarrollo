@@ -27,14 +27,12 @@
         <form method="post" action="{% url 'guardar_cuadrilla' %}">
             {% csrf_token %}
 
-            <!-- Nombre -->
             <div class="mb-3">
                 <label for="nombre_cuadrilla" class="form-label fw-semibold">Nombre de la cuadrilla</label>
                 <input type="text" name="nombre_cuadrilla" id="nombre_cuadrilla"
                        class="form-control" placeholder="Ej: Cuadrilla Norte" required>
             </div>
 
-            <!-- Operarios -->
             <div class="mb-3">
                 <label class="form-label fw-semibold">Operarios</label>
 
@@ -57,7 +55,6 @@
                 </div>
             </div>
 
-            <!-- Estado -->
             <div class="form-check mb-3">
                 <input class="form-check-input" type="checkbox" name="state" id="state" checked>
                 <label class="form-check-label fw-semibold" for="state">
@@ -65,8 +62,7 @@
                 </label>
             </div>
 
-            <!-- Botón crear -->
-            <button type="submit" class="btn btn-primary px-4">
+            <button type="submit" class="btn btn-info text-white px-4">
                 <i class="bi bi-plus-circle"></i> Crear Cuadrilla
             </button>
 

@@ -14,7 +14,7 @@
 
     <p><strong>ID:</strong> {{ incidencia.id_incidencia }}</p>
     <p><strong>Descripción:</strong> {{ incidencia.descripcion }}</p>
-    <p><strong>Dirección:</strong> {{ incidencia.direccion_incidente }}</p>
+    <p><strong>Dirección del incidente:</strong> {{ incidencia.direccion_incidente|default:"No especificada" }}</p>
     <p><strong>Lateral:</strong> {{ incidencia.lateral|default:"No especificado" }}</p>
     <p><strong>Longitud:</strong> {{ incidencia.longitud|default:"No especificado" }}</p>
     <p><strong>Prioridad:</strong> {{ incidencia.get_prioridad_display }}</p>
@@ -52,8 +52,10 @@
                         {% if ".jpg" in name or ".jpeg" in name or ".png" in name or ".gif" in name or ".webp" in name %}
                             <img src="{{ archivo.archivo.url }}" class="card-img-top" alt="Evidencia territorial">
                         {% else %}
-                            <div class="p-3">
-                                <a href="{{ archivo.archivo.url }}" target="_blank">Ver archivo adjunto</a>
+                            <div class="p-3 text-center">
+                                <a href="{{ archivo.archivo.url }}" target="_blank" class="btn btn-sm btn-info text-white">
+                                    Ver archivo adjunto
+                                </a>
                             </div>
                         {% endif %}
                     {% endwith %}
@@ -81,8 +83,10 @@
                                 {% if ".jpg" in name or ".jpeg" in name or ".png" in name or ".gif" in name or ".webp" in name %}
                                     <img src="{{ reg.evidencia.url }}" class="card-img-top" alt="Evidencia">
                                 {% else %}
-                                    <div class="p-3">
-                                        <a href="{{ reg.evidencia.url }}" target="_blank">Ver archivo adjunto</a>
+                                    <div class="p-3 text-center">
+                                        <a href="{{ reg.evidencia.url }}" target="_blank" class="btn btn-sm btn-info text-white">
+                                            Ver archivo adjunto
+                                        </a>
                                     </div>
                                 {% endif %}
                             {% endwith %}

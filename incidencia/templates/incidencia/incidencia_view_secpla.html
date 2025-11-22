@@ -52,8 +52,10 @@
                         {% if ".jpg" in name or ".jpeg" in name or ".png" in name or ".gif" in name or ".webp" in name %}
                             <img src="{{ archivo.archivo.url }}" class="card-img-top" alt="Evidencia territorial">
                         {% else %}
-                            <div class="p-3">
-                                <a href="{{ archivo.archivo.url }}" target="_blank">Ver archivo adjunto</a>
+                            <div class="p-3 text-center">
+                                <a href="{{ archivo.archivo.url }}" target="_blank" class="btn btn-sm btn-info text-white">
+                                    Ver archivo adjunto
+                                </a>
                             </div>
                         {% endif %}
                     {% endwith %}
@@ -81,8 +83,10 @@
                                 {% if ".jpg" in name or ".jpeg" in name or ".png" in name or ".gif" in name or ".webp" in name %}
                                     <img src="{{ reg.evidencia.url }}" class="card-img-top" alt="Evidencia">
                                 {% else %}
-                                    <div class="p-3">
-                                        <a href="{{ reg.evidencia.url }}" target="_blank">Ver archivo adjunto</a>
+                                    <div class="p-3 text-center">
+                                        <a href="{{ reg.evidencia.url }}" target="_blank" class="btn btn-sm btn-info text-white">
+                                            Ver archivo adjunto
+                                        </a>
                                     </div>
                                 {% endif %}
                             {% endwith %}

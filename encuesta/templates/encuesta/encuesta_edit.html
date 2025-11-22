@@ -1,80 +1,9 @@
 {% extends "core/base.html" %}
 
-{% block extra_styles %}
-<style>
-    .container-edit {
-        max-width: 850px !important;
-        margin: 40px auto !important;
-        background: #fff;
-        padding: 30px;
-        border-radius: 12px;
-        box-shadow: 0 3px 14px rgba(0,0,0,0.15);
-    }
-
-    h4 {
-        text-align: center;
-        margin-bottom: 30px;
-        font-weight: bold;
-    }
-
-    .form-section-title {
-        font-weight: bold;
-        margin-top: 25px;
-        margin-bottom: 10px;
-        font-size: 17px;
-    }
-
-    .pregunta-item {
-        margin-bottom: 12px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .pregunta-item input[type="text"] {
-        flex: 1;
-    }
-
-    .btn-small-delete {
-        background: transparent;
-        border: none;
-        color: red;
-        font-size: 20px;
-        cursor: pointer;
-    }
-
-    .btn-add {
-        margin-top: 15px;
-    }
-
-    textarea {
-        width: 100%;
-        min-height: 120px;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-    }
-
-    .btn-back {
-        display: inline-block;
-        margin-top: 20px;
-        padding: 10px 18px;
-        background: #6c757d;
-        color: white;
-        text-decoration: none;
-        border-radius: 6px;
-    }
-
-    .btn-back:hover {
-        background: #5a6268;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="container-edit">
+<div class="container mt-4" style="max-width: 850px;">
 
-    <h4>Editar Encuesta</h4>
+    <h4 class="mb-4 text-center fw-bold">Editar Encuesta</h4>
 
     {% if error %}
         <div class="alert alert-danger text-center">{{ error }}</div>
@@ -87,113 +16,117 @@
         </div>
     {% endif %}
 
-    <form method="post" action="{% url 'encuesta_edit' encuesta.id_encuesta %}">
-        {% csrf_token %}
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            <form method="post" action="{% url 'encuesta_edit' encuesta.id_encuesta %}">
+                {% csrf_token %}
 
-        <!-- DATOS GENERALES -->
-        <div class="form-section-title">Datos de la Encuesta</div>
+                <h5 class="mb-3 text-primary-emphasis border-bottom pb-2">Datos de la Encuesta</h5>
 
-        <div class="mb-3">
-            <label class="form-label">Título:</label>
-            <input type="text" name="titulo" class="form-control"
-                   value="{{ encuesta.titulo }}" required
-                   {% if encuesta.activo %}disabled{% endif %}>
-        </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Título:</label>
+                    <input type="text" name="titulo" class="form-control"
+                           value="{{ encuesta.titulo }}" required
+                           {% if encuesta.activo %}disabled{% endif %}>
+                </div>
 
-        <div class="mb-3">
-            <label class="form-label">Tipo de Incidencia:</label>
-            <select name="tipo_incidencia" class="form-select" required
-                    {% if encuesta.activo %}disabled{% endif %}>
-                {% for tipo in tipos_incidencia %}
-                    <option value="{{ tipo.id_tipo }}"
-                        {% if tipo.id_tipo == encuesta.id_tipo_incidencia.id_tipo %}selected{% endif %}>
-                        {{ tipo.nombre }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Tipo de Incidencia:</label>
+                    <select name="tipo_incidencia" class="form-select" required
+                            {% if encuesta.activo %}disabled{% endif %}>
+                        {% for tipo in tipos_incidencia %}
+                            <option value="{{ tipo.id_tipo }}"
+                                {% if tipo.id_tipo == encuesta.id_tipo_incidencia.id_tipo %}selected{% endif %}>
+                                {{ tipo.nombre }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-        <div class="mb-3">
-            <label class="form-label">Descripción:</label>
-            <textarea name="descripcion"
-                      {% if encuesta.activo %}disabled{% endif %}>{{ encuesta.descripcion }}</textarea>
-        </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Descripción:</label>
+                    <textarea name="descripcion" class="form-control" rows="4"
+                              {% if encuesta.activo %}disabled{% endif %}>{{ encuesta.descripcion }}</textarea>
+                </div>
 
-        <div class="form-check mb-4">
-            <input type="checkbox" class="form-check-input" name="activo"
-                   {% if encuesta.activo %}checked{% endif %}
-                   {% if encuesta.activo %}disabled{% endif %}>
-            <label class="form-check-label">Encuesta activa</label>
-        </div>
+                <div class="form-check mb-4">
+                    <input type="checkbox" class="form-check-input" name="activo" id="activoCheck"
+                           {% if encuesta.activo %}checked{% endif %}
+                           {% if encuesta.activo %}disabled{% endif %}>
+                    <label class="form-check-label" for="activoCheck">Encuesta activa</label>
+                </div>
 
-        <hr>
+                <h5 class="mb-3 mt-4 text-primary-emphasis border-bottom pb-2">Preguntas de la Encuesta</h5>
 
-        <!-- PREGUNTAS -->
-        <div class="form-section-title">Preguntas de la Encuesta</div>
+                <div id="preguntas-container">
+                    {% for pregunta in preguntas %}
+                    <div class="pregunta-item input-group mb-2">
+                        <input type="hidden" name="ids_preguntas[]" value="{{ pregunta.id_preguntas }}" />
 
-        <div id="preguntas-container">
-            {% for pregunta in preguntas %}
-            <div class="pregunta-item">
-                <input type="hidden" name="ids_preguntas[]" value="{{ pregunta.id_preguntas }}" />
+                        <input type="text" name="preguntas_existentes[]"
+                               class="form-control"
+                               value="{{ pregunta.pregunta }}"
+                               placeholder="Ingrese una pregunta" required
+                               {% if encuesta.activo %}disabled{% endif %}>
 
-                <input type="text" name="preguntas_existentes[]"
-                       class="form-control"
-                       value="{{ pregunta.pregunta }}"
-                       placeholder="Ingrese una pregunta" required
-                       {% if encuesta.activo %}disabled{% endif %}>
+                        {% if not encuesta.activo %}
+                        <a href="{% url 'eliminar_pregunta' pregunta.id_preguntas %}"
+                           onclick="return confirm('¿Está seguro de que desea eliminar esta pregunta?')"
+                           class="btn btn-outline-danger">✕</a>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                    {% if not encuesta.activo %}
+                    <div class="pregunta-item input-group mb-2">
+                        <input type="text" name="nuevas_preguntas[]"
+                               class="form-control"
+                               placeholder="Agregar nueva pregunta (opcional)">
+                        <button type="button" class="btn btn-outline-danger" onclick="eliminarPregunta(this)">✕</button>
+                    </div>
+                    {% endif %}
+                </div>
 
                 {% if not encuesta.activo %}
-                <a href="{% url 'eliminar_pregunta' pregunta.id_preguntas %}"
-                   onclick="return confirm('¿Está seguro de que desea eliminar esta pregunta?')"
-                   class="btn-small-delete">✕</a>
+                <button type="button" class="btn btn-info text-white mt-2" onclick="agregarPregunta()">
+                    + Agregar otra pregunta
+                </button>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-info text-white">Guardar Cambios</button>
+                </div>
                 {% endif %}
-            </div>
-            {% endfor %}
-
-            {% if not encuesta.activo %}
-            <div class="pregunta-item">
-                <input type="text" name="nuevas_preguntas[]"
-                       class="form-control"
-                       placeholder="Agregar nueva pregunta (opcional)">
-                <button type="button" class="btn-small-delete" onclick="eliminarPregunta(this)">✕</button>
-            </div>
-            {% endif %}
+            </form>
         </div>
+    </div>
 
-        {% if not encuesta.activo %}
-        <button type="button" class="btn btn-secondary btn-add" onclick="agregarPregunta()">
-            + Agregar otra pregunta
-        </button>
-
-        <br><br>
-
-        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-        {% endif %}
-    </form>
-
-    <a href="{% url 'encuesta_list' %}" class="btn-back">Volver a Encuestas</a>
+    <div class="mt-3 mb-5">
+        <a href="{% url 'encuesta_list' %}" class="btn btn-secondary">Volver a Encuestas</a>
+    </div>
 </div>
 
 {% if not encuesta.activo %}
 <script>
 function agregarPregunta() {
     const container = document.getElementById('preguntas-container');
-    const newPregunta = document.createElement('div');
-    newPregunta.className = 'pregunta-item';
+    const newDiv = document.createElement('div');
+    // Usamos las clases de Bootstrap 'input-group' y 'mb-2' para alineación
+    newDiv.className = 'pregunta-item input-group mb-2';
 
-    newPregunta.innerHTML = `
+    newDiv.innerHTML = `
         <input type="text" name="nuevas_preguntas[]" class="form-control"
                 placeholder="Agregar nueva pregunta" required />
-        <button type="button" class="btn-small-delete" onclick="eliminarPregunta(this)">✕</button>
+        <button type="button" class="btn btn-outline-danger" onclick="eliminarPregunta(this)">✕</button>
     `;
 
-    container.appendChild(newPregunta);
+    container.appendChild(newDiv);
 }
 
 function eliminarPregunta(button) {
+    // Buscamos por la clase .pregunta-item para contar cuántas hay
     const preguntas = document.querySelectorAll('.pregunta-item');
     if (preguntas.length > 1) {
-        button.parentElement.remove();
+        button.parentElement.remove(); // Elimina el div completo (input-group)
     } else {
         alert('Debe haber al menos una pregunta');
     }

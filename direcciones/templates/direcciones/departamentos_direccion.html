@@ -6,7 +6,7 @@
 {% block contenido_direccion %}
 <div class="container-fluid">
     <div class="d-flex justify-content-end mb-4">
-        <span class="badge bg-primary fs-6 p-2">
+        <span class="badge bg-info text-white fs-6 p-2">
             <i class="bi bi-building me-1"></i>{{ departamentos.count }} departamento{{ departamentos.count|pluralize }}
         </span>
     </div>
@@ -21,15 +21,14 @@
                 {% for departamento in departamentos %}
                 <div class="col-md-6 col-lg-4 mb-4">
                     <div class="card h-100 shadow-sm border-0">
-                        <div class="card-header bg-primary text-white">
+                        <div class="card-header bg-info text-white">
                             <h5 class="card-title mb-0">
                                 <i class="bi bi-building me-2"></i>
                                 {{ departamento.nombre_dpto }}
                             </h5>
                         </div>
                         <div class="card-body">
-                           
-                            <!-- ESTADO -->
+                            
                             <div class="mb-3">
                                 <small class="text-muted fw-bold">ESTADO</small>
                                 {% if departamento.state == 'Activo' %}

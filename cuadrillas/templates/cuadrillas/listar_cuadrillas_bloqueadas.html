@@ -1,72 +1,90 @@
 {% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Cuadrillas Bloqueadas{% endblock %}
 
 {% block content %}
 
-<h1>Cuadrillas Bloqueadas</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold"><i class="bi bi-lock-fill me-2"></i>Cuadrillas Bloqueadas</h2>
 
-<a href="{% url 'main_cuadrilla' %}" class="btn btn-primary">← Volver a Cuadrillas</a>
-
-<br><br>
+    <a href="{% url 'main_cuadrilla' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Volver a Cuadrillas
+    </a>
+</div>
 
 {% if messages %}
     {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">
+        <div class="alert alert-{{ message.tags }} mt-3">
             {{ message }}
         </div>
     {% endfor %}
 {% endif %}
 
-{% if cuadrillas_bloqueadas %}
-    <table class="table table-bordered table-striped" style="margin-top:20px;">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nombre de Cuadrilla</th>
-                <th>Jefe de Cuadrilla</th>
-                <th>Departamento</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
+<div class="card shadow-sm mt-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            
+            <table class="table table-striped table-bordered align-middle">
+                <thead class="table-dark text-center">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre de Cuadrilla</th>
+                        <th>Jefe de Cuadrilla</th>
+                        <th>Departamento</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
 
-        <tbody>
-            {% for cuadrilla in cuadrillas_bloqueadas %}
-            <tr>
-                <td>{{ cuadrilla.id_cuadrilla }}</td>
+                <tbody>
+                    {% if cuadrillas_bloqueadas %}
+                        {% for cuadrilla in cuadrillas_bloqueadas %}
+                        <tr>
+                            <td class="text-center">{{ cuadrilla.id_cuadrilla }}</td>
 
-                <td>{{ cuadrilla.nombre_cuadrilla }}</td>
+                            <td>{{ cuadrilla.nombre_cuadrilla }}</td>
 
-                <td>
-                    {% if cuadrilla.jefe_cuadrilla %}
-                        {{ cuadrilla.jefe_cuadrilla.usuario.first_name }} {{ cuadrilla.jefe_cuadrilla.usuario.last_name }}
+                            <td>
+                                {% if cuadrilla.jefe_cuadrilla %}
+                                    {{ cuadrilla.jefe_cuadrilla.usuario.first_name }} {{ cuadrilla.jefe_cuadrilla.usuario.last_name }}
+                                {% else %}
+                                    <span class="text-muted">No asignado</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if cuadrilla.departamento %}
+                                    {{ cuadrilla.departamento.nombre_dpto }} 
+                                    {% else %}
+                                    <span class="text-muted">No asignado</span>
+                                {% endif %}
+                            </td>
+
+                            <td class="text-center">
+                                <span class="badge bg-danger">Bloqueada</span>
+                            </td>
+
+                            <td class="text-center">
+                                <a href="{% url 'desbloquear_cuadrilla' cuadrilla.id_cuadrilla %}"
+                                   class="btn btn-sm btn-info text-white">
+                                    <i class="bi bi-unlock-fill"></i> Desbloquear
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
                     {% else %}
-                        No asignado
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">
+                                No hay cuadrillas bloqueadas
+                            </td>
+                        </tr>
                     {% endif %}
-                </td>
+                </tbody>
+            </table>
 
-                <td>
-                    {% if cuadrilla.departamento %}
-                        {{ cuadrilla.departamento.nombre }}
-                    {% else %}
-                        No asignado
-                    {% endif %}
-                </td>
-
-                <td class="text-danger fw-bold">BLOQUEADA</td>
-
-                <td>
-                    <a href="{% url 'desbloquear_cuadrilla' cuadrilla.id_cuadrilla %}"
-                       class="btn btn-success btn-sm">
-                        Desbloquear
-                    </a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-{% else %}
-    <p>No hay cuadrillas bloqueadas</p>
-{% endif %}
+        </div>
+    </div>
+</div>
 
 {% endblock %}

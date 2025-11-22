@@ -10,20 +10,22 @@
     <div class="d-flex justify-content-between mb-4">
         <form method="GET" class="d-flex w-100" action="{% url 'main_direccion' %}">
             <div>
-                <a href="{% url 'crear_direccion' %}" class="btn btn-success me-2">Nueva Dirección</a>
-                <a href="{% url 'main_direcciones_bloqueadas' %}" class="btn btn-warning me-2">Ver direcciones bloqueadas</a> 
+                <a href="{% url 'crear_direccion' %}" class="btn btn-info text-white me-2">Nueva Dirección</a>
+                <a href="{% url 'main_direcciones_bloqueadas' %}" class="btn btn-info text-white me-2">Ver direcciones bloqueadas</a> 
             </div>
             <input type="search" name="search" class="form-control me-2"
-                    placeholder="Buscar dirección..." value="{{ search_query|default:'' }}">
-            <button class="btn btn-outline-primary" type="submit">Buscar</button>
+                   placeholder="Buscar dirección..." value="{{ search_query|default:'' }}">
+            
+            <button class="btn btn-info text-white" type="submit">Buscar</button>
+            
             {% if search_query %}
-                <a href="{% url 'main_direccion' %}" class="btn btn-outline-danger ms-2">Limpiar</a>
+                <a href="{% url 'main_direccion' %}" class="btn btn-secondary ms-2">Limpiar</a>
             {% endif %}
         </form>
     </div>
 
     <div class="dropdown mb-3">
-        <button class="btn btn-primary dropdown-toggle" type="button" id="ordenarDropdown"
+        <button class="btn btn-info text-white dropdown-toggle" type="button" id="ordenarDropdown"
                 data-bs-toggle="dropdown" aria-expanded="false">
             Ordenar
         </button>
@@ -31,13 +33,13 @@
             <li><h6 class="dropdown-header">Por nombre</h6></li>
             <li>
                 <a class="dropdown-item {% if ordenar == 'alfabetico' %}active{% endif %}"
-                    href="?ordenar=alfabetico&search={{ search_query }}">
+                   href="?ordenar=alfabetico&search={{ search_query }}">
                     Nombre (A → Z)
                 </a>
             </li>
             <li>
                 <a class="dropdown-item {% if ordenar == 'alfabetico_desc' %}active{% endif %}"
-                    href="?ordenar=alfabetico_desc&search={{ search_query }}">
+                   href="?ordenar=alfabetico_desc&search={{ search_query }}">
                     Nombre (Z → A)
                 </a>
             </li>
@@ -45,13 +47,13 @@
             <li><h6 class="dropdown-header">Por ID</h6></li>
             <li>
                 <a class="dropdown-item {% if ordenar == 'id_asc' %}active{% endif %}"
-                    href="?ordenar=id_asc&search={{ search_query }}">
+                   href="?ordenar=id_asc&search={{ search_query }}">
                     ID (menor → mayor)
                 </a>
             </li>
             <li>
                 <a class="dropdown-item {% if ordenar == 'id_desc' %}active{% endif %}"
-                    href="?ordenar=id_desc&search={{ search_query }}">
+                   href="?ordenar=id_desc&search={{ search_query }}">
                     ID (mayor → menor)
                 </a>
             </li>
@@ -94,12 +96,14 @@
                         </span>
                     </td>
                     <td>
-                        <a href="{% url 'ver_direccion' direccion.id_direccion %}" class="btn btn-sm btn-info me-1">Ver</a>
-                        <a href="{% url 'editar_direccion' direccion.id_direccion %}" class="btn btn-sm btn-primary me-1">Editar</a>
-                        <a href="{% url 'bloquear_desbloquear_direccion' direccion.id_direccion %}" class="btn btn-sm btn-{% if direccion.state == 'Activo' %}danger{% else %}success{% endif %}">
+                        <a href="{% url 'ver_direccion' direccion.id_direccion %}" class="btn btn-sm btn-info text-white me-1">Ver</a>
+                        <a href="{% url 'editar_direccion' direccion.id_direccion %}" class="btn btn-sm btn-info text-white me-1">Editar</a>
+                        
+                        <a href="{% url 'bloquear_desbloquear_direccion' direccion.id_direccion %}" class="btn btn-sm btn-info text-white">
                             {% if direccion.state == True %}Bloquear{% else %}Desbloquear{% endif %}
                         </a>
-                        <a href="{% url 'asignar_encargado' direccion.id_direccion %}" class="btn btn-sm btn-warning mt-1">Asignar Encargado</a>
+                        
+                        <a href="{% url 'asignar_encargado' direccion.id_direccion %}" class="btn btn-sm btn-info text-white mt-1">Asignar Encargado</a>
                     </td>
                 </tr>
                 {% empty %}
@@ -116,8 +120,8 @@
         <ul class="pagination justify-content-center">
             {% if direccion_listado.has_previous %}
                 <li class="page-item">
-                    <a class="page-link"
-                        href="?page={{ direccion_listado.previous_page_number }}&search={{ search_query }}&ordenar={{ ordenar }}">
+                    <a class="page-link text-info"
+                       href="?page={{ direccion_listado.previous_page_number }}&search={{ search_query }}&ordenar={{ ordenar }}">
                         Anterior
                     </a>
                 </li>
@@ -127,11 +131,11 @@
 
             {% for i in direccion_listado.paginator.page_range %}
                 {% if direccion_listado.number == i %}
-                    <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                    <li class="page-item active"><span class="page-link bg-info border-info text-white">{{ i }}</span></li>
                 {% else %}
                     <li class="page-item">
-                        <a class="page-link"
-                            href="?page={{ i }}&search={{ search_query }}&ordenar={{ ordenar }}">
+                        <a class="page-link text-info"
+                           href="?page={{ i }}&search={{ search_query }}&ordenar={{ ordenar }}">
                             {{ i }}
                         </a>
                     </li>
@@ -140,8 +144,8 @@
 
             {% if direccion_listado.has_next %}
                 <li class="page-item">
-                    <a class="page-link"
-                        href="?page={{ direccion_listado.next_page_number }}&search={{ search_query }}&ordenar={{ ordenar }}">
+                    <a class="page-link text-info"
+                       href="?page={{ direccion_listado.next_page_number }}&search={{ search_query }}&ordenar={{ ordenar }}">
                         Siguiente
                     </a>
                 </li>

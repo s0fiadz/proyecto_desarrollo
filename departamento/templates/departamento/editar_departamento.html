@@ -3,39 +3,43 @@
 {% block content %}
 
 <div class="container mt-4">
-  <h2>Editar Departamento</h2>
+    <h2 class="mb-3">Editar Departamento</h2>
+    <hr>
 
-  {% if messages %}
-    {% for message in messages %}
-      <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
-    {% endfor %}
-  {% endif %}
-
-  <form method="post" action="{% url 'editar_departamento' departamento.id %}" autocomplete="off">
-    {% csrf_token %}
-
-    <div class="mb-3">
-      <label for="nombre_dpto" class="form-label">Nombre</label>
-      <input type="text" class="form-control" id="nombre_dpto" name="nombre_dpto" value="{{ departamento.nombre_dpto }}" required>
-    </div>
-
-    <div class="mb-3">
-      <label for="direccion_id" class="form-label">Dirección</label>
-      <select class="form-select" id="direccion_id" name="direccion" required>
-        <option value="">Seleccione una dirección</option>
-
-        {% for dir in direcciones %}
-          <option value="{{ dir.id_direccion }}"
-            {% if departamento.direccion.id_direccion == dir.id_direccion %}selected{% endif %}>
-            {{ dir.nombre_direccion }}
-          </option>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
         {% endfor %}
-      </select>
-    </div>
+    {% endif %}
 
-    <button type="submit" class="btn btn-primary">Guardar cambios</button>
-    <a href="{% url 'main_departamento' %}" class="btn btn-secondary ms-2">Cancelar</a>
-  </form>
+    <form method="post" action="{% url 'editar_departamento' departamento.id %}" autocomplete="off" class="card p-4 shadow-sm">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label for="nombre_dpto" class="form-label fw-bold">Nombre</label>
+            <input type="text" class="form-control" id="nombre_dpto" name="nombre_dpto" value="{{ departamento.nombre_dpto }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="direccion_id" class="form-label fw-bold">Dirección</label>
+            <select class="form-select" id="direccion_id" name="direccion" required>
+                <option value="">Seleccione una dirección</option>
+
+                {% for dir in direcciones %}
+                    <option value="{{ dir.id_direccion }}"
+                        {% if departamento.direccion.id_direccion == dir.id_direccion %}selected{% endif %}>
+                        {{ dir.nombre_direccion }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mt-3">
+            <button type="submit" class="btn btn-info text-white">Guardar cambios</button>
+            
+            <a href="{% url 'main_departamento' %}" class="btn btn-secondary ms-2">Cancelar</a>
+        </div>
+    </form>
 </div>
 
 {% endblock %}

@@ -60,14 +60,14 @@
             <form method="GET" class="d-flex" action="{% url 'incidencia:main_territorial' %}">
             <input type="search" name="search" class="form-control me-2"
                     placeholder="Buscar incidencia..." value="{{ search_query|default:'' }}">
-            <button class="btn buttoms" type="submit">Buscar</button>
+            
+            <button class="btn btn-info text-white" type="submit">Buscar</button>
+            
             {% if search_query %}
-                <a href="{% url 'incidencia:main_territorial' %}" class="btn btn-outline-danger ms-2">Limpiar</a>
+                <a href="{% url 'incidencia:main_territorial' %}" class="btn btn-secondary ms-2">Limpiar</a>
             {% endif %}
             </form>
         </div>
-
-
     </div>
 
     <form id="filterForm" method="GET" style="display: none;">
@@ -119,11 +119,11 @@
                     <td>{{ incidencia.fecha_creacion|date:"d/m/Y" }}</td>
                     <td>
                         <a href="{% url 'incidencia:incidencia_view' incidencia.id_incidencia %}" 
-                            class="btn btn-sm btn-info me-1">Ver</a>
+                            class="btn btn-sm btn-info text-white me-1">Ver</a>
 
                         {% if incidencia.estado == 'finalizada' %}
                             <a href="{% url 'incidencia:ver_evidencia_territorial' incidencia.id_incidencia %}" 
-                                class="btn btn-sm btn-success">
+                                class="btn btn-sm btn-info text-white">
                                 Ver Evidencia
                             </a>
                         {% endif %}
@@ -143,7 +143,7 @@
         <ul class="pagination justify-content-center">
             {% if incidencias_listado.has_previous %}
                 <li class="page-item">
-                    <a class="page-link"
+                    <a class="page-link text-info"
                         href="?page={{ incidencias_listado.previous_page_number }}&search={{ search_query }}&estado={{ estado }}&prioridad={{ prioridad }}&ordenar={{ ordenar }}">
                         Anterior
                     </a>
@@ -154,10 +154,10 @@
 
             {% for i in incidencias_listado.paginator.page_range %}
                 {% if incidencias_listado.number == i %}
-                    <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                    <li class="page-item active"><span class="page-link bg-info border-info text-white">{{ i }}</span></li>
                 {% else %}
                     <li class="page-item">
-                        <a class="page-link"
+                        <a class="page-link text-info"
                             href="?page={{ i }}&search={{ search_query }}&estado={{ estado }}&prioridad={{ prioridad }}&ordenar={{ ordenar }}">
                             {{ i }}
                         </a>
@@ -167,7 +167,7 @@
 
             {% if incidencias_listado.has_next %}
                 <li class="page-item">
-                    <a class="page-link"
+                    <a class="page-link text-info"
                         href="?page={{ incidencias_listado.next_page_number }}&search={{ search_query }}&estado={{ estado }}&prioridad={{ prioridad }}&ordenar={{ ordenar }}">
                         Siguiente
                     </a>

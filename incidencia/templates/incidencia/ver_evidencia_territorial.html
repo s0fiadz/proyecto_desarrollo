@@ -13,7 +13,6 @@
     <h2 class="mb-3 text-center">Evidencia de Incidencia #{{ incidencia.id_incidencia }}</h2>
     <hr>
 
-    <!-- Detalles de la incidencia -->
     <div class="card shadow-sm mb-4">
         <div class="card-body">
             <h5 class="card-title">Detalles de la Incidencia</h5>
@@ -24,7 +23,6 @@
         </div>
     </div>
 
-    <!-- Evidencias -->
     <h5 class="mb-3">Evidencias Subidas por la Cuadrilla</h5>
 
     {% if evidencia %}
@@ -37,8 +35,10 @@
                                 {% if ".jpg" in name or ".jpeg" in name or ".png" in name or ".gif" in name or ".webp" in name %}
                                     <img src="{{ reg.evidencia.url }}" class="card-img-top" alt="Evidencia">
                                 {% else %}
-                                    <div class="p-3">
-                                        <a href="{{ reg.evidencia.url }}" target="_blank">Ver archivo adjunto</a>
+                                    <div class="p-3 text-center">
+                                        <a href="{{ reg.evidencia.url }}" target="_blank" class="btn btn-sm btn-info text-white">
+                                            Ver archivo adjunto
+                                        </a>
                                     </div>
                                 {% endif %}
                             {% endwith %}
@@ -62,19 +62,17 @@
         <p class="text-muted">No hay evidencia registrada para esta incidencia.</p>
     {% endif %}
 
-    <!-- Botones de acción del territorial -->
     {% if incidencia.estado == "finalizada" %}
         <div class="text-center mt-4">
-            <a href="{% url 'incidencia:evaluar_evidencia' incidencia.id_incidencia 'cerrar' %}" class="btn btn-success me-2">
-                ✅ Cerrar incidencia
+            <a href="{% url 'incidencia:evaluar_evidencia' incidencia.id_incidencia 'cerrar' %}" class="btn btn-info text-white me-2">
+                Cerrar incidencia
             </a>
-            <a href="{% url 'incidencia:evaluar_evidencia' incidencia.id_incidencia 'proceso' %}" class="btn btn-warning">
-                🔄 Devolver a proceso
+            <a href="{% url 'incidencia:evaluar_evidencia' incidencia.id_incidencia 'proceso' %}" class="btn btn-info text-white">
+                Devolver a proceso
             </a>
         </div>
     {% endif %}
 
-    <!-- Botón volver -->
     <div class="text-center mt-4">
         <a href="{% url 'incidencia:incidencia_list' %}" class="btn btn-secondary">Volver a la lista</a>
     </div>

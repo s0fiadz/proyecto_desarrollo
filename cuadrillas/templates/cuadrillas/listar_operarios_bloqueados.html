@@ -2,12 +2,13 @@
 
 {% block content %}
 
-<h4>Operarios Bloqueados</h4>
-<hr>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold"><i class="bi bi-lock-fill me-2"></i>Operarios Bloqueados</h4>
 
-<a href="{% url 'main_operario' %}" class="btn btn-secondary mb-3">
-    ← Volver a Operarios
-</a>
+    <a href="{% url 'main_operario' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Volver a Operarios
+    </a>
+</div>
 
 {% if messages %}
     {% for message in messages %}
@@ -17,47 +18,53 @@
     {% endfor %}
 {% endif %}
 
-<table class="table table-bordered table-striped mt-3">
-    <thead class="table-light">
-        <tr>
-            <th>Nombre de Usuario</th>
-            <th>Nombre</th>
-            <th>Apellido</th>
-            <th>Cargo</th>
-            <th>Email</th>
-            <th>Cuadrilla</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
+<div class="card shadow-sm mt-3">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle">
+                <thead class="table-dark text-center">
+                    <tr>
+                        <th>Nombre de Usuario</th>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Cargo</th>
+                        <th>Email</th>
+                        <th>Cuadrilla</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
 
-    <tbody>
-        {% for operario in operarios_bloqueados %}
-        <tr>
-            <td>{{ operario.usuario.username }}</td>
-            <td>{{ operario.usuario.first_name }}</td>
-            <td>{{ operario.usuario.last_name }}</td>
-            <td>{{ operario.cargo }}</td>
-            <td>{{ operario.usuario.email }}</td>
-            <td>
-                {% if operario.cuadrilla %}
-                    {{ operario.cuadrilla.nombre_cuadrilla }}
-                {% else %}
-                    <span class="text-muted">Sin cuadrilla</span>
-                {% endif %}
-            </td>
-            <td>
-                <a href="{% url 'desbloquear_operario' operario.usuario.id %}" 
-                   class="btn btn-success btn-sm">
-                    Desbloquear
-                </a>
-            </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="7" class="text-center">No hay operarios bloqueados</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+                <tbody>
+                    {% for operario in operarios_bloqueados %}
+                    <tr>
+                        <td>{{ operario.usuario.username }}</td>
+                        <td>{{ operario.usuario.first_name }}</td>
+                        <td>{{ operario.usuario.last_name }}</td>
+                        <td>{{ operario.cargo }}</td>
+                        <td>{{ operario.usuario.email }}</td>
+                        <td>
+                            {% if operario.cuadrilla %}
+                                {{ operario.cuadrilla.nombre_cuadrilla }}
+                            {% else %}
+                                <span class="text-muted">Sin cuadrilla</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <a href="{% url 'desbloquear_operario' operario.usuario.id %}" 
+                               class="btn btn-info text-white btn-sm">
+                                <i class="bi bi-unlock-fill"></i> Desbloquear
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">No hay operarios bloqueados</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
 {% endblock %}

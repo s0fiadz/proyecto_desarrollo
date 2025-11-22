@@ -18,27 +18,39 @@
             margin: 0;
         }
 
-        /*botones personalizados*/
+        /* :::::::: 1. COLOR CELESTE UNIFICADO :::::::: */
+        :root {
+            --color-celeste: #0dcaf0;       /* El color principal */
+            --color-celeste-dark: #0aa2c0;  /* Para hovers */
+            --color-sidebar-bg: #17a2b8;    /* Un celeste un poco más sólido para el fondo de la barra */
+        }
+
+        /* :::::::: 2. BOTONES PERSONALIZADOS (.buttoms) :::::::: */
         .buttoms {
             width: 250px;
-            background-color: #0a99c4;
+            background-color: var(--color-celeste);
+            border-color: var(--color-celeste);
             color: white;
+            font-weight: 500;
+            border: 1px solid transparent;
+            transition: color .15s ease-in-out,background-color .15s ease-in-out;
         }
         .buttoms:hover {
-            background-color: #1e2a3a;
+            background-color: var(--color-celeste-dark);
             color: #fff;
         }
         .buttoms:focus,
         .buttoms:active {
-            background-color: #0a99c4 !important;
-            color: #fff!important;
-            box-shadow: 0 0 0 0.25rem rgba(93, 164, 245, 0.5) !important;
+            background-color: var(--color-celeste-dark) !important;
+            color: #fff !important;
+            box-shadow: 0 0 0 0.25rem rgba(13, 202, 240, 0.5) !important;
         }
 
-        /* Sidebar */
+        /* :::::::: 3. SIDEBAR (Barra Lateral) :::::::: */
         .sidebar {
             width: 250px;
-            background-color: #0a99c4;
+            /* Usamos un tono celeste/turquesa sólido para que el texto blanco resalte */
+            background-color: var(--color-sidebar-bg); 
             color: white;
             padding: 1.5rem 1rem;
             display: flex;
@@ -46,6 +58,7 @@
             position: fixed;
             top: 0;
             bottom: 0;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
         }
         .sidebar a {
             color: #f8f9fa;
@@ -58,17 +71,20 @@
             transition: all 0.2s;
         }
         .sidebar a:hover {
-            background-color: #1e2a3a;
+            /* Efecto hover en celeste oscuro */
+            background-color: rgba(255, 255, 255, 0.2); 
             color: #fff;
         }
         .sidebar a.active {
-            background-color: #0d6efd;
-            color: #fff;
+            background-color: white;
+            color: var(--color-sidebar-bg); /* Texto celeste cuando está activo */
+            font-weight: bold;
         }
         .sidebar h4 {
             color: #fff;
             margin-bottom: 1.5rem;
             text-align: center;
+            font-weight: bold;
         }
 
         /* Contenido + Footer */
@@ -86,38 +102,55 @@
         }
 
         footer {
-            background-color: #0b1221;
+            background-color: #343a40; /* Gris oscuro neutro */
             color: white;
             text-align: center;
             padding: 1rem 0;
-            border-top: 1px solid #1e2a3a;
+            border-top: 1px solid #dee2e6;
             width: 100%;
         }
 
         footer a {
-            color: #0dcaf0;
+            color: var(--color-celeste); /* Enlaces del footer en celeste */
             text-decoration: none;
             margin: 0 5px;
         }
 
         footer a:hover {
+            color: #fff;
             text-decoration: underline;
         }
 
-
+        /* Ajuste extra para unificar cualquier btn-primary/success que se haya escapado en bloques hijos */
+        .btn-primary, .btn-success, .btn-warning {
+            background-color: var(--color-celeste) !important;
+            border-color: var(--color-celeste) !important;
+            color: white !important;
+        }
+        .btn-primary:hover, .btn-success:hover, .btn-warning:hover {
+            background-color: var(--color-celeste-dark) !important;
+            border-color: var(--color-celeste-dark) !important;
+        }
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
     <div class="sidebar">
         <h4><i class="bi bi-speedometer2 me-2"></i>Panel Territorial</h4>
+        
         <a href="{% url 'incidencia:incidencia_create' %}">
-            <i class="bi bi-list-check"></i> Nueva Incidencia
+            <i class="bi bi-plus-circle"></i> Nueva Incidencia
         </a>
-        <hr class="text-secondary mt-4">
+        <a href="{% url 'incidencia:main_territorial' %}">
+             <i class="bi bi-list-check"></i> Mis Incidencias
+        </a>
+
+        <hr class="text-white-50 mt-4">
+        
         <form action="{% url 'logout' %}" method="post" style="display:inline;" class="mt-auto px-3">
                 {% csrf_token %}
-                <button type="submit" class="btn text-white p-0">Cerrar sesión</button>
+                <button type="submit" class="btn btn-outline-light w-100 btn-sm">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                </button>
         </form>
     </div> 
 

@@ -1,104 +1,44 @@
 {% extends "core/base.html" %}
 
-{% block extra_styles %}
-<style>
-    .container {
-        max-width: 700px !important;
-        margin: 40px auto !important;
-        padding: 30px !important;
-        background: #fff !important;
-        border-radius: 10px !important;
-        box-shadow: 0 3px 10px rgba(0,0,0,0.15) !important;
-    }
-
-    h2 {
-        margin-bottom: 25px !important;
-        font-size: 26px !important;
-        font-weight: bold !important;
-    }
-
-    label {
-        display: block !important;
-        margin-bottom: 10px !important;
-        font-weight: bold !important;
-        font-size: 15px !important;
-    }
-
-    select {
-        width: 100% !important;
-        padding: 10px !important;
-        border-radius: 6px !important;
-        border: 1px solid #ccc !important;
-        font-size: 15px !important;
-    }
-
-    .form-group {
-        margin-bottom: 25px !important;
-    }
-
-    .btn {
-        padding: 10px 20px !important;
-        border: none !important;
-        border-radius: 6px !important;
-        cursor: pointer !important;
-        text-decoration: none !important;
-        display: inline-block !important;
-        margin-right: 10px !important;
-    }
-
-    .btn-primary {
-        background: #007bff !important;
-        color: #fff !important;
-    }
-
-    .btn-secondary {
-        background: #6c757d !important;
-        color: #fff !important;
-    }
-
-    .alert {
-        margin-top: 15px !important;
-        padding: 12px !important;
-        border-radius: 6px !important;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="container">
+<div class="container mt-4" style="max-width: 700px;">
 
-    <h2>Asignar Jefe a la Cuadrilla "{{ cuadrilla.nombre_cuadrilla }}"</h2>
+    <h2 class="mb-3">Asignar Jefe a la Cuadrilla "{{ cuadrilla.nombre_cuadrilla }}"</h2>
+    <hr>
 
     {% if messages %}
-      {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">
-          {{ message }}
-        </div>
-      {% endfor %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mb-4">
+                {{ message }}
+            </div>
+        {% endfor %}
     {% endif %}
 
-    <form method="post">
+    <form method="post" class="card p-4 shadow-sm">
         {% csrf_token %}
 
-        <div class="form-group">
-            <label for="jefe_id">Seleccione un Jefe:</label>
-            <select name="jefe_id" id="jefe_id" required>
+        <div class="mb-3">
+            <label for="jefe_id" class="form-label fw-bold">Seleccione un Jefe:</label>
+            <select name="jefe_id" id="jefe_id" class="form-select" required>
                 <option value="" disabled selected>-- Seleccione --</option>
 
                 {% for jefe in jefes_disponibles %}
-                  <option value="{{ jefe.id }}"
-                    {% if cuadrilla.jefe_cuadrilla and cuadrilla.jefe_cuadrilla.id == jefe.id %}selected{% endif %}
-                  >
-                    {{ jefe.usuario.first_name }} {{ jefe.usuario.last_name }} ({{ jefe.cargo }})
-                  </option>
+                    <option value="{{ jefe.id }}"
+                        {% if cuadrilla.jefe_cuadrilla and cuadrilla.jefe_cuadrilla.id == jefe.id %}selected{% endif %}
+                    >
+                        {{ jefe.usuario.first_name }} {{ jefe.usuario.last_name }} ({{ jefe.cargo }})
+                    </option>
                 {% empty %}
-                  <option disabled>No hay miembros con cargo "Jefe de Cuadrilla"</option>
+                    <option disabled>No hay miembros con cargo "Jefe de Cuadrilla"</option>
                 {% endfor %}
             </select>
         </div>
 
-        <button type="submit" class="btn btn-primary">Asignar Jefe</button>
-        <a href="{% url 'main_cuadrilla' %}" class="btn btn-secondary">Volver</a>
+        <div class="mt-4">
+            <button type="submit" class="btn btn-info text-white">Asignar Jefe</button>
+            
+            <a href="{% url 'main_cuadrilla' %}" class="btn btn-secondary ms-2">Volver</a>
+        </div>
     </form>
 
 </div>

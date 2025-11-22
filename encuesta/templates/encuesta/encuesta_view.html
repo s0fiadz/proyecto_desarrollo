@@ -1,89 +1,50 @@
 {% extends "core/base.html" %}
 
-{% block extra_styles %}
-<style>
-    .container {
-        max-width: 700px !important;
-        margin: 40px auto !important;
-        background: #fff !important;
-        padding: 25px !important;
-        border-radius: 10px !important;
-        box-shadow: 0 3px 12px rgba(0,0,0,0.15) !important;
-    }
-
-    h4 {
-        margin-bottom: 25px !important;
-        font-size: 26px !important;
-        font-weight: bold !important;
-        text-align: center !important;
-    }
-
-    .card {
-        border: 1px solid #ddd !important;
-        border-radius: 10px !important;
-        padding: 20px !important;
-        margin-bottom: 25px !important;
-    }
-
-    .card p {
-        margin-bottom: 8px !important;
-        font-size: 15px !important;
-    }
-
-    ol li {
-        margin-bottom: 6px !important;
-    }
-
-    .btn-back {
-        display: inline-block !important;
-        padding: 10px 18px !important;
-        background: #6c757d !important;
-        color: #fff !important;
-        border-radius: 6px !important;
-        text-decoration: none !important;
-    }
-
-    .btn-back:hover {
-        background: #5a6268 !important;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="container">
+<div class="container mt-4" style="max-width: 700px;">
 
-    <h4>Detalles de la Encuesta</h4>
+    <h4 class="mb-4 text-center fw-bold">Detalles de la Encuesta</h4>
 
-    <div class="card">
-        <p><strong>ID:</strong> {{ encuesta.id_encuesta }}</p>
-        <p><strong>Título:</strong> {{ encuesta.titulo }}</p>
-        <p><strong>Tipo de Incidencia:</strong> {{ encuesta.id_tipo_incidencia.nombre }}</p>
-        <p><strong>Descripción:</strong> {{ encuesta.descripcion }}</p>
-        <p>
-            <strong>Estado:</strong>
-            {% if encuesta.activo %}
-                Activo
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title text-primary-emphasis border-bottom pb-2 mb-3">Información General</h5>
+            
+            <p><strong>ID:</strong> {{ encuesta.id_encuesta }}</p>
+            <p><strong>Título:</strong> {{ encuesta.titulo }}</p>
+            <p><strong>Tipo de Incidencia:</strong> {{ encuesta.id_tipo_incidencia.nombre }}</p>
+            <p><strong>Descripción:</strong> {{ encuesta.descripcion|default:"Sin descripción" }}</p>
+            
+            <p><strong>Estado:</strong>
+                {% if encuesta.activo %}
+                    <span class="badge bg-success">Activo</span>
+                {% else %}
+                    <span class="badge bg-danger">Bloqueado</span>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title text-primary-emphasis border-bottom pb-2 mb-3">Preguntas Asociadas</h5>
+
+            {% if preguntas %}
+                <ol class="list-group list-group-numbered list-group-flush">
+                    {% for pregunta in preguntas %}
+                        <li class="list-group-item">{{ pregunta.pregunta }}</li>
+                    {% endfor %}
+                </ol>
             {% else %}
-                Bloqueado
+                <div class="alert alert-secondary mb-0">
+                    No hay preguntas definidas para esta encuesta.
+                </div>
             {% endif %}
-        </p>
+        </div>
     </div>
 
-    <div class="card">
-        <h5 style="margin-bottom: 15px;">Preguntas</h5>
-
-        {% if preguntas %}
-            <ol>
-                {% for pregunta in preguntas %}
-                    <li>{{ pregunta.pregunta }}</li>
-                {% endfor %}
-            </ol>
-        {% else %}
-            <p class="text-muted">No hay preguntas definidas para esta encuesta.</p>
-        {% endif %}
+    <div class="mb-5">
+        <a href="{% url 'encuesta_list' %}" class="btn btn-secondary">Volver a Encuestas</a>
     </div>
-
-    <a href="{% url 'encuesta_list' %}" class="btn-back">Volver a Encuestas</a>
 
 </div>
 {% endblock %}

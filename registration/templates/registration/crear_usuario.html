@@ -15,7 +15,6 @@
     {% endfor %}
 {% endif %}
 
-<!-- FORMULARIO INDIVIDUAL -->
 <form method="POST">
     {% csrf_token %}
 
@@ -30,13 +29,12 @@
         {{ profile_form.as_p }}
     </fieldset>
 
-    <button type="submit" class="btn btn-success">Crear usuario</button>
+    <button type="submit" class="btn btn-info text-white">Crear usuario</button>
     <a href="{% url 'main_usuario' %}" class="btn btn-secondary">Cancelar</a>
 </form>
 
 <hr class="mt-5">
 
-<!-- FORMULARIO DE CARGA MASIVA -->
 <h3>Crear múltiples usuarios</h3>
 <p>Pega aquí varias líneas con el formato:</p>
 
@@ -62,7 +60,7 @@ Juan,Perez,juanperez@gmail.com,1
 Maria,Gonzalez,marig@gmail.com,2
 Pedro,Ruiz,pedro.ruiz@empresa.cl,3"></textarea>
 
-    <button type="submit" name="crear_multiples" class="btn btn-primary mt-3">
+    <button type="submit" name="crear_multiples" class="btn btn-info text-white mt-3">
         Crear usuarios masivamente
     </button>
 </form>
