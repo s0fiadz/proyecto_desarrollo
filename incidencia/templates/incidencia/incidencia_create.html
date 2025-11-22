@@ -1,169 +1,139 @@
+{% extends 'incidencia/base_territorial.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Crear Incidencia</title>
-    <style>
-        body {
-            background-color: #f8f9fa;
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            margin: 0;
-            padding-top: 40px;
-        }
 
-        .form-container {
-            background: #fff;
-            padding: 30px 40px;
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            width: 500px;
-        }
-
-        h4 {
-            text-align: center;
-            color: #007bff;
-            margin-bottom: 20px;
-        }
-
-        form p {
-            margin-bottom: 15px;
-        }
-
-        input[type="text"],
-        input[type="email"],
-        textarea,
-        select {
-            width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            font-size: 14px;
-        }
-
-        textarea {
-            min-height: 60px;
-        }
-
-        input[type="submit"] {
-            width: 100%;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        input[type="submit"]:hover {
-            background-color: #0056b3;
-        }
-
-        small {
-            color: #666;
-        }
-
-        .volver {
-            display: block;
-            text-align: center;
-            margin-top: 15px;
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        .volver:hover {
-            text-decoration: underline;
-        }
-
-        hr {
-            border: none;
-            border-top: 1px solid #ccc;
-            margin: 25px 0;
-        }
-
-        strong {
-            color: #444;
-        }
-    </style>
-</head>
-<body>
-
-<div class="form-container">
-    <h4>Crear Incidencia</h4>
+{% block content %}
+<div class="container mt-4" style="max-width: 800px;">
+    
+    <h4 class="mb-4 text-center fw-bold">Crear Nueva Incidencia</h4>
 
     {% if error %}
-    <p style="color: red; text-align: center;"><strong>Error:</strong> {{ error }}</p>
+        <div class="alert alert-danger text-center">
+            <strong>Error:</strong> {{ error }}
+        </div>
     {% endif %}
 
-    <form method="post" action="{% url 'incidencia:incidencia_create' %}" enctype="multipart/form-data">
-        {% csrf_token %}
-        
-        <p><strong>Datos de la Incidencia:</strong></p>
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            
+            <form method="post" action="{% url 'incidencia:incidencia_create' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <h5 class="text-primary-emphasis border-bottom pb-2 mb-3">Datos de la Incidencia</h5>
 
-        <p>
-            <select name="departamento" required>
-                <option value="">Seleccione un departamento</option>
-                {% for dpto in departamentos %}
-                    <option value="{{ dpto.id }}">{{ dpto.nombre_dpto }}</option>
-                {% endfor %}
-            </select>
-        </p>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Departamento</label>
+                        <select name="departamento" class="form-select" required>
+                            <option value="">Seleccione un departamento</option>
+                            {% for dpto in departamentos %}
+                                <option value="{{ dpto.id }}">{{ dpto.nombre_dpto }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-        <p>
-            <select name="id_encuesta" id="id_encuesta" required onchange="cargarPreguntas()">
-                <option value="">Seleccione una encuesta</option>
-                {% for encuesta in encuestas %}
-                <option value="{{ encuesta.id_encuesta }}">{{ encuesta.titulo }}</option>
-                {% endfor %}
-            </select>
-        </p>
-        
-        <p><textarea name="descripcion" placeholder="Descripción de la incidencia" required></textarea></p>
-        <p><input type="text" name="direccion_incidente" placeholder="Dirección del incidente" required /></p>
-        <p><input type="text" name="lateral" placeholder="Lateral (opcional)" /></p>
-        <p><input type="text" name="longitud" placeholder="Longitud (opcional)" /></p>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Encuesta Asociada</label>
+                        <select name="id_encuesta" id="id_encuesta" class="form-select" required onchange="cargarPreguntas()">
+                            <option value="">Seleccione una encuesta</option>
+                            {% for encuesta in encuestas %}
+                            <option value="{{ encuesta.id_encuesta }}">{{ encuesta.titulo }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Descripción</label>
+                    <textarea name="descripcion" class="form-control" rows="3" placeholder="Descripción de la incidencia" required></textarea>
+                </div>
 
-        <p>
-            <select name="prioridad" required>
-                <option value="">Seleccione prioridad</option>
-                <option value="baja">Baja</option>
-                <option value="media" selected>Media</option>
-                <option value="alta">Alta</option>
-                <option value="urgente">Urgente</option>
-            </select>
-        </p>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Dirección del Incidente</label>
+                    <input type="text" name="direccion_incidente" class="form-control" placeholder="Dirección del incidente" required />
+                </div>
 
-        <hr>
-        <p><strong>Datos del Vecino:</strong></p>
-        
-        <p><input type="text" name="nombre_vecino" placeholder="Nombre del vecino" required /></p>
-        <p><input type="text" name="apellido_vecino" placeholder="Apellido del vecino" required /></p>
-        <p><input type="email" name="correo_vecino" placeholder="Correo (opcional)" /></p>
-        <p><input type="text" name="direccion_vecino" placeholder="Dirección del vecino" required /></p>
-        <p><input type="text" name="rat" placeholder="RAT (opcional)" /></p>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label fw-bold">Lateral</label>
+                        <input type="text" name="lateral" class="form-control" placeholder="Opcional" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label fw-bold">Longitud</label>
+                        <input type="text" name="longitud" class="form-control" placeholder="Opcional" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label fw-bold">Prioridad</label>
+                        <select name="prioridad" class="form-select" required>
+                            <option value="">Seleccione</option>
+                            <option value="baja">Baja</option>
+                            <option value="media" selected>Media</option>
+                            <option value="alta">Alta</option>
+                            <option value="urgente">Urgente</option>
+                        </select>
+                    </div>
+                </div>
 
-        <hr>
-        <p><strong>Preguntas de la Encuesta:</strong></p>
-        <div id="preguntas-container">
-            <p>Seleccione una encuesta para cargar las preguntas</p>
+                <h5 class="text-primary-emphasis border-bottom pb-2 mb-3 mt-4">Datos del Vecino</h5>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Nombre</label>
+                        <input type="text" name="nombre_vecino" class="form-control" required />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Apellido</label>
+                        <input type="text" name="apellido_vecino" class="form-control" required />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Correo</label>
+                        <input type="email" name="correo_vecino" class="form-control" placeholder="Opcional" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">RAT</label>
+                        <input type="text" name="rat" class="form-control" placeholder="Opcional" />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Dirección del Vecino</label>
+                    <input type="text" name="direccion_vecino" class="form-control" required />
+                </div>
+
+                <h5 class="text-primary-emphasis border-bottom pb-2 mb-3 mt-4">Preguntas de la Encuesta</h5>
+                
+                <div id="preguntas-container" class="p-3 bg-light rounded border mb-3">
+                    <p class="text-muted text-center mb-0">Seleccione una encuesta arriba para cargar las preguntas.</p>
+                </div>
+
+                <h5 class="text-primary-emphasis border-bottom pb-2 mb-3 mt-4">Archivos Multimedia</h5>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Adjuntar Evidencia</label>
+                    <input type="file" name="archivos_multimedia" class="form-control" multiple />
+                    <div class="form-text">Puede seleccionar múltiples archivos (Imágenes, PDF, etc).</div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Descripción de Archivos</label>
+                    <textarea name="descripcion_archivo" class="form-control" rows="2" placeholder="Opcional"></textarea>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-info text-white btn-lg">Crear Incidencia</button>
+                </div>
+            </form>
+
         </div>
-        <hr>
-        <p><strong>Archivos Multimedia:</strong></p>
-        <p>
-            <input type="file" name="archivos_multimedia" multiple />
-            <br>
-            <small>Puede seleccionar múltiples archivos</small>
-        </p>
-        <p><textarea name="descripcion_archivo" placeholder="Descripción de los archivos (opcional)"></textarea></p>
-        <p><input type="submit" value="Crear Incidencia"/></p>
-    </form>
+    </div>
 
-    <a href="{% url 'incidencia:main_territorial' %}" class="volver">← Volver al listado de incidencias</a>
+    <div class="text-center mt-4 mb-5">
+        <a href="{% url 'incidencia:main_territorial' %}" class="btn btn-secondary">
+            Volver al listado de incidencias
+        </a>
+    </div>
 </div>
 
 <script>
@@ -172,33 +142,36 @@ function cargarPreguntas() {
     const container = document.getElementById('preguntas-container');
     
     if (!encuestaId) {
-        container.innerHTML = '<p>Seleccione una encuesta para cargar las preguntas</p>';
+        container.innerHTML = '<p class="text-muted text-center mb-0">Seleccione una encuesta para cargar las preguntas</p>';
         return;
     }
     
+    // Se añade un spinner o texto de carga
+    container.innerHTML = '<p class="text-center text-muted">Cargando preguntas...</p>';
+
     fetch(`{% url 'incidencia:get_preguntas' %}?id_encuesta=${encuestaId}`)
         .then(response => response.json())
         .then(data => {
             if (data.length > 0) {
                 let html = '';
                 data.forEach(pregunta => {
+                    // Generamos HTML con clases de Bootstrap para que se vea integrado
                     html += `
-                        <p>
-                            <strong>${pregunta.pregunta}</strong><br>
-                            <textarea name="respuesta_${pregunta.id_preguntas}" placeholder="Ingrese su respuesta" required></textarea>
-                        </p>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">${pregunta.pregunta}</label>
+                            <textarea name="respuesta_${pregunta.id_preguntas}" class="form-control" rows="2" placeholder="Ingrese su respuesta" required></textarea>
+                        </div>
                     `;
                 });
                 container.innerHTML = html;
             } else {
-                container.innerHTML = '<p>Esta encuesta no tiene preguntas definidas</p>';
+                container.innerHTML = '<div class="alert alert-warning">Esta encuesta no tiene preguntas definidas.</div>';
             }
         })
         .catch(() => {
-            container.innerHTML = '<p>Error al cargar las preguntas</p>';
+            container.innerHTML = '<div class="alert alert-danger">Error al cargar las preguntas. Intente nuevamente.</div>';
         });
 }
 </script>
 
-</body>
-</html>
+{% endblock %}

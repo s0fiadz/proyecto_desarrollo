@@ -6,11 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cambiar Estado de Incidencia</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 <div class="container mt-4">
-    <div class="card">
-        <div class="card-header">
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
             <h3 class="card-title mb-0">Cambiar Estado - Incidencia #{{ incidencia.id_incidencia }}</h3>
         </div>
         <div class="card-body">
@@ -26,8 +27,8 @@
                     {% if incidencia.estado == 'abierta' %}bg-primary
                     {% elif incidencia.estado == 'finalizada' %}bg-success
                     {% elif incidencia.estado == 'rechazada' %}bg-danger
-                    {% elif incidencia.estado == 'proceso' %}bg-warning
-                    {% elif incidencia.estado == 'derivada' %}bg-info
+                    {% elif incidencia.estado == 'proceso' %}bg-warning text-dark
+                    {% elif incidencia.estado == 'derivada' %}bg-info text-dark
                     {% else %}bg-secondary{% endif %}">
                     {{ incidencia.get_estado_display }}
                 </span>
@@ -47,9 +48,10 @@
                 </div>
                 
                 <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-info text-white">
                         <i class="fas fa-save"></i> Guardar Cambios
                     </button>
+                    
                     <a href="{% url 'incidencia_list_derivar' %}" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Volver al Listado
                     </a>
@@ -58,8 +60,7 @@
         </div>
     </div>
 
-    <!-- Información adicional -->
-    <div class="card mt-4">
+    <div class="card mt-4 shadow-sm">
         <div class="card-body">
             <h6 class="card-title">Información sobre los estados</h6>
             <ul class="small text-muted mb-0">

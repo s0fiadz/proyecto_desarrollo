@@ -35,10 +35,11 @@
 
         <div class="d-flex justify-content-between">
             {% if accion == 'cerrar' %}
-                <button type="submit" class="btn btn-success">Confirmar Cierre</button>
+                <button type="submit" class="btn btn-info text-white">Confirmar Cierre</button>
             {% elif accion == 'proceso' %}
-                <button type="submit" class="btn btn-warning">Rechazar Evidencia (Volver a Proceso)</button>
+                <button type="submit" class="btn btn-info text-white">Rechazar Evidencia (Volver a Proceso)</button>
             {% endif %}
+            
             <a href="{% url 'incidencia:ver_evidencia_territorial' incidencia.id_incidencia %}" class="btn btn-secondary">Cancelar</a>
         </div>
     </form>

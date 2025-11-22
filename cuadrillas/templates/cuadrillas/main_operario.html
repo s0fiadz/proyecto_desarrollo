@@ -1,80 +1,85 @@
 {% extends 'core/base.html' %}
 
 {% block content %}
+<div class="container mt-4">
 
-<h4>Gestión de Operarios</h4>
-<hr>
+    <h2 class="mb-3">Gestión de Operarios</h2>
+    <hr>
 
-<a href="{% url 'listar_operarios_bloqueados' %}" class="btn btn-warning mb-2">
-    Ver Operarios Bloqueados
-</a>
+    <div class="d-flex justify-content-between mb-4">
+        <a href="{% url 'listar_operarios_bloqueados' %}" class="btn btn-info text-white">
+            Ver Operarios Bloqueados
+        </a>
 
-<br>
+        <a href="{% url 'main_cuadrilla' %}" class="btn btn-secondary">
+            Volver a Gestión de Cuadrillas
+        </a>
+    </div>
 
-<a href="{% url 'main_cuadrilla' %}" class="btn btn-secondary mb-4">
-    Volver a Gestión de Cuadrillas
-</a>
-
-{% if messages %}
-    {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} mt-2">
-            {{ message }}
-        </div>
-    {% endfor %}
-{% endif %}
-
-<hr>
-
-<table class="table table-bordered table-striped mt-3">
-    <thead class="table-light">
-        <tr>
-            <th>Nombre de Usuario</th>
-            <th>Nombre</th>
-            <th>Apellido</th>
-            <th>Cargo</th>
-            <th>Email</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        {% for operario in operario_listado %}
-        <tr>
-            <td>{{ operario.usuario.username }}</td>
-            <td>{{ operario.usuario.first_name }}</td>
-            <td>{{ operario.usuario.last_name }}</td>
-            <td>{{ operario.cargo }}</td>
-            <td>{{ operario.usuario.email }}</td>
-            <td>
-                {% if operario.usuario.is_active %}
-                    <span class="badge bg-success">Activo</span>
-                {% else %}
-                    <span class="badge bg-danger">Bloqueado</span>
-                {% endif %}
-            </td>
-            <td>
-                <a href="{% url 'ver_operario' operario.usuario.id %}" class="btn btn-info btn-sm">Ver</a>
-
-                <a href="{% url 'bloquear_operario' operario.usuario_id %}" 
-                   class="btn btn-danger btn-sm">
-                   Bloquear
-                </a>
-
-                <a href="{% url 'cambiar_cargo' operario.id %}" 
-                   class="btn btn-primary btn-sm">
-                   Cambiar cargo
-                </a>
-
-                {% if operario.cargo == 'Jefe de Cuadrilla' %}
-                    <span class="badge bg-primary">Jefe de Cuadrilla</span>
-                {% else %}
-                    <span class="badge bg-secondary">Operario</span>
-                {% endif %}
-            </td>
-        </tr>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mt-2">
+                {{ message }}
+            </div>
         {% endfor %}
-    </tbody>
-</table>
+    {% endif %}
 
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle mt-3">
+            <thead class="table-dark">
+                <tr>
+                    <th>Nombre de Usuario</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Cargo</th>
+                    <th>Email</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for operario in operario_listado %}
+                <tr>
+                    <td>{{ operario.usuario.username }}</td>
+                    <td>{{ operario.usuario.first_name }}</td>
+                    <td>{{ operario.usuario.last_name }}</td>
+                    <td>{{ operario.cargo }}</td>
+                    <td>{{ operario.usuario.email }}</td>
+                    <td>
+                        {% if operario.usuario.is_active %}
+                            <span class="badge bg-success">Activo</span>
+                        {% else %}
+                            <span class="badge bg-danger">Bloqueado</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <a href="{% url 'ver_operario' operario.usuario.id %}" class="btn btn-info text-white">Ver</a>
+
+                            <a href="{% url 'bloquear_operario' operario.usuario_id %}" 
+                               class="btn btn-info text-white">
+                               Bloquear
+                            </a>
+
+                            <a href="{% url 'cambiar_cargo' operario.id %}" 
+                               class="btn btn-info text-white">
+                               Cambiar cargo
+                            </a>
+                        </div>
+
+                        {% if operario.cargo == 'Jefe de Cuadrilla' %}
+                            <span class="badge bg-primary ms-1">Jefe</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center">No hay operarios registrados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}

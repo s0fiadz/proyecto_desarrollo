@@ -7,7 +7,6 @@
 
     <h4 class="mb-4">Ver Incidencia</h4>
 
-    <!-- Datos de la incidencia -->
     <div class="card mb-4">
         <div class="card-body">
             <h5 class="card-title">Información de la Incidencia</h5>
@@ -22,7 +21,6 @@
         </div>
     </div>
 
-    <!-- Datos del vecino -->
     <div class="card mb-4">
         <div class="card-body">
             <h5 class="card-title">Datos del Vecino</h5>
@@ -33,7 +31,6 @@
         </div>
     </div>
 
-    <!-- Respuestas -->
     <div class="card mb-4">
         <div class="card-body">
             <h5 class="card-title">Respuestas a la Encuesta</h5>
@@ -51,7 +48,6 @@
         </div>
     </div>
 
-    <!-- Evidencias territoriales -->
     <h5 class="mb-3">Evidencias subidas por el Territorial</h5>
 
     {% if archivos %}
@@ -63,8 +59,10 @@
                             {% if ".jpg" in name or ".jpeg" in name or ".png" in name or ".gif" in name or ".webp" in name %}
                                 <img src="{{ archivo.archivo.url }}" class="card-img-top" alt="Evidencia territorial">
                             {% else %}
-                                <div class="p-3">
-                                    <a href="{{ archivo.archivo.url }}" target="_blank">Ver archivo adjunto</a>
+                                <div class="p-3 text-center">
+                                    <a href="{{ archivo.archivo.url }}" target="_blank" class="btn btn-sm btn-info text-white">
+                                        Ver archivo adjunto
+                                    </a>
                                 </div>
                             {% endif %}
                         {% endwith %}
@@ -82,7 +80,6 @@
 
     <hr class="my-4">
 
-    <!-- Evidencias cuadrilla -->
     <h5 class="mb-3">Evidencias subidas por la Cuadrilla</h5>
 
     {% if evidencia %}
@@ -95,8 +92,10 @@
                                 {% if ".jpg" in name or ".jpeg" in name or ".png" in name or ".gif" in name or ".webp" in name %}
                                     <img src="{{ reg.evidencia.url }}" class="card-img-top" alt="Evidencia">
                                 {% else %}
-                                    <div class="p-3">
-                                        <a href="{{ reg.evidencia.url }}" target="_blank">Ver archivo adjunto</a>
+                                    <div class="p-3 text-center">
+                                        <a href="{{ reg.evidencia.url }}" target="_blank" class="btn btn-sm btn-info text-white">
+                                            Ver archivo adjunto
+                                        </a>
                                     </div>
                                 {% endif %}
                             {% endwith %}

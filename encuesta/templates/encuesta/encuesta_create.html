@@ -51,13 +51,14 @@
         </div>
     </div>
 
-    <button type="button" class="btn btn-secondary mt-2" onclick="agregarPregunta()">
+    <button type="button" class="btn btn-info text-white mt-2" onclick="agregarPregunta()">
         + Agregar otra pregunta
     </button>
 
     <div class="mt-4">
-        <button type="submit" class="btn btn-primary">Crear Encuesta</button>
-        <a href="{% url 'encuesta_list' %}" class="btn btn-outline-secondary">Volver a Encuestas</a>
+        <button type="submit" class="btn btn-info text-white">Crear Encuesta</button>
+        
+        <a href="{% url 'encuesta_list' %}" class="btn btn-secondary ms-2">Volver a Encuestas</a>
     </div>
 </form>
 

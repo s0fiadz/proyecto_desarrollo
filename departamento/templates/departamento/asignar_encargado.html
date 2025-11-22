@@ -2,23 +2,29 @@
 
 {% block content %}
 
-<h2 class="mb-4">Asignar Encargado al Departamento: {{ departamento.nombre_dpto }}</h2>
+<div class="container mt-4">
+    <h2 class="mb-3">Asignar Encargado al Departamento: {{ departamento.nombre_dpto }}</h2>
+    <hr>
 
-<form method="post" action="{% url 'asignar_encargado' id_departamento=departamento.id %}" class="mb-3">
-    {% csrf_token %}
+    <form method="post" action="{% url 'asignar_encargado' id_departamento=departamento.id %}" class="card p-4 shadow-sm">
+        {% csrf_token %}
 
-    <div class="mb-3">
-        <label for="usuario" class="form-label">Seleccione un usuario:</label>
-        <select name="usuario" id="usuario" class="form-select" required>
-            <option value="">-- Seleccione --</option>
-            {% for u in usuarios %}
-                <option value="{{ u.id }}">{{ u.username }}</option>
-            {% endfor %}
-        </select>
-    </div>
+        <div class="mb-3">
+            <label for="usuario" class="form-label fw-bold">Seleccione un usuario:</label>
+            <select name="usuario" id="usuario" class="form-select" required>
+                <option value="">-- Seleccione --</option>
+                {% for u in usuarios %}
+                    <option value="{{ u.id }}">{{ u.username }}</option>
+                {% endfor %}
+            </select>
+        </div>
 
-    <button type="submit" class="btn btn-primary">Asignar</button>
-    <a href="{% url 'main_departamento' %}" class="btn btn-secondary ms-2">Volver a la lista</a>
-</form>
+        <div class="mt-3">
+            <button type="submit" class="btn btn-info text-white">Asignar</button>
+            
+            <a href="{% url 'main_departamento' %}" class="btn btn-secondary ms-2">Volver a la lista</a>
+        </div>
+    </form>
+</div>
 
 {% endblock %}

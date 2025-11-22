@@ -9,12 +9,12 @@
     <hr>
 
     <div class="mb-3">
-        <a href="{% url 'crear_usuario' %}" class="btn btn-success mb-2">Nuevo Usuario</a>
-        <a href="{% url 'main_usuario_bloqueados' %}" class="btn btn-warning mb-2">Ver usuarios bloqueados</a>
+        <a href="{% url 'crear_usuario' %}" class="btn btn-info text-white mb-2">Nuevo Usuario</a>
+        <a href="{% url 'main_usuario_bloqueados' %}" class="btn btn-info text-white mb-2">Ver usuarios bloqueados</a>
     </div>
 
     <div class="dropdown mb-3">
-        <button class="btn btn-primary dropdown-toggle" type="button" id="filtroDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        <button class="btn btn-info text-white dropdown-toggle" type="button" id="filtroDropdown" data-bs-toggle="dropdown" aria-expanded="false">
             Filtrar y Ordenar
         </button>
         <ul class="dropdown-menu" aria-labelledby="filtroDropdown">
@@ -65,9 +65,9 @@
                         {% endif %}
                     </td>
                     <td>
-                        <a href="{% url 'ver_usuario' usuario.id %}" class="btn btn-info btn-sm">Ver</a>
-                        <a href="{% url 'editar_usuario' usuario.id %}" class="btn btn-warning btn-sm">Editar</a>
-                        <a href="{% url 'bloquear_desbloquear_usuario' usuario.id %}" class="btn btn-danger btn-sm">Bloquear</a>
+                        <a href="{% url 'ver_usuario' usuario.id %}" class="btn btn-info text-white btn-sm">Ver</a>
+                        <a href="{% url 'editar_usuario' usuario.id %}" class="btn btn-info text-white btn-sm">Editar</a>
+                        <a href="{% url 'bloquear_desbloquear_usuario' usuario.id %}" class="btn btn-info text-white btn-sm">Bloquear</a>
                     </td>
                 </tr>
             {% empty %}
@@ -83,7 +83,7 @@
             <ul class="pagination justify-content-center">
                 {% if page_obj.has_previous %}
                     <li class="page-item">
-                        <a class="page-link" href="?{{ query_params }}&page={{ page_obj.previous_page_number }}">&laquo;</a>
+                        <a class="page-link text-info" href="?{{ query_params }}&page={{ page_obj.previous_page_number }}">&laquo;</a>
                     </li>
                 {% else %}
                     <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
@@ -91,15 +91,15 @@
 
                 {% for i in page_obj.paginator.page_range %}
                     {% if page_obj.number == i %}
-                        <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                        <li class="page-item active"><span class="page-link bg-info border-info text-white">{{ i }}</span></li>
                     {% else %}
-                        <li class="page-item"><a class="page-link" href="?{{ query_params }}&page={{ i }}">{{ i }}</a></li>
+                        <li class="page-item"><a class="page-link text-info" href="?{{ query_params }}&page={{ i }}">{{ i }}</a></li>
                     {% endif %}
                 {% endfor %}
 
                 {% if page_obj.has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="?{{ query_params }}&page={{ page_obj.next_page_number }}">&raquo;</a>
+                        <a class="page-link text-info" href="?{{ query_params }}&page={{ page_obj.next_page_number }}">&raquo;</a>
                     </li>
                 {% else %}
                     <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
